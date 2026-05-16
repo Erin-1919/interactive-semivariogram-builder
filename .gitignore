@@ -1,0 +1,7 @@
+verify_*.png
+.DS_Store
+__pycache__/
+*.pyc
+.vscode/
+.idea/
+.claude/

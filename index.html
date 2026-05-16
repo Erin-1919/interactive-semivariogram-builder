@@ -1,0 +1,1217 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Interactive Semivariogram Builder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Manrope:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* Scholarly palette — warm cream + deep navy ink + teal-blue accent */
+    --paper: #f5f1e8;
+    --paper-soft: #fbf8f0;
+    --paper-deep: #eae3d2;
+    --ink: #1a2332;
+    --ink-soft: #3a4658;
+    --ink-mute: #6a7585;
+    --rule: #c9c3b3;
+    --rule-soft: #ddd7c5;
+    --accent: #1e4d6b;
+    --accent-deep: #143a52;
+    --accent-pale: #d4e3eb;
+    --sage: #5d7a5b;
+    --unknown: #8a8474;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Manrope', sans-serif;
+    font-size: 17px;
+    line-height: 1.55;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse at top left, rgba(30, 77, 107, 0.05), transparent 60%),
+      radial-gradient(ellipse at bottom right, rgba(93, 122, 91, 0.04), transparent 60%);
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.3;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/><feColorMatrix values='0 0 0 0 0.1 0 0 0 0 0.12 0 0 0 0 0.18 0 0 0 0.08 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  }
+  .app { position: relative; z-index: 2; }
+
+  h1.title {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 58px;
+    margin: 0;
+    letter-spacing: -0.02em;
+  }
+  h1.title em { font-style: italic; color: var(--accent); }
+
+  /* GRID */
+  .grid-svg-frame {
+    background: var(--paper-soft);
+    border: 1px solid var(--rule);
+    padding: 18px;
+    display: inline-block;
+  }
+  .grid-svg { display: block; }
+  .cell-rect {
+    fill: var(--paper);
+    stroke: var(--rule);
+    stroke-width: 0.5;
+    transition: fill 0.12s, stroke 0.12s;
+  }
+  .cell-rect.unknown { fill: url(#unknownPattern); }
+  .cell-rect.in-pair {
+    fill: var(--accent-pale);
+    stroke: var(--accent);
+    stroke-width: 1.2;
+  }
+  .cell-rect.is-hovered {
+    fill: var(--accent);
+    stroke: var(--accent-deep);
+    stroke-width: 1.5;
+  }
+  .cell-group { transition: opacity 0.1s; }
+  .cell-group.faded { opacity: 0.18; }
+  .cell-group.interactive { cursor: pointer; }
+  .cell-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 20px;
+    font-weight: 500;
+    fill: var(--ink);
+    text-anchor: middle;
+    dominant-baseline: central;
+    user-select: none;
+    pointer-events: none;
+  }
+  .cell-value.unknown {
+    fill: var(--unknown);
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 28px;
+  }
+  .cell-value.on-hovered { fill: var(--paper-soft); font-weight: 600; }
+  .pair-line {
+    stroke: var(--accent);
+    stroke-width: 1.6;
+    opacity: 0.6;
+    fill: none;
+    stroke-linecap: round;
+    pointer-events: none;
+  }
+  .pair-dot { fill: var(--accent); pointer-events: none; }
+
+  /* MASTHEAD */
+  header.masthead {
+    padding: 36px 48px 26px;
+    border-bottom: 1px solid var(--rule);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 32px;
+  }
+  .masthead .eyebrow {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 17px;
+    color: var(--accent);
+    margin-bottom: 8px;
+    letter-spacing: 0.01em;
+  }
+  .masthead .meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    color: var(--ink-mute);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    text-align: right;
+    line-height: 1.9;
+  }
+  .masthead .meta .rule-line {
+    display: inline-block; width: 80px; height: 1px;
+    background: var(--rule); margin-bottom: 6px;
+  }
+
+  /* MAIN GRID */
+  main.workbench {
+    display: grid;
+    grid-template-columns: minmax(320px, 0.85fr) minmax(640px, 1.5fr) minmax(420px, 1fr);
+    min-height: calc(100vh - 130px);
+  }
+  .panel {
+    padding: 34px 38px;
+    border-right: 1px solid var(--rule);
+    position: relative;
+  }
+  .panel:last-child { border-right: none; }
+  .panel-header {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 26px;
+    padding-bottom: 16px;
+    border-bottom: 1px dashed var(--rule-soft);
+  }
+  .panel-num {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 17px;
+    color: var(--accent);
+  }
+  .panel-title {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 30px;
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+  .panel-sub {
+    font-family: 'Manrope', sans-serif;
+    font-size: 14px;
+    color: var(--ink-mute);
+    margin-left: auto;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  /* CONTROLS */
+  .control-block { margin-bottom: 26px; }
+  .control-label {
+    display: block;
+    font-family: 'Manrope', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ink-soft);
+    margin-bottom: 12px;
+  }
+  select.preset {
+    appearance: none;
+    width: 100%;
+    background: var(--paper-soft);
+    border: 1px solid var(--rule);
+    padding: 14px 40px 14px 16px;
+    font-family: 'Manrope', sans-serif;
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--ink);
+    cursor: pointer;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path d='M1 1l5 5 5-5' stroke='%231a2332' stroke-width='1.5' fill='none' stroke-linecap='round'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+  }
+  select.preset:focus { outline: none; border-color: var(--accent); }
+
+  .toggle-group {
+    display: flex;
+    border: 1px solid var(--rule);
+    background: var(--paper-soft);
+  }
+  .toggle-btn {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding: 12px 10px;
+    font-family: 'Manrope', sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--ink-soft);
+    cursor: pointer;
+    border-right: 1px solid var(--rule);
+  }
+  .toggle-btn:last-child { border-right: none; }
+  .toggle-btn.active { background: var(--ink); color: var(--paper); }
+
+  .legend {
+    display: flex;
+    gap: 18px;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+    font-size: 14px;
+    color: var(--ink-mute);
+  }
+  .legend-item { display: flex; align-items: center; gap: 8px; }
+  .swatch { width: 16px; height: 16px; border: 1px solid var(--rule); display: inline-block; }
+  .swatch.known { background: var(--paper); }
+  .swatch.pair { background: var(--accent-pale); border-color: var(--accent); }
+  .swatch.unknown-sw {
+    background-image: repeating-linear-gradient(45deg,
+      var(--unknown), var(--unknown) 2px, transparent 2px, transparent 5px);
+    background-color: var(--paper-deep);
+  }
+
+  .preset-blurb {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 15px;
+    color: var(--ink-mute);
+    margin-top: 10px;
+    line-height: 1.5;
+  }
+
+  input[type=checkbox].model-toggle {
+    appearance: none;
+    width: 20px; height: 20px;
+    border: 1px solid var(--rule);
+    background: var(--paper-soft);
+    margin-right: 10px;
+    vertical-align: middle;
+    cursor: pointer;
+    position: relative;
+  }
+  input[type=checkbox].model-toggle:checked {
+    background: var(--accent); border-color: var(--accent);
+  }
+  input[type=checkbox].model-toggle:checked::after {
+    content: '✓';
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--paper-soft); font-size: 15px;
+  }
+  .model-toggle-label {
+    font-family: 'Manrope', sans-serif;
+    font-size: 16px;
+    color: var(--ink);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  /* LAG CHIPS */
+  .lag-strip {
+    display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0;
+  }
+  .lag-chip {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 15px;
+    font-weight: 500;
+    background: var(--paper-soft);
+    border: 1px solid var(--rule);
+    color: var(--ink-soft);
+    padding: 9px 14px;
+    cursor: pointer;
+    letter-spacing: 0.02em;
+  }
+  .lag-chip:hover { border-color: var(--ink-mute); }
+  .lag-chip.active {
+    background: var(--accent); color: var(--paper-soft); border-color: var(--accent);
+  }
+  .lag-chip.upcoming { opacity: 0.4; }
+  .lag-chip .n-badge { margin-left: 8px; font-size: 13px; opacity: 0.75; }
+
+  /* STEP BUTTONS */
+  .step-controls { display: flex; gap: 10px; flex-wrap: wrap; }
+  .step-btn {
+    font-family: 'Manrope', sans-serif;
+    font-size: 16px; font-weight: 500;
+    background: var(--paper-soft);
+    border: 1px solid var(--rule);
+    color: var(--ink);
+    padding: 11px 18px;
+    cursor: pointer;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .step-btn:hover:not(:disabled) {
+    background: var(--ink); color: var(--paper); border-color: var(--ink);
+  }
+  .step-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+  .step-btn.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .step-btn.primary:hover:not(:disabled) { background: var(--accent); border-color: var(--accent); }
+
+  /* PLOT */
+  .formula {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 22px;
+    text-align: center;
+    padding: 18px;
+    color: var(--ink);
+    background: var(--paper-deep);
+    margin-bottom: 18px;
+  }
+  .formula .accent { color: var(--accent); font-weight: 500; }
+
+  .plot-frame {
+    background: var(--paper-soft);
+    border: 1px solid var(--rule);
+    padding: 16px 10px 10px;
+    margin-bottom: 22px;
+  }
+  .plot-svg { display: block; width: 100%; height: auto; }
+  .axis-line { stroke: var(--ink); stroke-width: 0.9; }
+  .axis-tick { stroke: var(--ink-mute); stroke-width: 0.6; }
+  .axis-text {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    fill: var(--ink-mute);
+  }
+  .axis-label {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 18px;
+    fill: var(--ink);
+  }
+  .gridline { stroke: var(--rule-soft); stroke-width: 0.5; stroke-dasharray: 2 3; }
+  .plot-point {
+    fill: var(--ink);
+    stroke: var(--paper-soft);
+    stroke-width: 1.4;
+  }
+  .plot-point.selected { fill: var(--accent); }
+  .plot-point-ring {
+    fill: none; stroke: var(--accent); stroke-width: 1.3; opacity: 0.5;
+  }
+  .plot-connector {
+    stroke: var(--ink-mute);
+    stroke-width: 0.8;
+    fill: none;
+    stroke-dasharray: 1 4;
+  }
+  .selected-value-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    fill: var(--accent);
+    font-weight: 600;
+  }
+  .model-curve {
+    stroke: var(--sage);
+    stroke-width: 1.6;
+    fill: none;
+    stroke-dasharray: 5 4;
+    opacity: 0.85;
+  }
+  .model-label {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 14px;
+    fill: var(--sage);
+  }
+
+  /* SUMMARY */
+  .summary-box {
+    border: 1px solid var(--rule);
+    background: var(--paper-soft);
+    padding: 20px 22px;
+    margin-bottom: 22px;
+    border-left: 4px solid var(--accent);
+  }
+  .summary-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 8px 0;
+    border-bottom: 1px dotted var(--rule);
+    font-size: 17px;
+  }
+  .summary-line:last-of-type { border-bottom: none; }
+  .summary-line .label {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    color: var(--ink-soft);
+  }
+  .summary-line .val {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+    color: var(--ink);
+  }
+  .summary-line .val.big {
+    font-size: 24px;
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .pair-table {
+    margin-top: 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 16px;
+    border-top: 1px dashed var(--rule);
+    padding-top: 14px;
+  }
+  .pair-table-header {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    padding: 6px 0;
+    font-family: 'Manrope', sans-serif;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-mute);
+    border-bottom: 1px solid var(--rule-soft);
+    margin-bottom: 8px;
+  }
+  .pair-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    padding: 4px 0;
+    color: var(--ink-soft);
+  }
+  .pair-row .sq { color: var(--accent); font-weight: 500; }
+  .more-note {
+    margin-top: 10px;
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 15px;
+    color: var(--ink-mute);
+  }
+  .empty-summary {
+    border: 1px dashed var(--rule);
+    padding: 26px;
+    color: var(--ink-mute);
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    text-align: center;
+    margin-bottom: 22px;
+    font-size: 17px;
+  }
+  .hover-hint {
+    margin-top: 6px;
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 15px;
+    color: var(--ink-mute);
+    text-align: center;
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 1280px) {
+    main.workbench { grid-template-columns: 1fr; }
+    .panel { border-right: none; border-bottom: 1px solid var(--rule); }
+    header.masthead { padding: 26px 32px 20px; flex-direction: column; align-items: flex-start; }
+    .masthead .meta { text-align: left; }
+  }
+  @media (min-width: 1700px) {
+    body { font-size: 18px; }
+    h1.title { font-size: 64px; }
+    .panel { padding: 40px 46px; }
+    .panel-title { font-size: 32px; }
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+<script type="text/babel" data-presets="env,react">
+const { useState, useMemo, useEffect, useCallback } = React;
+
+// ------------------------------------------------------------------
+// DATASETS — 10x10 grids generated to produce instructive semivariogram shapes.
+// `null` marks an unsampled cell (`?`).
+// ------------------------------------------------------------------
+const DATASETS = {
+  smooth: {
+    label: 'Smooth spatial pattern',
+    blurb: 'Short-range autocorrelation — γ(h) rises then plateaus near the sill.',
+    grid: [
+      [ 24,  23,  21,  19,  18,  20,  22,  25,  31,  34],
+      [ 27,  26,  23,  21,  20,  23,  25,  27,  30,  32],
+      [ 29,  29,  28,  25,  24, null,  28,  27,  27,  27],
+      [ 28,  29,  29,  27,  26,  27,  27,  26,  25,  24],
+      [ 26,  26,  27,  26,  25,  25,  26,  26,  26,  26],
+      [ 22,  23,  25,  24,  22,  22,  25, null,  23,  24],
+      [ 22,  24,  26,  24,  20,  21,  25,  24,  20,  18],
+      [ 27,  28,  29,  27,  22,  21,  25,  25,  21,  18],
+      [ 32,  33, null,  30,  23,  20,  23,  26,  26,  24],
+      [ 33,  33,  34,  31,  23,  19,  22,  27,  29,  28]
+    ]
+  },
+  random: {
+    label: 'Random noise',
+    blurb: 'No spatial structure — γ(h) is flat near the variance from the very first lag.',
+    grid: [
+      [ 33,  26,  27,  32,  25,  29,  31,  17,  13,  18],
+      [ 18,  32,  32,  12,  23,  30,  15,  30,  14,  22],
+      [ 30,  18,  19,  18,  28,  17,  34,  22,  22,  23],
+      [ 25,  24,  23,  34,  30,  30, null,  26,  19,  34],
+      [ 22,  16,  31,  15,  31,  26,  14,  13, null,  12],
+      [ 15,  23,  34,  22,  30,  33,  30,  26,  22,  23],
+      [ 18,  23,  20,  17,  34,  12,  14,  16,  34,  27],
+      [ 32, null,  28,  20,  23,  12,  26,  31,  27,  15],
+      [ 24,  18,  34,  32,  16,  23,  33,  31,  28,  26],
+      [ 12,  29,  22,  14,  17,  24,  28,  23,  26,  32]
+    ]
+  },
+  clustered: {
+    label: 'Clustered / patchy pattern',
+    blurb: 'Two zones produce a periodic γ(h) — it rises, peaks, then dips ("hole effect").',
+    grid: [
+      [ 30,  30,  30,  29,  28,  15,  15,  14,  14,  14],
+      [ 30,  30,  30,  31,  27,  16,  14,  14,  14,  14],
+      [ 30,  30,  30,  30,  27,  16, null,  14,  14,  16],
+      [ 29,  29,  30,  31,  29,  16,  14,  14,  14,  13],
+      [ 28,  27,  28,  28,  27,  19,  16,  16,  17,  15],
+      [ 16,  16,  15,  16,  17,  26,  27,  28,  28,  28],
+      [ 14,  15,  14, null,  17,  28,  31,  30,  30,  29],
+      [ 12,  13,  14,  14,  15,  28,  30,  30,  30,  30],
+      [ 14,  13,  14,  14,  17,  27,  31,  30, null,  30],
+      [ 14,  14,  13,  14,  16,  27,  29,  29,  30,  30]
+    ]
+  }
+};
+
+// ------------------------------------------------------------------
+// PURE HELPERS — semivariogram math
+//
+//   gamma(h) = 1 / (2 * N(h)) * sum_{pairs at exact distance h} (z_i - z_j)^2
+//
+// Pairs are grouped by their EXACT Euclidean distance, so h = 1 (direct
+// horizontal/vertical neighbours) is distinct from h = sqrt(2) ≈ 1.41
+// (diagonal neighbours). This is the correct treatment on a regular grid.
+// Unknown (null) cells are excluded entirely.
+//
+// Far lags (h > MAX_LAG) are dropped from the visible empirical
+// semivariogram because they have few pairs and become dominated by
+// sampling noise / edge effects — the textbook rule of thumb is to
+// limit empirical γ(h) to about half the maximum extent of the data.
+// ------------------------------------------------------------------
+const MAX_LAG = 5.0; // half-extent of the 10×10 grid
+
+function computePairs(grid, allDirections) {
+  const known = [];
+  for (let r = 0; r < grid.length; r++) {
+    for (let c = 0; c < grid[r].length; c++) {
+      const v = grid[r][c];
+      if (v !== null && v !== undefined) known.push({ r, c, v });
+    }
+  }
+  const pairs = [];
+  for (let i = 0; i < known.length; i++) {
+    for (let j = i + 1; j < known.length; j++) {
+      const a = known[i], b = known[j];
+      const dr = b.r - a.r, dc = b.c - a.c;
+      // Cardinal mode excludes diagonals
+      if (!allDirections && dr !== 0 && dc !== 0) continue;
+      const dist = Math.sqrt(dr * dr + dc * dc);
+      pairs.push({
+        a, b, dist,
+        key: dist.toFixed(6),         // exact distance grouping key
+        label: dist.toFixed(2),        // display label, e.g. "1.41"
+        sqDiff: (a.v - b.v) ** 2
+      });
+    }
+  }
+  return pairs;
+}
+
+function computeSemivariogram(pairs, maxLag) {
+  const groups = new Map();
+  for (const p of pairs) {
+    if (maxLag !== undefined && p.dist > maxLag + 1e-9) continue;
+    if (!groups.has(p.key)) {
+      groups.set(p.key, { h: p.dist, label: p.label, items: [] });
+    }
+    groups.get(p.key).items.push(p);
+  }
+  const lags = Array.from(groups.values()).map(g => {
+    const sumSq = g.items.reduce((s, p) => s + p.sqDiff, 0);
+    return {
+      h: g.h,
+      label: g.label,
+      n: g.items.length,
+      sumSq,
+      gamma: sumSq / (2 * g.items.length),
+      pairs: g.items
+    };
+  });
+  lags.sort((a, b) => a.h - b.h);
+  return lags;
+}
+
+// ------------------------------------------------------------------
+// Inline self-tests — assertions run once on page load and report to
+// the browser console. A failure prints in red so it cannot be missed.
+// ------------------------------------------------------------------
+(function runTests() {
+  const eq = (a, b, msg) => {
+    if (Math.abs(a - b) > 1e-9) console.error('FAIL:', msg, 'got', a, 'want', b);
+    else console.log('ok  ', msg);
+  };
+
+  // Test 1: 2x2 all directions — h=1 (cardinal) is SEPARATE from h=sqrt(2) (diagonal).
+  //   pairs at h=1:    (1,2)sq=1, (1,3)sq=4, (2,4)sq=4, (3,4)sq=1   sumSq=10, N=4, γ=10/8=1.25
+  //   pairs at h=√2:   (1,4)sq=9, (2,3)sq=1                          sumSq=10, N=2, γ=10/4=2.5
+  {
+    const grid = [[1, 2], [3, 4]];
+    const lags = computeSemivariogram(computePairs(grid, true));
+    eq(lags.length, 2, 'T1: two distinct lags');
+    eq(lags[0].n, 4, 'T1: N(h=1) = 4');
+    eq(lags[0].gamma, 1.25, 'T1: gamma(h=1) = 1.25');
+    eq(lags[1].n, 2, 'T1: N(h=√2) = 2');
+    eq(lags[1].gamma, 2.5, 'T1: gamma(h=√2) = 2.5');
+  }
+
+  // Test 2: 2x2 cardinal — diagonal pair excluded entirely.
+  {
+    const grid = [[1, 2], [3, 4]];
+    const lags = computeSemivariogram(computePairs(grid, false));
+    eq(lags.length, 1, 'T2: cardinal — only h=1');
+    eq(lags[0].n, 4, 'T2: N(h=1) = 4');
+    eq(lags[0].gamma, 1.25, 'T2: gamma(h=1) = 1.25');
+  }
+
+  // Test 3: unknown cells excluded.
+  //   grid: [[1, null], [3, 4]]  known: 1, 3, 4
+  //   pairs (all dir): (1,3) h=1 sq=4, (3,4) h=1 sq=1, (1,4) h=√2 sq=9
+  {
+    const grid = [[1, null], [3, 4]];
+    const lags = computeSemivariogram(computePairs(grid, true));
+    eq(lags[0].n, 2, 'T3: N(h=1) = 2 (unknown excluded)');
+    eq(lags[0].sumSq, 4 + 1, 'T3: sumSq(h=1) = 5');
+    eq(lags[1].n, 1, 'T3: N(h=√2) = 1');
+    eq(lags[1].sumSq, 9, 'T3: sumSq(h=√2) = 9');
+  }
+
+  // Test 4: MAX_LAG filter drops far pairs from the visible semivariogram.
+  //   grid 1×6: distances available are 1,2,3,4,5. With maxLag=3 we keep h≤3.
+  {
+    const grid = [[1, 2, 3, 4, 5, 6]];
+    const lags = computeSemivariogram(computePairs(grid, false), 3);
+    eq(lags.length, 3, 'T4: lags capped at h=3');
+    eq(lags[0].h, 1, 'T4: first kept h=1');
+    eq(lags[lags.length - 1].h, 3, 'T4: last kept h=3');
+  }
+
+  console.log('%c[semivariogram tests done]', 'color:#1e4d6b;font-weight:bold');
+})();
+
+// ------------------------------------------------------------------
+// GridView — SVG render of the sample grid with optional pair-line
+// overlay and hover-driven focus filtering.
+// ------------------------------------------------------------------
+function GridView({
+  grid,
+  highlightedPairs,   // all pairs at currently selected lag, or null
+  hoveredCell,        // { r, c } | null
+  onCellHover,        // (cell | null) => void
+  size = 580
+}) {
+  const N = grid.length;
+  const padding = 22;
+  const inner = size - padding * 2;
+  const cellSize = inner / N;
+  const center = (idx) => padding + idx * cellSize + cellSize / 2;
+
+  // When hovering, restrict pair drawing to pairs that touch the hovered cell
+  let drawnPairs = highlightedPairs || [];
+  if (hoveredCell && highlightedPairs) {
+    drawnPairs = highlightedPairs.filter(p =>
+      (p.a.r === hoveredCell.r && p.a.c === hoveredCell.c) ||
+      (p.b.r === hoveredCell.r && p.b.c === hoveredCell.c)
+    );
+  }
+
+  const inDrawn = new Set();
+  drawnPairs.forEach(p => {
+    inDrawn.add(`${p.a.r}-${p.a.c}`);
+    inDrawn.add(`${p.b.r}-${p.b.c}`);
+  });
+
+  const hoverActive = !!hoveredCell;
+
+  return (
+    <svg className="grid-svg" width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+      <defs>
+        <pattern id="unknownPattern" patternUnits="userSpaceOnUse" width="6" height="6" patternTransform="rotate(45)">
+          <rect width="6" height="6" fill="var(--paper-deep)" />
+          <line x1="0" y1="0" x2="0" y2="6" stroke="var(--unknown)" strokeWidth="1.5" />
+        </pattern>
+      </defs>
+
+      {grid.map((row, r) =>
+        row.map((v, c) => {
+          const isUnknown = v === null || v === undefined;
+          const k = `${r}-${c}`;
+          const isHovered = hoverActive && hoveredCell.r === r && hoveredCell.c === c;
+          const isInPair = inDrawn.has(k);
+          const fade = hoverActive && !isHovered && !isInPair;
+          const cellClasses = [
+            'cell-rect',
+            isUnknown ? 'unknown' : '',
+            !isUnknown && isInPair && !isHovered ? 'in-pair' : '',
+            isHovered ? 'is-hovered' : ''
+          ].filter(Boolean).join(' ');
+          return (
+            <g
+              key={k}
+              className={`cell-group ${fade ? 'faded' : ''} ${!isUnknown ? 'interactive' : ''}`}
+              onMouseEnter={!isUnknown ? () => onCellHover && onCellHover({ r, c }) : undefined}
+              onMouseLeave={!isUnknown ? () => onCellHover && onCellHover(null) : undefined}
+            >
+              <rect
+                className={cellClasses}
+                x={padding + c * cellSize}
+                y={padding + r * cellSize}
+                width={cellSize}
+                height={cellSize}
+              />
+              <text
+                className={`cell-value ${isUnknown ? 'unknown' : ''} ${isHovered ? 'on-hovered' : ''}`}
+                x={center(c)}
+                y={center(r)}
+              >
+                {isUnknown ? '?' : v}
+              </text>
+            </g>
+          );
+        })
+      )}
+
+      {drawnPairs.map((p, i) => {
+        const x1 = center(p.a.c), y1 = center(p.a.r);
+        const x2 = center(p.b.c), y2 = center(p.b.r);
+        return (
+          <g key={`pair-${i}`}>
+            <line className="pair-line" x1={x1} y1={y1} x2={x2} y2={y2} />
+            <circle className="pair-dot" cx={x1} cy={y1} r={3} />
+            <circle className="pair-dot" cx={x2} cy={y2} r={3} />
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
+// ------------------------------------------------------------------
+// Spherical model — auto-fit from revealed empirical lags.
+// gamma(h) = c0 + c1 * (1.5*(h/a) - 0.5*(h/a)^3)   for h <= a
+// gamma(h) = c0 + c1                                for h >  a
+// ------------------------------------------------------------------
+function fitSphericalModel(revealedLags) {
+  if (!revealedLags || revealedLags.length < 2) return null;
+  const sorted = [...revealedLags].sort((a, b) => a.h - b.h);
+  const c0 = Math.max(0, sorted[0].gamma);
+  const sill = Math.max(...sorted.map(l => l.gamma));
+  const c1 = Math.max(0.0001, sill - c0);
+  const threshold = c0 + 0.95 * c1;
+  const reached = sorted.find(l => l.gamma >= threshold);
+  const a = reached ? reached.h : sorted[sorted.length - 1].h;
+  return { c0, c1, a, sill: c0 + c1 };
+}
+function sphericalGamma({ c0, c1, a }, h) {
+  if (h >= a) return c0 + c1;
+  const x = h / a;
+  return c0 + c1 * (1.5 * x - 0.5 * x ** 3);
+}
+
+function niceStep(range, targetTicks) {
+  const raw = range / targetTicks;
+  const mag = Math.pow(10, Math.floor(Math.log10(raw)));
+  const norm = raw / mag;
+  let step;
+  if (norm < 1.5) step = 1;
+  else if (norm < 3) step = 2;
+  else if (norm < 7) step = 5;
+  else step = 10;
+  return step * mag;
+}
+
+// ------------------------------------------------------------------
+// SemivariogramPlot — SVG plot with axes, points, optional model.
+// ------------------------------------------------------------------
+function SemivariogramPlot({ lags, selectedIdx, revealedCount, showModel, width = 540, height = 340 }) {
+  const margin = { top: 22, right: 28, bottom: 56, left: 68 };
+  const innerW = width - margin.left - margin.right;
+  const innerH = height - margin.top - margin.bottom;
+  const visibleLags = lags.slice(0, revealedCount);
+
+  // Use the full lag set for axis domains so axes stay stable across reveals
+  const maxH = Math.max(...lags.map(l => l.h), 1);
+  const maxG = Math.max(...lags.map(l => l.gamma), 1);
+  const xScale = (h) => margin.left + (h / (maxH * 1.05)) * innerW;
+  const yScale = (g) => margin.top + innerH - (g / (maxG * 1.1)) * innerH;
+
+  const xTicks = [];
+  for (let t = 0; t <= Math.ceil(maxH * 1.05); t++) xTicks.push(t);
+  const yStep = niceStep(maxG * 1.1, 5);
+  const yTicks = [];
+  for (let t = 0; t <= maxG * 1.1 + 1e-6; t += yStep) yTicks.push(t);
+
+  const model = showModel ? fitSphericalModel(visibleLags) : null;
+  let modelPath = null;
+  if (model) {
+    const samples = 80;
+    const pts = [];
+    for (let i = 0; i <= samples; i++) {
+      const h = (i / samples) * maxH * 1.05;
+      pts.push(`${i === 0 ? 'M' : 'L'} ${xScale(h)} ${yScale(sphericalGamma(model, h))}`);
+    }
+    modelPath = pts.join(' ');
+  }
+
+  return (
+    <svg className="plot-svg" viewBox={`0 0 ${width} ${height}`}>
+      {yTicks.map((t, i) => (
+        <line key={`gy-${i}`} className="gridline"
+          x1={margin.left} x2={margin.left + innerW}
+          y1={yScale(t)} y2={yScale(t)} />
+      ))}
+      <line className="axis-line"
+        x1={margin.left} x2={margin.left + innerW}
+        y1={margin.top + innerH} y2={margin.top + innerH} />
+      <line className="axis-line"
+        x1={margin.left} x2={margin.left}
+        y1={margin.top} y2={margin.top + innerH} />
+
+      {xTicks.map((t, i) => (
+        <g key={`tx-${i}`}>
+          <line className="axis-tick"
+            x1={xScale(t)} x2={xScale(t)}
+            y1={margin.top + innerH} y2={margin.top + innerH + 6} />
+          <text className="axis-text"
+            x={xScale(t)} y={margin.top + innerH + 22}
+            textAnchor="middle">{t}</text>
+        </g>
+      ))}
+      {yTicks.map((t, i) => (
+        <g key={`ty-${i}`}>
+          <line className="axis-tick"
+            x1={margin.left - 6} x2={margin.left}
+            y1={yScale(t)} y2={yScale(t)} />
+          <text className="axis-text"
+            x={margin.left - 10} y={yScale(t)}
+            textAnchor="end" dominantBaseline="central">
+            {t.toFixed(t < 10 ? 1 : 0)}
+          </text>
+        </g>
+      ))}
+
+      <text className="axis-label"
+        x={margin.left + innerW / 2}
+        y={height - 12}
+        textAnchor="middle">lag distance h</text>
+      <text className="axis-label"
+        x={-margin.top - innerH / 2}
+        y={20}
+        transform="rotate(-90)"
+        textAnchor="middle">semivariance γ(h)</text>
+
+      {visibleLags.length > 1 && (
+        <path className="plot-connector"
+          d={visibleLags
+            .map((l, i) => `${i === 0 ? 'M' : 'L'} ${xScale(l.h)} ${yScale(l.gamma)}`)
+            .join(' ')} />
+      )}
+
+      {modelPath && (
+        <g>
+          <path className="model-curve" d={modelPath} />
+          <text className="model-label"
+            x={xScale(maxH * 0.98)}
+            y={yScale(model.sill) - 8}
+            textAnchor="end">
+            spherical: c₀={model.c0.toFixed(1)}, sill={model.sill.toFixed(1)}, a={model.a.toFixed(1)}
+          </text>
+        </g>
+      )}
+
+      {visibleLags.map((l, i) => {
+        const selected = i === selectedIdx;
+        return (
+          <g key={`pt-${i}`}>
+            {selected && (
+              <circle className="plot-point-ring"
+                cx={xScale(l.h)} cy={yScale(l.gamma)} r={13} />
+            )}
+            <circle className={`plot-point ${selected ? 'selected' : ''}`}
+              cx={xScale(l.h)} cy={yScale(l.gamma)} r={selected ? 7 : 5} />
+            {selected && (
+              <text className="selected-value-label"
+                x={xScale(l.h)} y={yScale(l.gamma) - 16}
+                textAnchor="middle">
+                γ = {l.gamma.toFixed(2)}
+              </text>
+            )}
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
+// ------------------------------------------------------------------
+// CalculationSummary — selected-lag report card.
+// ------------------------------------------------------------------
+function CalculationSummary({ lag }) {
+  if (!lag) {
+    return (
+      <div className="empty-summary">
+        Press <strong>Next →</strong> to reveal the first lag.
+      </div>
+    );
+  }
+  const MAX_ROWS = 8;
+  const showRows = lag.pairs.slice(0, MAX_ROWS);
+  const more = lag.pairs.length - showRows.length;
+  return (
+    <div className="summary-box">
+      <div className="summary-line">
+        <span className="label">selected lag distance</span>
+        <span className="val">h = {lag.label}</span>
+      </div>
+      <div className="summary-line">
+        <span className="label">number of valid pairs</span>
+        <span className="val">N(h) = {lag.n}</span>
+      </div>
+      <div className="summary-line">
+        <span className="label">sum of squared differences</span>
+        <span className="val">Σ = {lag.sumSq.toFixed(2)}</span>
+      </div>
+      <div className="summary-line">
+        <span className="label">semivariance</span>
+        <span className="val big">γ(h) = {lag.gamma.toFixed(2)}</span>
+      </div>
+      <div className="pair-table">
+        <div className="pair-table-header">
+          <span>pair (z_i, z_j)</span>
+          <span>diff</span>
+          <span>(diff)²</span>
+        </div>
+        {showRows.map((p, i) => (
+          <div className="pair-row" key={i}>
+            <span>({p.a.v}, {p.b.v})</span>
+            <span>{(p.a.v - p.b.v).toFixed(0)}</span>
+            <span className="sq">{p.sqDiff.toFixed(0)}</span>
+          </div>
+        ))}
+        {more > 0 && (
+          <div className="more-note">
+            showing first {MAX_ROWS} of {lag.pairs.length} pairs
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ------------------------------------------------------------------
+// App
+// ------------------------------------------------------------------
+function App() {
+  const [presetKey, setPresetKey] = useState('smooth');
+  const [allDirections, setAllDirections] = useState(true);
+  const [showModel, setShowModel] = useState(false);
+  const [selectedIdx, setSelectedIdx] = useState(0);
+  const [revealedCount, setRevealedCount] = useState(0);
+  const [hoveredCell, setHoveredCell] = useState(null);
+
+  const preset = DATASETS[presetKey];
+  const grid = preset.grid;
+  const pairs = useMemo(() => computePairs(grid, allDirections), [grid, allDirections]);
+  const lags = useMemo(() => computeSemivariogram(pairs, MAX_LAG), [pairs]);
+
+  // Reset progression when the lag set changes
+  useEffect(() => {
+    setRevealedCount(0);
+    setSelectedIdx(0);
+    setHoveredCell(null);
+  }, [presetKey, allDirections]);
+
+  const selectedLag = revealedCount > 0 ? lags[selectedIdx] : null;
+  const highlightedPairs = selectedLag ? selectedLag.pairs : null;
+
+  const onNext = useCallback(() => {
+    setRevealedCount(rc => {
+      if (rc >= lags.length) return rc;
+      const next = rc + 1;
+      setSelectedIdx(next - 1);
+      return next;
+    });
+  }, [lags.length]);
+
+  const onPrev = useCallback(() => {
+    setRevealedCount(rc => {
+      if (rc <= 0) return rc;
+      const next = rc - 1;
+      setSelectedIdx(Math.max(0, next - 1));
+      return next;
+    });
+  }, []);
+
+  const onReset = useCallback(() => {
+    setRevealedCount(0);
+    setSelectedIdx(0);
+    setHoveredCell(null);
+  }, []);
+
+  const onChipClick = useCallback((i) => {
+    setRevealedCount(rc => Math.max(rc, i + 1));
+    setSelectedIdx(i);
+  }, []);
+
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.target.tagName === 'SELECT' || e.target.tagName === 'INPUT') return;
+      if (e.key === 'ArrowRight') { e.preventDefault(); onNext(); }
+      else if (e.key === 'ArrowLeft') { e.preventDefault(); onPrev(); }
+      else if (e.key === 'Home') { e.preventDefault(); onReset(); }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onNext, onPrev, onReset]);
+
+  return (
+    <div className="app">
+      <header className="masthead">
+        <div>
+          <div className="eyebrow">Ordinary Kriging · Teaching Demonstration</div>
+          <h1 className="title">
+            Interactive <em>Semivariogram</em> Builder
+          </h1>
+        </div>
+        <div className="meta">
+          <div><span className="rule-line"></span></div>
+          <div>10 × 10 sample grid</div>
+          <div>γ(h) at exact lag distances</div>
+          <div>← / → to step lags</div>
+        </div>
+      </header>
+
+      <main className="workbench">
+        {/* §1 — Controls */}
+        <section className="panel">
+          <div className="panel-header">
+            <span className="panel-num">§ 1</span>
+            <h2 className="panel-title">Controls</h2>
+            <span className="panel-sub">{preset.label}</span>
+          </div>
+
+          <div className="control-block">
+            <label className="control-label">Dataset preset</label>
+            <select className="preset" value={presetKey}
+              onChange={e => setPresetKey(e.target.value)}>
+              {Object.entries(DATASETS).map(([k, d]) =>
+                <option key={k} value={k}>{d.label}</option>)}
+            </select>
+            <div className="preset-blurb">{preset.blurb}</div>
+          </div>
+
+          <div className="control-block">
+            <label className="control-label">Direction mode</label>
+            <div className="toggle-group">
+              <button className={`toggle-btn ${!allDirections ? 'active' : ''}`}
+                onClick={() => setAllDirections(false)}>Cardinal only</button>
+              <button className={`toggle-btn ${allDirections ? 'active' : ''}`}
+                onClick={() => setAllDirections(true)}>All directions</button>
+            </div>
+            <div className="preset-blurb">
+              {allDirections
+                ? 'Includes diagonals — realistic omnidirectional semivariogram.'
+                : 'Horizontal and vertical only — mirrors the manual exercise.'}
+            </div>
+          </div>
+
+          <div className="control-block">
+            <label className="model-toggle-label">
+              <input type="checkbox" className="model-toggle"
+                checked={showModel}
+                onChange={e => setShowModel(e.target.checked)} />
+              Show fitted spherical model
+            </label>
+          </div>
+
+          <div className="legend">
+            <span className="legend-item"><span className="swatch known"></span> observed value</span>
+            <span className="legend-item"><span className="swatch pair"></span> paired cell</span>
+            <span className="legend-item"><span className="swatch unknown-sw"></span> unsampled (?)</span>
+          </div>
+        </section>
+
+        {/* §2 — Pairs */}
+        <section className="panel">
+          <div className="panel-header">
+            <span className="panel-num">§ 2</span>
+            <h2 className="panel-title">Point pairs at h</h2>
+            <span className="panel-sub">
+              {selectedLag
+                ? `h = ${selectedLag.label} · N = ${selectedLag.n}${hoveredCell ? ' · isolating one cell' : ''}`
+                : 'press Next to start'}
+            </span>
+          </div>
+
+          <div className="grid-svg-frame" style={{ display: 'flex', justifyContent: 'center' }}>
+            <GridView
+              grid={grid}
+              highlightedPairs={highlightedPairs}
+              hoveredCell={hoveredCell}
+              onCellHover={setHoveredCell}
+              size={580}
+            />
+          </div>
+          {selectedLag && (
+            <div className="hover-hint">
+              Hover any cell to focus on pairs from that point only.
+            </div>
+          )}
+
+          <label className="control-label" style={{ marginTop: 22 }}>
+            Lag distance h — click to reveal up to that lag
+          </label>
+          <div className="lag-strip">
+            {lags.map((l, i) => {
+              const isUpcoming = i >= revealedCount;
+              return (
+                <button key={i}
+                  className={`lag-chip ${i === selectedIdx && !isUpcoming ? 'active' : ''} ${isUpcoming ? 'upcoming' : ''}`}
+                  onClick={() => onChipClick(i)}>
+                  h = {l.label}
+                  <span className="n-badge">N={l.n}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          <label className="control-label">Step through</label>
+          <div className="step-controls">
+            <button className="step-btn" onClick={onPrev} disabled={revealedCount === 0}>← Previous</button>
+            <button className="step-btn primary" onClick={onNext} disabled={revealedCount >= lags.length}>Next →</button>
+            <button className="step-btn" onClick={onReset} disabled={revealedCount === 0}>Reset</button>
+          </div>
+        </section>
+
+        {/* §3 — Plot + summary */}
+        <section className="panel">
+          <div className="panel-header">
+            <span className="panel-num">§ 3</span>
+            <h2 className="panel-title">Empirical semivariogram</h2>
+            <span className="panel-sub">{lags.length} lag distances · h ≤ {MAX_LAG.toFixed(0)}</span>
+          </div>
+
+          <div className="formula">
+            γ(<span className="accent">h</span>) ={' '}
+            1 ⁄ 2N(<span className="accent">h</span>) · Σ [ z(s<sub>i</sub>) − z(s<sub>j</sub>) ]²
+          </div>
+
+          <div className="plot-frame">
+            <SemivariogramPlot
+              lags={lags}
+              selectedIdx={selectedIdx}
+              revealedCount={revealedCount}
+              showModel={showModel}
+            />
+          </div>
+
+          <CalculationSummary lag={selectedLag} />
+        </section>
+      </main>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
