@@ -373,18 +373,6 @@
   .step-btn.primary:hover:not(:disabled) { background: var(--accent); border-color: var(--accent); }
 
   /* PLOT */
-  .formula {
-    font-family: 'Fraunces', serif;
-    font-style: italic;
-    font-size: 22px;
-    text-align: center;
-    padding: 18px;
-    color: var(--ink);
-    background: var(--paper-deep);
-    margin-bottom: 18px;
-  }
-  .formula .accent { color: var(--accent); font-weight: 500; }
-
   .plot-frame {
     background: var(--paper-soft);
     border: 1px solid var(--rule);
@@ -455,90 +443,6 @@
     paint-order: stroke;
     stroke: var(--paper);
     stroke-width: 3;
-  }
-
-  /* SUMMARY */
-  .summary-box {
-    border: 1px solid var(--rule);
-    background: var(--paper-soft);
-    padding: 20px 22px;
-    margin-bottom: 22px;
-    border-left: 4px solid var(--accent);
-  }
-  .summary-line {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    padding: 8px 0;
-    border-bottom: 1px dotted var(--rule);
-    font-size: 17px;
-  }
-  .summary-line:last-of-type { border-bottom: none; }
-  .summary-line .label {
-    font-family: 'Fraunces', serif;
-    font-style: italic;
-    color: var(--ink-soft);
-  }
-  .summary-line .val {
-    font-family: 'JetBrains Mono', monospace;
-    font-weight: 500;
-    color: var(--ink);
-  }
-  .summary-line .val.big {
-    font-size: 24px;
-    color: var(--accent);
-    font-weight: 600;
-  }
-  .pair-table {
-    margin-top: 16px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 16px;
-    border-top: 1px dashed var(--rule);
-    padding-top: 14px;
-  }
-  .pair-table-header {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    padding: 6px 0;
-    font-family: 'Manrope', sans-serif;
-    font-size: 13px;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--ink-mute);
-    border-bottom: 1px solid var(--rule-soft);
-    margin-bottom: 8px;
-  }
-  .pair-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    padding: 4px 0;
-    color: var(--ink-soft);
-  }
-  .pair-row .sq { color: var(--accent); font-weight: 500; }
-  .more-note {
-    margin-top: 10px;
-    font-family: 'Fraunces', serif;
-    font-style: italic;
-    font-size: 15px;
-    color: var(--ink-mute);
-  }
-  .empty-summary {
-    border: 1px dashed var(--rule);
-    padding: 26px;
-    color: var(--ink-mute);
-    font-family: 'Fraunces', serif;
-    font-style: italic;
-    text-align: center;
-    margin-bottom: 22px;
-    font-size: 17px;
-  }
-  .hover-hint {
-    margin-top: 6px;
-    font-family: 'Fraunces', serif;
-    font-style: italic;
-    font-size: 15px;
-    color: var(--ink-mute);
-    text-align: center;
   }
 
   /* STEP BAR */
@@ -846,6 +750,68 @@
     .panel { padding: 40px 46px; }
     .panel-title { font-size: 32px; }
   }
+
+  /* MODE WORKBENCH — used by both ThreeByThreeMode and TenByTenMode */
+  .mode-shell {
+    padding: 28px 40px 36px;
+    display: grid;
+    grid-template-columns: minmax(420px, 1.2fr) minmax(520px, 1.4fr);
+    gap: 32px;
+    align-items: start;
+  }
+  @media (max-width: 1280px) {
+    .mode-shell { grid-template-columns: 1fr; }
+  }
+  .mode-shell .grid-pane { display: flex; flex-direction: column; gap: 16px; }
+  .mode-shell .right-pane { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+
+  .mode-header {
+    padding: 22px 40px 6px;
+    display: flex;
+    align-items: baseline;
+    gap: 18px;
+    flex-wrap: wrap;
+  }
+  .mode-header .blurb {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    color: var(--ink-mute);
+    font-size: 16px;
+  }
+  .mode-header .extras { margin-left: auto; display: flex; gap: 14px; align-items: center; }
+
+  .model-radio { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .model-radio label {
+    font-family: 'Manrope', sans-serif;
+    font-size: 14px;
+    color: var(--ink-soft);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+  }
+  .model-radio input[type=radio] { accent-color: var(--accent); }
+
+  .whatif-footer {
+    padding: 12px 40px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid var(--rule-soft);
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    color: var(--ink-mute);
+  }
+  .whatif-footer button {
+    font-family: 'Manrope', sans-serif;
+    font-style: normal;
+    background: var(--paper-soft);
+    border: 1px solid var(--rule);
+    color: var(--ink);
+    padding: 8px 14px;
+    cursor: pointer;
+  }
+  .whatif-footer button:hover { background: var(--accent-pale); border-color: var(--accent); }
 </style>
 </head>
 <body>
@@ -1543,61 +1509,6 @@ function SemivariogramPlot({ lags, selectedIdx, revealedCount, modelName = 'none
 }
 
 // ------------------------------------------------------------------
-// CalculationSummary — selected-lag report card.
-// ------------------------------------------------------------------
-function CalculationSummary({ lag }) {
-  if (!lag) {
-    return (
-      <div className="empty-summary">
-        Press <strong>Next →</strong> to reveal the first lag.
-      </div>
-    );
-  }
-  const MAX_ROWS = 8;
-  const showRows = lag.pairs.slice(0, MAX_ROWS);
-  const more = lag.pairs.length - showRows.length;
-  return (
-    <div className="summary-box">
-      <div className="summary-line">
-        <span className="label">selected lag distance</span>
-        <span className="val">h = {lag.label}</span>
-      </div>
-      <div className="summary-line">
-        <span className="label">number of valid pairs</span>
-        <span className="val">N(h) = {lag.n}</span>
-      </div>
-      <div className="summary-line">
-        <span className="label">sum of squared differences</span>
-        <span className="val">Σ = {lag.sumSq.toFixed(2)}</span>
-      </div>
-      <div className="summary-line">
-        <span className="label">semivariance</span>
-        <span className="val big">γ(h) = {lag.gamma.toFixed(2)}</span>
-      </div>
-      <div className="pair-table">
-        <div className="pair-table-header">
-          <span>pair (z_i, z_j)</span>
-          <span>diff</span>
-          <span>(diff)²</span>
-        </div>
-        {showRows.map((p, i) => (
-          <div className="pair-row" key={i}>
-            <span>({p.a.v}, {p.b.v})</span>
-            <span>{(p.a.v - p.b.v).toFixed(0)}</span>
-            <span className="sq">{p.sqDiff.toFixed(0)}</span>
-          </div>
-        ))}
-        {more > 0 && (
-          <div className="more-note">
-            showing first {MAX_ROWS} of {lag.pairs.length} pairs
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-// ------------------------------------------------------------------
 // StepBar — horizontal numbered scaffold. Soft-scaffold: clicking any
 // step jumps to it, nothing is gated.
 //
@@ -1806,7 +1717,9 @@ function PredictionPanel({ prediction }) {
           ))}
         </tbody>
       </table>
-      <div className="u-bar">
+      <div className="u-bar" role="progressbar"
+        aria-valuenow={(u * 100).toFixed(0)}
+        aria-valuemin="0" aria-valuemax="100">
         <span className="label">uncertainty</span>
         <span className="track"><span className="fill" style={{ width: `${(u * 100).toFixed(0)}%` }} /></span>
         <span className="val">{(u * 100).toFixed(0)}%</span>
@@ -1821,67 +1734,101 @@ function PredictionPanel({ prediction }) {
 }
 
 // ------------------------------------------------------------------
-// App
+// TenByTenMode — the existing 10×10 workflow rebuilt on the shared
+// shell (StepBar + grid + TabbedPanel + what-if footer).
 // ------------------------------------------------------------------
-function App() {
-  const [presetKey, setPresetKey] = useState('smooth');
-  const [allDirections, setAllDirections] = useState(true);
-  const [modelName, setModelName] = useState('none');
-  const [selectedIdx, setSelectedIdx] = useState(0);
-  const [revealedCount, setRevealedCount] = useState(0);
-  const [hoveredCell, setHoveredCell] = useState(null);
+const TEN_STEPS = [
+  { label: 'Grid', tab: 'formula', highlight: null },
+  { label: 'Pairs', tab: 'formula', highlight: 'z_i' },
+  { label: 'Compute γ(h)', tab: 'calc', highlight: 'oneOver2N' },
+  { label: 'Plot point', tab: 'plot', highlight: null },
+  { label: 'Fit model', tab: 'plot', highlight: null }
+];
+
+function TenByTenMode() {
+  const [presetKey, setPresetKey] = React.useState('smooth');
+  const [editedGrid, setEditedGrid] = React.useState(null);
+  const [allDirections, setAllDirections] = React.useState(true);
+  const [selectedIdx, setSelectedIdx] = React.useState(0);
+  const [revealedCount, setRevealedCount] = React.useState(0);
+  const [hoveredCell, setHoveredCell] = React.useState(null);
+  const [modelName, setModelName] = React.useState('none');
+  const [predictOn, setPredictOn] = React.useState(false);
+  const [predictTarget, setPredictTarget] = React.useState(null);
+  const [revealedStep, setRevealedStep] = React.useState(1);
+  const [activeTab, setActiveTab] = React.useState('formula');
+  const [tabPinned, setTabPinned] = React.useState(false);
 
   const preset = DATASETS_10X10[presetKey];
-  const [editedGrid, setEditedGrid] = useState(null);
   const grid = editedGrid || preset.grid;
-  const pairs = useMemo(
-    () => computePairs(grid, { cardinalOnly: !allDirections }),
+  const pairs = React.useMemo(
+    () => computePairs(grid, { cardinalOnly: !allDirections, maxLag: MAX_LAG_10X10 }),
     [grid, allDirections]
   );
-  const lags = useMemo(() => computeSemivariogram(pairs, MAX_LAG_10X10), [pairs]);
+  const lags = React.useMemo(() => computeSemivariogram(pairs, MAX_LAG_10X10), [pairs]);
 
-  // Reset progression when the lag set changes
-  useEffect(() => {
+  const editedKeys = React.useMemo(() => {
+    if (!editedGrid) return null;
+    const keys = new Set();
+    for (let r = 0; r < grid.length; r++) {
+      for (let c = 0; c < grid[r].length; c++) {
+        if (grid[r][c] !== preset.grid[r][c]) keys.add(`${r}-${c}`);
+      }
+    }
+    return keys;
+  }, [editedGrid, preset.grid, grid]);
+
+  React.useEffect(() => {
     setRevealedCount(0);
     setSelectedIdx(0);
     setHoveredCell(null);
   }, [presetKey, allDirections]);
 
-  useEffect(() => { setEditedGrid(null); }, [presetKey]);
+  React.useEffect(() => {
+    setEditedGrid(null);
+    setPredictTarget(null);
+  }, [presetKey]);
+
+  React.useEffect(() => {
+    if (!predictOn) { setPredictTarget(null); return; }
+    if (predictTarget) return;
+    for (let r = 0; r < grid.length; r++) {
+      for (let c = 0; c < grid[r].length; c++) {
+        if (grid[r][c] === null) { setPredictTarget({ r, c }); return; }
+      }
+    }
+  }, [predictOn, grid, predictTarget]);
+
+  React.useEffect(() => {
+    if (tabPinned) return;
+    const step = TEN_STEPS[Math.max(0, revealedStep - 1)];
+    setActiveTab(step.tab);
+  }, [revealedStep, tabPinned]);
+
+  React.useEffect(() => {
+    if (predictOn) { setTabPinned(false); setActiveTab('predict'); }
+  }, [predictOn]);
 
   const selectedLag = revealedCount > 0 ? lags[selectedIdx] : null;
   const highlightedPairs = selectedLag ? selectedLag.pairs : null;
 
-  const onNext = useCallback(() => {
-    setRevealedCount(rc => {
-      if (rc >= lags.length) return rc;
-      const next = rc + 1;
-      setSelectedIdx(next - 1);
-      return next;
-    });
-  }, [lags.length]);
+  const knownCells = React.useMemo(() => {
+    const out = [];
+    for (let r = 0; r < grid.length; r++) {
+      for (let c = 0; c < grid[r].length; c++) {
+        const v = grid[r][c];
+        if (v !== null && v !== undefined) out.push({ r, c, v });
+      }
+    }
+    return out;
+  }, [grid]);
 
-  const onPrev = useCallback(() => {
-    setRevealedCount(rc => {
-      if (rc <= 0) return rc;
-      const next = rc - 1;
-      setSelectedIdx(Math.max(0, next - 1));
-      return next;
-    });
-  }, []);
+  const prediction = React.useMemo(() => {
+    if (!predictOn || !predictTarget) return null;
+    return predictionWeights(predictTarget, knownCells, 6);
+  }, [predictOn, predictTarget, knownCells]);
 
-  const onReset = useCallback(() => {
-    setRevealedCount(0);
-    setSelectedIdx(0);
-    setHoveredCell(null);
-  }, []);
-
-  const onChipClick = useCallback((i) => {
-    setRevealedCount(rc => Math.max(rc, i + 1));
-    setSelectedIdx(i);
-  }, []);
-
-  const onCellEdit = useCallback((r, c, value) => {
+  const onCellEdit = React.useCallback((r, c, value) => {
     setEditedGrid(prev => {
       const base = prev || preset.grid;
       const next = base.map(row => row.slice());
@@ -1890,116 +1837,94 @@ function App() {
     });
   }, [preset.grid]);
 
-  useEffect(() => {
-    const onKey = (e) => {
-      if (e.target.tagName === 'SELECT' || e.target.tagName === 'INPUT') return;
-      if (e.key === 'ArrowRight') { e.preventDefault(); onNext(); }
-      else if (e.key === 'ArrowLeft') { e.preventDefault(); onPrev(); }
-      else if (e.key === 'Home') { e.preventDefault(); onReset(); }
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [onNext, onPrev, onReset]);
+  const onResetValues = React.useCallback(() => {
+    setEditedGrid(null);
+  }, []);
+
+  const onChipClick = React.useCallback((i) => {
+    setRevealedCount(rc => Math.max(rc, i + 1));
+    setSelectedIdx(i);
+    setRevealedStep(s => Math.max(s, 4));
+  }, []);
+
+  const onStep = React.useCallback((i) => {
+    setRevealedStep(i);
+    setTabPinned(false);
+  }, []);
+
+  const onTab = React.useCallback((k) => {
+    setActiveTab(k);
+    setTabPinned(true);
+  }, []);
+
+  const tabs = predictOn
+    ? [
+        { key: 'formula', label: 'γ(h) Formula' },
+        { key: 'calc',    label: 'Calculation' },
+        { key: 'plot',    label: 'Semivariogram plot' },
+        { key: 'predict', label: 'Prediction' }
+      ]
+    : [
+        { key: 'formula', label: 'γ(h) Formula' },
+        { key: 'calc',    label: 'Calculation' },
+        { key: 'plot',    label: 'Semivariogram plot' }
+      ];
+
+  const stepHighlight = TEN_STEPS[Math.max(0, revealedStep - 1)].highlight;
 
   return (
-    <div className="app">
-      <header className="masthead">
-        <div>
-          <div className="eyebrow">Ordinary Kriging · Teaching Demonstration</div>
-          <h1 className="title">
-            Interactive <em>Semivariogram</em> Builder
-          </h1>
+    <div>
+      <div className="mode-header">
+        <span className="blurb">{preset.blurb}</span>
+        <div className="extras">
+          <select className="preset" value={presetKey}
+            onChange={e => setPresetKey(e.target.value)}
+            style={{ width: 220 }}>
+            {Object.entries(DATASETS_10X10).map(([k, d]) =>
+              <option key={k} value={k}>{d.label}</option>)}
+          </select>
+          <div className="toggle-group" style={{ width: 280 }}>
+            <button className={`toggle-btn ${!allDirections ? 'active' : ''}`}
+              onClick={() => setAllDirections(false)}>Cardinal</button>
+            <button className={`toggle-btn ${allDirections ? 'active' : ''}`}
+              onClick={() => setAllDirections(true)}>All directions</button>
+          </div>
+          <label className="model-toggle-label" style={{ marginLeft: 8 }}>
+            <input type="checkbox" className="model-toggle"
+              checked={predictOn}
+              onChange={e => setPredictOn(e.target.checked)} />
+            Predict at an unknown cell
+          </label>
         </div>
-        <div className="meta">
-          <div><span className="rule-line"></span></div>
-          <div>10 × 10 sample grid</div>
-          <div>γ(h) at exact lag distances</div>
-          <div>← / → to step lags</div>
+      </div>
+
+      {!predictOn && (
+        <div style={{ padding: '0 40px' }}>
+          <StepBar
+            steps={TEN_STEPS.map(s => s.label)}
+            activeStep={revealedStep}
+            onStep={onStep}
+          />
         </div>
-      </header>
+      )}
 
-      <main className="workbench">
-        {/* §1 — Controls */}
-        <section className="panel">
-          <div className="panel-header">
-            <span className="panel-num">§ 1</span>
-            <h2 className="panel-title">Controls</h2>
-            <span className="panel-sub">{preset.label}</span>
-          </div>
-
-          <div className="control-block">
-            <label className="control-label">Dataset preset</label>
-            <select className="preset" value={presetKey}
-              onChange={e => setPresetKey(e.target.value)}>
-              {Object.entries(DATASETS_10X10).map(([k, d]) =>
-                <option key={k} value={k}>{d.label}</option>)}
-            </select>
-            <div className="preset-blurb">{preset.blurb}</div>
-          </div>
-
-          <div className="control-block">
-            <label className="control-label">Direction mode</label>
-            <div className="toggle-group">
-              <button className={`toggle-btn ${!allDirections ? 'active' : ''}`}
-                onClick={() => setAllDirections(false)}>Cardinal only</button>
-              <button className={`toggle-btn ${allDirections ? 'active' : ''}`}
-                onClick={() => setAllDirections(true)}>All directions</button>
-            </div>
-            <div className="preset-blurb">
-              {allDirections
-                ? 'Includes diagonals — realistic omnidirectional semivariogram.'
-                : 'Horizontal and vertical only — mirrors the manual exercise.'}
-            </div>
-          </div>
-
-          <div className="control-block">
-            <label className="model-toggle-label">
-              <input type="checkbox" className="model-toggle"
-                checked={modelName !== 'none'}
-                onChange={e => setModelName(e.target.checked ? 'spherical' : 'none')} />
-              Show fitted model
-            </label>
-          </div>
-
-          <div className="legend">
-            <span className="legend-item"><span className="swatch known"></span> observed value</span>
-            <span className="legend-item"><span className="swatch pair"></span> paired cell</span>
-            <span className="legend-item"><span className="swatch unknown-sw"></span> unsampled (?)</span>
-          </div>
-        </section>
-
-        {/* §2 — Pairs */}
-        <section className="panel">
-          <div className="panel-header">
-            <span className="panel-num">§ 2</span>
-            <h2 className="panel-title">Point pairs at h</h2>
-            <span className="panel-sub">
-              {selectedLag
-                ? `h = ${selectedLag.label} · N = ${selectedLag.n}${hoveredCell ? ' · isolating one cell' : ''}`
-                : 'press Next to start'}
-            </span>
-          </div>
-
-          <div className="grid-svg-frame" style={{ display: 'flex', justifyContent: 'center' }}>
+      <div className="mode-shell">
+        <div className="grid-pane">
+          <div className="grid-svg-frame" style={{ display: 'flex', justifyContent: 'center', background: 'var(--paper-soft)', border: '1px solid var(--rule)', padding: 16 }}>
             <GridView
               grid={grid}
               highlightedPairs={highlightedPairs}
               hoveredCell={hoveredCell}
               onCellHover={setHoveredCell}
-              size={580}
+              size={520}
               onEdit={onCellEdit}
+              editedKeys={editedKeys}
+              predictTarget={predictOn ? predictTarget : null}
+              predictNeighbors={prediction ? prediction.neighbors : null}
+              onTargetClick={predictOn ? setPredictTarget : null}
             />
           </div>
-          {selectedLag && (
-            <div className="hover-hint">
-              Hover any cell to focus on pairs from that point only.
-            </div>
-          )}
-
-          <label className="control-label" style={{ marginTop: 22 }}>
-            Lag distance h — click to reveal up to that lag
-          </label>
-          <div className="lag-strip">
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
             {lags.map((l, i) => {
               const isUpcoming = i >= revealedCount;
               return (
@@ -2012,40 +1937,66 @@ function App() {
               );
             })}
           </div>
-
-          <label className="control-label">Step through</label>
-          <div className="step-controls">
-            <button className="step-btn" onClick={onPrev} disabled={revealedCount === 0}>← Previous</button>
-            <button className="step-btn primary" onClick={onNext} disabled={revealedCount >= lags.length}>Next →</button>
-            <button className="step-btn" onClick={onReset} disabled={revealedCount === 0}>Reset</button>
+          <div className="model-radio">
+            <span style={{ fontFamily: 'Manrope, sans-serif', fontSize: 13, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--ink-soft)' }}>
+              Fit model:
+            </span>
+            {['none', 'spherical', 'exponential', 'gaussian'].map(m =>
+              <label key={m}>
+                <input type="radio" name="model" value={m}
+                  checked={modelName === m}
+                  onChange={() => {
+                    setModelName(m);
+                    if (m !== 'none') setRevealedStep(s => Math.max(s, 5));
+                  }} />
+                {m}
+              </label>
+            )}
           </div>
-        </section>
+        </div>
 
-        {/* §3 — Plot + summary */}
-        <section className="panel">
-          <div className="panel-header">
-            <span className="panel-num">§ 3</span>
-            <h2 className="panel-title">Empirical semivariogram</h2>
-            <span className="panel-sub">{lags.length} lag distances · h ≤ {MAX_LAG_10X10.toFixed(0)}</span>
-          </div>
+        <div className="right-pane">
+          <TabbedPanel tabs={tabs} activeTab={activeTab} onTab={onTab}>
+            {{
+              formula: <FormulaPanel highlight={stepHighlight} />,
+              calc:    <CalculationTable lag={selectedLag} />,
+              plot:    <div className="plot-frame">
+                         <SemivariogramPlot
+                           lags={lags}
+                           selectedIdx={selectedIdx}
+                           revealedCount={revealedCount}
+                           modelName={modelName}
+                         />
+                       </div>,
+              predict: <PredictionPanel prediction={prediction} />
+            }}
+          </TabbedPanel>
+        </div>
+      </div>
 
-          <div className="formula">
-            γ(<span className="accent">h</span>) ={' '}
-            1 ⁄ 2N(<span className="accent">h</span>) · Σ [ z(s<sub>i</sub>) − z(s<sub>j</sub>) ]²
-          </div>
+      <div className="whatif-footer">
+        <span>Tip: click any cell to change its value.</span>
+        <button onClick={onResetValues} disabled={!editedGrid}>Reset values</button>
+      </div>
+    </div>
+  );
+}
 
-          <div className="plot-frame">
-            <SemivariogramPlot
-              lags={lags}
-              selectedIdx={selectedIdx}
-              revealedCount={revealedCount}
-              modelName={modelName}
-            />
-          </div>
-
-          <CalculationSummary lag={selectedLag} />
-        </section>
-      </main>
+// ------------------------------------------------------------------
+// App
+// ------------------------------------------------------------------
+function App() {
+  return (
+    <div className="app">
+      <header className="masthead">
+        <div>
+          <div className="eyebrow">Ordinary Kriging · Teaching Demonstration</div>
+          <h1 className="title">
+            Interactive <em>Semivariogram</em> Builder
+          </h1>
+        </div>
+      </header>
+      <TenByTenMode />
     </div>
   );
 }
