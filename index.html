@@ -483,6 +483,68 @@
     text-align: center;
   }
 
+  /* STEP BAR */
+  .step-bar {
+    display: flex;
+    gap: 4px;
+    padding: 8px 12px;
+    background: var(--paper-soft);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    margin-bottom: 20px;
+    overflow-x: auto;
+  }
+  .step-bar .step-item {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 3px;
+    cursor: pointer;
+    color: var(--ink-soft);
+    font-family: 'Manrope', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    text-align: left;
+    transition: background 0.12s, color 0.12s, border-color 0.12s;
+  }
+  .step-bar .step-item:hover { background: var(--paper-deep); }
+  .step-bar .step-item.active {
+    background: var(--accent);
+    color: var(--paper-soft);
+    border-color: var(--accent);
+  }
+  .step-bar .step-item.active .step-num {
+    background: var(--paper-soft);
+    color: var(--accent);
+  }
+  .step-bar .step-num {
+    flex-shrink: 0;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--paper-deep);
+    color: var(--ink-soft);
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .step-bar .step-label {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  @media (max-width: 1280px) {
+    .step-bar .step-label { display: none; }
+    .step-bar .step-item { flex: 0 0 auto; }
+  }
+
   /* RESPONSIVE */
   @media (max-width: 1280px) {
     main.workbench { grid-template-columns: 1fr; }
@@ -1138,6 +1200,33 @@ function CalculationSummary({ lag }) {
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+// ------------------------------------------------------------------
+// StepBar — horizontal numbered scaffold. Soft-scaffold: clicking any
+// step jumps to it, nothing is gated.
+// ------------------------------------------------------------------
+function StepBar({ steps, activeStep, onStep }) {
+  return (
+    <div className="step-bar" role="tablist">
+      {steps.map((label, i) => {
+        const idx = i + 1;
+        const isActive = idx === activeStep;
+        return (
+          <button
+            key={idx}
+            type="button"
+            className={`step-item ${isActive ? 'active' : ''}`}
+            onClick={() => onStep(idx)}
+            title={`${idx}. ${label}`}
+          >
+            <span className="step-num">{idx}</span>
+            <span className="step-label">{label}</span>
+          </button>
+        );
+      })}
     </div>
   );
 }
