@@ -197,10 +197,12 @@ does for them.
 - The grid overlays thin dashed `--accent` lines from the target to its six
   nearest known cells, each labelled with its normalised weight
   (`w = 0.23`).
-- A box below the grid lists `ẑ = Σ w·z = 14.7 mm`, the weight list, and an
-  uncertainty bar.
 - The right panel exposes a fourth tab **Prediction** (visible only while
-  the toggle is on); the other three tabs stay available.
+  the toggle is on, and auto-selected when the toggle flips on); the other
+  three tabs stay available. The Prediction tab is the single home for the
+  prediction summary — `ẑ = Σ w·z = 14.7 mm`, the ranked weight list, the
+  uncertainty bar, and the plain-language framing. The grid carries only
+  the lines and labels; there is no separate summary box beneath the grid.
 - The step bar is hidden while Prediction is on — the prediction story sits
   *after* the empirical-build story, not in the middle of it.
 
