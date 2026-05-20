@@ -1078,6 +1078,7 @@ function GridView({
   onTargetClick = null    // optional (cell) => void
 }) {
   const [editing, setEditing] = useState(null); // { r, c, raw }
+  const editingRef = React.useRef(null);
   const N = grid.length;
   const padding = 22;
   const inner = size - padding * 2;
@@ -1100,6 +1101,8 @@ function GridView({
   const hoverActive = !!hoveredCell;
 
   const commitEdit = (r, c, raw) => {
+    if (editingRef.current === null) return; // already committed or cancelled
+    editingRef.current = null;
     setEditing(null);
     if (!onEdit) return;
     const trimmed = (raw == null ? '' : String(raw)).trim();
@@ -1113,7 +1116,9 @@ function GridView({
 
   const startEdit = (r, c, v) => {
     if (!onEdit) return;
-    setEditing({ r, c, raw: v === null || v === undefined ? '' : String(v) });
+    const next = { r, c, raw: v === null || v === undefined ? '' : String(v) };
+    editingRef.current = next;
+    setEditing(next);
   };
 
   const handleCellClick = (r, c, v) => {
@@ -1190,10 +1195,14 @@ function GridView({
                     autoFocus
                     value={editing.raw}
                     onChange={(e) => setEditing({ r, c, raw: e.target.value })}
-                    onBlur={() => commitEdit(r, c, editing.raw)}
+                    onBlur={(e) => commitEdit(r, c, e.currentTarget.value)}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') { e.preventDefault(); commitEdit(r, c, editing.raw); }
-                      else if (e.key === 'Escape') { e.preventDefault(); setEditing(null); }
+                      else if (e.key === 'Escape') {
+                        e.preventDefault();
+                        editingRef.current = null;
+                        setEditing(null);
+                      }
                     }}
                   />
                 </foreignObject>
