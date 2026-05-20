@@ -585,6 +585,39 @@
     overflow-y: auto;
   }
 
+  /* FORMULA PANEL */
+  .formula-panel { font-family: 'Fraunces', serif; }
+  .formula-panel .big-formula {
+    font-size: 30px;
+    font-style: italic;
+    line-height: 1.6;
+    text-align: center;
+    color: var(--ink-soft);
+    padding: 18px 0;
+    background: var(--paper-deep);
+    border-radius: 4px;
+    margin-bottom: 18px;
+  }
+  .formula-panel .big-formula .term {
+    padding: 2px 4px;
+    border-radius: 3px;
+    transition: background 0.15s, color 0.15s;
+  }
+  .formula-panel .big-formula .term.hi {
+    background: var(--accent-pale);
+    color: var(--accent-deep);
+    font-weight: 500;
+  }
+  .formula-panel .caption {
+    font-family: 'Manrope', sans-serif;
+    font-style: normal;
+    font-size: 15px;
+    color: var(--ink-soft);
+    line-height: 1.55;
+    margin-bottom: 12px;
+  }
+  .formula-panel .caption strong { color: var(--accent); }
+
   /* RESPONSIVE */
   @media (max-width: 1280px) {
     main.workbench { grid-template-columns: 1fr; }
@@ -1303,6 +1336,44 @@ function TabbedPanel({ tabs, activeTab, onTab, children }) {
             (no content for tab "{activeTab}")
           </p>
         )}
+      </div>
+    </div>
+  );
+}
+
+// ------------------------------------------------------------------
+// FormulaPanel — γ(h) with terms that highlight based on `highlight`.
+//   highlight ∈ 'h' | 'z_i' | 'z_j' | 'diff' | 'sq' | 'sum' | 'N' | 'oneOver2N' | null
+// ------------------------------------------------------------------
+function FormulaPanel({ highlight }) {
+  const klass = (key) => 'term' + (highlight === key ? ' hi' : '');
+  const captions = {
+    null:        'Press the next step to walk through each piece of this formula.',
+    h:           <span><strong>h</strong> is the lag distance — the spacing between the two stations in each pair.</span>,
+    z_i:         <span><strong>Z(x<sub>i</sub>)</strong> is one observed rainfall value at station <em>x<sub>i</sub></em>.</span>,
+    z_j:         <span><strong>Z(x<sub>i</sub> + h)</strong> is the rainfall value at the station <em>h</em> away.</span>,
+    diff:        <span><strong>The difference</strong> of the two paired values tells us how alike they are.</span>,
+    sq:          <span><strong>Squaring</strong> the difference removes the sign and emphasises large gaps.</span>,
+    sum:         <span><strong>Σ</strong> sums the squared differences across every valid pair at this lag.</span>,
+    N:           <span><strong>N(h)</strong> is the number of valid pairs at this lag.</span>,
+    oneOver2N:   <span><strong>1 / [2N(h)]</strong> turns the sum into an average and then halves it — that is the semivariance γ(h).</span>
+  };
+  const caption = captions[highlight] !== undefined ? captions[highlight] : captions[null];
+  return (
+    <div className="formula-panel">
+      <div className="big-formula">
+        γ(<span className={klass('h')}>h</span>) ={' '}
+        <span className={klass('oneOver2N')}>1 / [2<span className={klass('N')}>N(h)</span>]</span>{' '}
+        ·{' '}
+        <span className={klass('sum')}>Σ</span>{' '}
+        <span className={klass('sq')}>[
+          <span className={klass('z_i')}>Z(x<sub>i</sub>)</span>{' '}−{' '}
+          <span className={klass('z_j')}>Z(x<sub>i</sub> + h)</span>
+        ]<sup>2</sup></span>
+      </div>
+      <div className="caption">{caption}</div>
+      <div className="caption" style={{ color: 'var(--ink-mute)' }}>
+        Plain-language: how different are paired observations, on average, at a given distance?
       </div>
     </div>
   );
