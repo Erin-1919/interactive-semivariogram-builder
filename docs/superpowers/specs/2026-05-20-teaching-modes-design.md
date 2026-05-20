@@ -238,10 +238,13 @@ holds only `mode` and the keyboard handler.
 | `predictOn` | `false` | Toggles the prediction sub-mode. |
 | `predictTarget` | first `null` cell of preset | Re-targetable by clicking another `?` cell. |
 
-Switching modes resets `revealedStep` / `selectedLag` / `selectedIdx` /
-`revealedCount` for the mode being entered. Per-mode edits to `values`
-persist for the session; `[Reset values]` is the only thing that wipes
-them, and it is mode-local.
+Switching modes preserves all state in both modes — including
+`revealedStep`, `selectedLag`, edited `values`, the model selection, and
+the prediction toggle. The instructor can flip between modes mid-lecture
+without losing progress. `[Reset values]` wipes that mode's edits only;
+`Home` (keyboard) resets that mode's progression to step 1. Implemented
+by mounting both mode components at all times and hiding the inactive
+one with `display: none`.
 
 ## Components
 
