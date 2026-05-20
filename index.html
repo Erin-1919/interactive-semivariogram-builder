@@ -575,8 +575,9 @@
   .tabbed-panel .tab:hover { color: var(--ink); background: var(--paper-deep); }
   .tabbed-panel .tab.active {
     color: var(--accent);
-    border-bottom-color: var(--accent);
+    border-bottom: 3px solid var(--accent);
     background: var(--paper);
+    font-weight: 700;
   }
   .tabbed-panel .tab-body {
     padding: 22px 26px;
@@ -1281,12 +1282,14 @@ function StepBar({ steps, activeStep, onStep }) {
 // ------------------------------------------------------------------
 function TabbedPanel({ tabs, activeTab, onTab, children }) {
   return (
-    <div className="tabbed-panel">
+    <div className="tabbed-panel" role="tablist">
       <div className="tabs">
         {tabs.map(t => (
           <button
             key={t.key}
             type="button"
+            role="tab"
+            aria-selected={t.key === activeTab}
             className={`tab ${t.key === activeTab ? 'active' : ''}`}
             onClick={() => onTab(t.key)}
           >
@@ -1295,7 +1298,11 @@ function TabbedPanel({ tabs, activeTab, onTab, children }) {
         ))}
       </div>
       <div className="tab-body">
-        {children[activeTab]}
+        {children[activeTab] ?? (
+          <p style={{ color: 'var(--ink-mute)', fontStyle: 'italic' }}>
+            (no content for tab "{activeTab}")
+          </p>
+        )}
       </div>
     </div>
   );
