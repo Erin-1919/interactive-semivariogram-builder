@@ -754,8 +754,8 @@ function computeSemivariogram(pairs, maxLag) {
     const exp = modelGamma(model('exponential'), big);
     const gau = modelGamma(model('gaussian'), big);
     eq(sph, 2.5, 'T6: spherical reaches c0+c1 above range');
-    eq(Math.abs(exp - 2.5) < 0.01 ? 1 : 0, 1, 'T6: exponential approaches c0+c1');
-    eq(Math.abs(gau - 2.5) < 0.01 ? 1 : 0, 1, 'T6: gaussian approaches c0+c1');
+    eq(exp, 2.5, 'T6: exponential reaches c0+c1 above range');
+    eq(gau, 2.5, 'T6: gaussian reaches c0+c1 above range');
   }
 
   console.log('%c[semivariogram tests done]', 'color:#1d4ed8;font-weight:bold');
@@ -1211,7 +1211,7 @@ function App() {
               <input type="checkbox" className="model-toggle"
                 checked={modelName !== 'none'}
                 onChange={e => setModelName(e.target.checked ? 'spherical' : 'none')} />
-              Show fitted spherical model
+              Show fitted model
             </label>
           </div>
 
