@@ -618,6 +618,73 @@
   }
   .formula-panel .caption strong { color: var(--accent); }
 
+  /* CALCULATION TABLE */
+  .calc-table { font-family: 'Manrope', sans-serif; color: var(--ink-soft); }
+  .calc-table .head-line {
+    display: flex; justify-content: space-between; align-items: baseline;
+    padding: 6px 0;
+    border-bottom: 1px dashed var(--rule-soft);
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    color: var(--ink-mute);
+    margin-bottom: 12px;
+  }
+  .calc-table .head-line strong {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+    color: var(--ink);
+    font-style: normal;
+  }
+  .calc-table table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 15px;
+  }
+  .calc-table th, .calc-table td {
+    padding: 6px 8px;
+    text-align: left;
+    border-bottom: 1px dotted var(--rule);
+  }
+  .calc-table th {
+    font-family: 'Manrope', sans-serif;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-mute);
+    border-bottom: 1px solid var(--rule);
+  }
+  .calc-table .hidden-cell { color: var(--rule); }
+  .calc-table .sq { color: var(--accent); font-weight: 500; }
+  .calc-table .footer {
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid var(--rule);
+    font-family: 'JetBrains Mono', monospace;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    row-gap: 6px;
+    column-gap: 14px;
+  }
+  .calc-table .footer .label {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    color: var(--ink-mute);
+  }
+  .calc-table .footer .val { font-weight: 500; color: var(--ink); }
+  .calc-table .footer .val.big {
+    color: var(--accent);
+    font-size: 20px;
+  }
+  .calc-table .empty {
+    border: 1px dashed var(--rule);
+    padding: 22px;
+    color: var(--ink-mute);
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    text-align: center;
+  }
+
   /* RESPONSIVE */
   @media (max-width: 1280px) {
     main.workbench { grid-template-columns: 1fr; }
@@ -1376,6 +1443,68 @@ function FormulaPanel({ highlight }) {
       <div className="caption">{caption}</div>
       <div className="caption" style={{ color: 'var(--ink-mute)' }}>
         Plain-language: how different are paired observations, on average, at a given distance?
+      </div>
+    </div>
+  );
+}
+
+// ------------------------------------------------------------------
+// CalculationTable — pair-by-pair calculation. `revealColumns` is a
+// Set-like object with boolean flags { diff, sq, sum, gamma } so steps
+// 4–7 fill in columns one at a time.
+// ------------------------------------------------------------------
+function CalculationTable({ lag, revealColumns = { diff: true, sq: true, sum: true, gamma: true }, maxRows = 8 }) {
+  if (!lag) {
+    return (
+      <div className="calc-table">
+        <div className="empty">Choose a lag distance to see the pair calculation.</div>
+      </div>
+    );
+  }
+  const rows = lag.pairs.slice(0, maxRows);
+  const more = lag.pairs.length - rows.length;
+  return (
+    <div className="calc-table">
+      <div className="head-line">
+        <span>lag distance</span><strong>h = {lag.label}</strong>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>(z<sub>i</sub>, z<sub>j</sub>)</th>
+            <th>diff</th>
+            <th>(diff)<sup>2</sup></th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((p, i) => {
+            const diff = p.a.v - p.b.v;
+            return (
+              <tr key={i}>
+                <td>({p.a.v}, {p.b.v})</td>
+                <td className={revealColumns.diff ? '' : 'hidden-cell'}>
+                  {revealColumns.diff ? diff.toFixed(0) : '…'}
+                </td>
+                <td className={'sq ' + (revealColumns.sq ? '' : 'hidden-cell')}>
+                  {revealColumns.sq ? p.sqDiff.toFixed(0) : '…'}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+      {more > 0 && (
+        <div style={{ marginTop: 8, fontStyle: 'italic', color: 'var(--ink-mute)', fontSize: 14 }}>
+          showing first {maxRows} of {lag.pairs.length} pairs
+        </div>
+      )}
+      <div className="footer">
+        <span className="label">N(h)</span>
+        <span className="val">{lag.n}</span>
+        <span className="label">Σ (diff)²</span>
+        <span className="val">{revealColumns.sum ? lag.sumSq.toFixed(2) : '…'}</span>
+        <span className="label">γ(h) = Σ / [2N(h)]</span>
+        <span className="val big">{revealColumns.gamma ? lag.gamma.toFixed(2) : '…'}</span>
       </div>
     </div>
   );
