@@ -655,6 +655,34 @@ function computeSemivariogram(pairs, maxLag) {
 }
 
 // ------------------------------------------------------------------
+// Conceptual prediction weights — inverse-distance, NOT Ordinary Kriging.
+// Used by the 10×10 "Predict at unknown" sub-mode to show that nearby
+// stations contribute, weights sum to 1, and uncertainty grows with
+// distance. Real OK derives weights from the fitted variogram.
+// ------------------------------------------------------------------
+function predictionWeights(target, knownCells, k = 6, maxLag = MAX_LAG_10X10) {
+  const withDist = knownCells.map(cell => {
+    const dr = cell.r - target.r;
+    const dc = cell.c - target.c;
+    return { cell, d: Math.sqrt(dr * dr + dc * dc) };
+  });
+  withDist.sort((a, b) => a.d - b.d);
+  const chosen = withDist.slice(0, k);
+  const eps = 1e-6;
+  const rawWeights = chosen.map(n => 1 / (n.d * n.d + eps));
+  const sumRaw = rawWeights.reduce((s, w) => s + w, 0);
+  const neighbors = chosen.map((n, i) => ({
+    cell: n.cell,
+    d: n.d,
+    w: rawWeights[i] / sumRaw
+  }));
+  const zHat = neighbors.reduce((s, n) => s + n.w * n.cell.v, 0);
+  const meanD = neighbors.reduce((s, n) => s + n.d, 0) / neighbors.length;
+  const u = Math.min(1, meanD / maxLag);
+  return { neighbors, zHat, u };
+}
+
+// ------------------------------------------------------------------
 // Inline self-tests — assertions run once on page load and report to
 // the browser console. A failure prints in red so it cannot be missed.
 // ------------------------------------------------------------------
@@ -756,6 +784,26 @@ function computeSemivariogram(pairs, maxLag) {
     eq(sph, 2.5, 'T6: spherical reaches c0+c1 above range');
     eq(exp, 2.5, 'T6: exponential reaches c0+c1 above range');
     eq(gau, 2.5, 'T6: gaussian reaches c0+c1 above range');
+  }
+
+  // Test 7: predictionWeights — weights sum to 1; zHat bounded by neighbour values.
+  {
+    const target = { r: 0, c: 0 };
+    const knowns = [
+      { r: 0, c: 1, v: 10 },
+      { r: 1, c: 0, v: 20 },
+      { r: 1, c: 1, v: 30 },
+      { r: 5, c: 5, v: 100 }
+    ];
+    const out = predictionWeights(target, knowns, 3);
+    eq(out.neighbors.length, 3, 'T7: takes the 3 nearest neighbours');
+    const sumW = out.neighbors.reduce((s, n) => s + n.w, 0);
+    eq(Math.abs(sumW - 1) < 1e-9 ? 1 : 0, 1, 'T7: weights sum to 1');
+    const minV = Math.min(...out.neighbors.map(n => n.cell.v));
+    const maxV = Math.max(...out.neighbors.map(n => n.cell.v));
+    eq(out.zHat >= minV - 1e-9 && out.zHat <= maxV + 1e-9 ? 1 : 0, 1,
+       'T7: zHat is within [min, max] of selected neighbours');
+    eq(out.u >= 0 && out.u <= 1 ? 1 : 0, 1, 'T7: uncertainty in [0,1]');
   }
 
   console.log('%c[semivariogram tests done]', 'color:#1d4ed8;font-weight:bold');
