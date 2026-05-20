@@ -1395,6 +1395,7 @@ function SemivariogramPlot({ lags, selectedIdx, revealedCount, modelName = 'none
       )}
 
       {modelPath && model && (() => {
+        /* IIFE: local consts for guide coordinates */
         const yNugget = yScale(model.c0);
         const ySill = yScale(model.sill);
         const xRange = xScale(model.a);
@@ -1419,7 +1420,7 @@ function SemivariogramPlot({ lags, selectedIdx, revealedCount, modelName = 'none
             <path className="model-curve" d={modelPath} />
             <text className="model-label"
               x={xScale(maxH * 0.98)}
-              y={ySill - 22}
+              y={Math.max(ySill - 22, yTop + 4)}
               textAnchor="end">
               {model.name}
             </text>
