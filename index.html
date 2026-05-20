@@ -85,6 +85,48 @@
   .cell-group { transition: opacity 0.1s; }
   .cell-group.faded { opacity: 0.18; }
   .cell-group.interactive { cursor: pointer; }
+  .cell-rect.predict-target {
+    fill: var(--accent-pale);
+    stroke: var(--accent);
+    stroke-width: 2;
+    stroke-dasharray: 4 3;
+  }
+  .cell-rect.edited {
+    stroke: var(--accent);
+    stroke-width: 1.5;
+    stroke-opacity: 0.7;
+  }
+  .predict-line {
+    stroke: var(--accent);
+    stroke-width: 1.2;
+    stroke-dasharray: 4 3;
+    opacity: 0.75;
+    fill: none;
+    pointer-events: none;
+  }
+  .predict-weight {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    fill: var(--accent-deep);
+    font-weight: 600;
+    pointer-events: none;
+    paint-order: stroke;
+    stroke: var(--paper);
+    stroke-width: 3;
+  }
+  .cell-edit-input {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 16px;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    text-align: center;
+    border: 2px solid var(--accent);
+    background: var(--paper);
+    color: var(--ink);
+    padding: 0;
+  }
+  .cell-edit-input:focus { outline: none; }
   .cell-value {
     font-family: 'JetBrains Mono', monospace;
     font-size: 20px;
@@ -1025,18 +1067,23 @@ function predictionWeights(target, knownCells, k = 6, maxLag = MAX_LAG_10X10) {
 // ------------------------------------------------------------------
 function GridView({
   grid,
-  highlightedPairs,   // all pairs at currently selected lag, or null
-  hoveredCell,        // { r, c } | null
-  onCellHover,        // (cell | null) => void
-  size = 580
+  highlightedPairs,
+  hoveredCell,
+  onCellHover,
+  size = 580,
+  onEdit,                 // optional (r, c, value | null) => void
+  predictTarget = null,   // optional { r, c }
+  predictNeighbors = null,// optional [{ cell:{r,c,v}, w, d }]
+  editedKeys = null,      // optional Set of "r-c" strings
+  onTargetClick = null    // optional (cell) => void
 }) {
+  const [editing, setEditing] = useState(null); // { r, c, raw }
   const N = grid.length;
   const padding = 22;
   const inner = size - padding * 2;
   const cellSize = inner / N;
   const center = (idx) => padding + idx * cellSize + cellSize / 2;
 
-  // When hovering, restrict pair drawing to pairs that touch the hovered cell
   let drawnPairs = highlightedPairs || [];
   if (hoveredCell && highlightedPairs) {
     drawnPairs = highlightedPairs.filter(p =>
@@ -1044,7 +1091,6 @@ function GridView({
       (p.b.r === hoveredCell.r && p.b.c === hoveredCell.c)
     );
   }
-
   const inDrawn = new Set();
   drawnPairs.forEach(p => {
     inDrawn.add(`${p.a.r}-${p.a.c}`);
@@ -1052,6 +1098,32 @@ function GridView({
   });
 
   const hoverActive = !!hoveredCell;
+
+  const commitEdit = (r, c, raw) => {
+    setEditing(null);
+    if (!onEdit) return;
+    const trimmed = (raw == null ? '' : String(raw)).trim();
+    if (trimmed === '') {
+      onEdit(r, c, null);
+      return;
+    }
+    const num = Number(trimmed);
+    if (Number.isFinite(num)) onEdit(r, c, num);
+  };
+
+  const startEdit = (r, c, v) => {
+    if (!onEdit) return;
+    setEditing({ r, c, raw: v === null || v === undefined ? '' : String(v) });
+  };
+
+  const handleCellClick = (r, c, v) => {
+    const isUnknown = v === null || v === undefined;
+    if (isUnknown && predictTarget && onTargetClick) {
+      onTargetClick({ r, c });
+      return;
+    }
+    if (!isUnknown && onEdit) startEdit(r, c, v);
+  };
 
   return (
     <svg className="grid-svg" width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
@@ -1068,19 +1140,26 @@ function GridView({
           const k = `${r}-${c}`;
           const isHovered = hoverActive && hoveredCell.r === r && hoveredCell.c === c;
           const isInPair = inDrawn.has(k);
+          const isTarget = predictTarget && predictTarget.r === r && predictTarget.c === c;
+          const isEdited = editedKeys && editedKeys.has(k);
           const fade = hoverActive && !isHovered && !isInPair;
+          const isEditingThis = editing && editing.r === r && editing.c === c;
           const cellClasses = [
             'cell-rect',
             isUnknown ? 'unknown' : '',
             !isUnknown && isInPair && !isHovered ? 'in-pair' : '',
-            isHovered ? 'is-hovered' : ''
+            isHovered ? 'is-hovered' : '',
+            isTarget ? 'predict-target' : '',
+            isEdited ? 'edited' : ''
           ].filter(Boolean).join(' ');
+          const interactive = !isUnknown || (isUnknown && predictTarget && onTargetClick);
           return (
             <g
               key={k}
-              className={`cell-group ${fade ? 'faded' : ''} ${!isUnknown ? 'interactive' : ''}`}
+              className={`cell-group ${fade ? 'faded' : ''} ${interactive ? 'interactive' : ''}`}
               onMouseEnter={!isUnknown ? () => onCellHover && onCellHover({ r, c }) : undefined}
               onMouseLeave={!isUnknown ? () => onCellHover && onCellHover(null) : undefined}
+              onClick={interactive ? () => handleCellClick(r, c, v) : undefined}
             >
               <rect
                 className={cellClasses}
@@ -1089,13 +1168,36 @@ function GridView({
                 width={cellSize}
                 height={cellSize}
               />
-              <text
-                className={`cell-value ${isUnknown ? 'unknown' : ''} ${isHovered ? 'on-hovered' : ''}`}
-                x={center(c)}
-                y={center(r)}
-              >
-                {isUnknown ? '?' : v}
-              </text>
+              {!isEditingThis && (
+                <text
+                  className={`cell-value ${isUnknown ? 'unknown' : ''} ${isHovered ? 'on-hovered' : ''}`}
+                  x={center(c)}
+                  y={center(r)}
+                >
+                  {isUnknown ? '?' : v}
+                </text>
+              )}
+              {isEditingThis && (
+                <foreignObject
+                  x={padding + c * cellSize + 4}
+                  y={padding + r * cellSize + 4}
+                  width={cellSize - 8}
+                  height={cellSize - 8}
+                >
+                  <input
+                    className="cell-edit-input"
+                    type="number"
+                    autoFocus
+                    value={editing.raw}
+                    onChange={(e) => setEditing({ r, c, raw: e.target.value })}
+                    onBlur={() => commitEdit(r, c, editing.raw)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') { e.preventDefault(); commitEdit(r, c, editing.raw); }
+                      else if (e.key === 'Escape') { e.preventDefault(); setEditing(null); }
+                    }}
+                  />
+                </foreignObject>
+              )}
             </g>
           );
         })
@@ -1109,6 +1211,20 @@ function GridView({
             <line className="pair-line" x1={x1} y1={y1} x2={x2} y2={y2} />
             <circle className="pair-dot" cx={x1} cy={y1} r={3} />
             <circle className="pair-dot" cx={x2} cy={y2} r={3} />
+          </g>
+        );
+      })}
+
+      {predictTarget && predictNeighbors && predictNeighbors.map((n, i) => {
+        const x1 = center(predictTarget.c), y1 = center(predictTarget.r);
+        const x2 = center(n.cell.c), y2 = center(n.cell.r);
+        const mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
+        return (
+          <g key={`pred-${i}`}>
+            <line className="predict-line" x1={x1} y1={y1} x2={x2} y2={y2} />
+            <text className="predict-weight" x={mx} y={my - 4} textAnchor="middle">
+              w={n.w.toFixed(2)}
+            </text>
           </g>
         );
       })}
@@ -1522,7 +1638,8 @@ function App() {
   const [hoveredCell, setHoveredCell] = useState(null);
 
   const preset = DATASETS_10X10[presetKey];
-  const grid = preset.grid;
+  const [editedGrid, setEditedGrid] = useState(null);
+  const grid = editedGrid || preset.grid;
   const pairs = useMemo(
     () => computePairs(grid, { cardinalOnly: !allDirections }),
     [grid, allDirections]
@@ -1535,6 +1652,8 @@ function App() {
     setSelectedIdx(0);
     setHoveredCell(null);
   }, [presetKey, allDirections]);
+
+  useEffect(() => { setEditedGrid(null); }, [presetKey]);
 
   const selectedLag = revealedCount > 0 ? lags[selectedIdx] : null;
   const highlightedPairs = selectedLag ? selectedLag.pairs : null;
@@ -1567,6 +1686,15 @@ function App() {
     setRevealedCount(rc => Math.max(rc, i + 1));
     setSelectedIdx(i);
   }, []);
+
+  const onCellEdit = useCallback((r, c, value) => {
+    setEditedGrid(prev => {
+      const base = prev || preset.grid;
+      const next = base.map(row => row.slice());
+      next[r][c] = value;
+      return next;
+    });
+  }, [preset.grid]);
 
   useEffect(() => {
     const onKey = (e) => {
@@ -1665,6 +1793,7 @@ function App() {
               hoveredCell={hoveredCell}
               onCellHover={setHoveredCell}
               size={580}
+              onEdit={onCellEdit}
             />
           </div>
           {selectedLag && (
