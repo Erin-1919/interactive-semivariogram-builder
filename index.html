@@ -668,7 +668,7 @@ function predictionWeights(target, knownCells, k = 6, maxLag = MAX_LAG_10X10) {
   });
   withDist.sort((a, b) => a.d - b.d);
   const chosen = withDist.slice(0, k);
-  const eps = 1e-6;
+  const eps = 1e-6; // guard: prevents 1/0 if target coincides with a known cell
   const rawWeights = chosen.map(n => 1 / (n.d * n.d + eps));
   const sumRaw = rawWeights.reduce((s, w) => s + w, 0);
   const neighbors = chosen.map((n, i) => ({
@@ -804,6 +804,14 @@ function predictionWeights(target, knownCells, k = 6, maxLag = MAX_LAG_10X10) {
     eq(out.zHat >= minV - 1e-9 && out.zHat <= maxV + 1e-9 ? 1 : 0, 1,
        'T7: zHat is within [min, max] of selected neighbours');
     eq(out.u >= 0 && out.u <= 1 ? 1 : 0, 1, 'T7: uncertainty in [0,1]');
+    // Saturation: target far from all knowns — u should clamp to 1.
+    const farKnowns = [
+      { r: 9, c: 9, v: 50 },
+      { r: 8, c: 9, v: 50 },
+      { r: 9, c: 8, v: 50 }
+    ];
+    const outFar = predictionWeights({ r: 0, c: 0 }, farKnowns, 3);
+    eq(outFar.u, 1, 'T7: uncertainty saturates to 1 when meanD >= maxLag');
   }
 
   console.log('%c[semivariogram tests done]', 'color:#1d4ed8;font-weight:bold');
