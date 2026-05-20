@@ -509,7 +509,6 @@
     font-family: 'Manrope', sans-serif;
     font-size: 13px;
     font-weight: 500;
-    text-align: left;
     transition: background 0.12s, color 0.12s, border-color 0.12s;
   }
   .step-bar .step-item:hover { background: var(--paper-deep); }
@@ -1207,10 +1206,15 @@ function CalculationSummary({ lag }) {
 // ------------------------------------------------------------------
 // StepBar — horizontal numbered scaffold. Soft-scaffold: clicking any
 // step jumps to it, nothing is gated.
+//
+// Props:
+//   steps        Array<string>     step labels in order
+//   activeStep   number            1-based index of the active step
+//   onStep       (idx) => void     called with the 1-based step index
 // ------------------------------------------------------------------
 function StepBar({ steps, activeStep, onStep }) {
   return (
-    <div className="step-bar" role="tablist">
+    <div className="step-bar">
       {steps.map((label, i) => {
         const idx = i + 1;
         const isActive = idx === activeStep;
