@@ -509,10 +509,24 @@
 const { useState, useMemo, useEffect, useCallback } = React;
 
 // ------------------------------------------------------------------
-// DATASETS — 10x10 grids generated to produce instructive semivariogram shapes.
+// 3×3 fixed rainfall grid — matches the lecture slides.
+// Cardinal-only mode produces exactly h = 1 (12 pairs) and h = 2 (6 pairs).
+// ------------------------------------------------------------------
+const DATASET_3X3 = {
+  label: '3×3 rainfall demo',
+  blurb: 'A 3×3 rainfall grid for a hand-calculated semivariogram.',
+  grid: [
+    [14, 16, 18],
+    [12, 14, 17],
+    [10, 13, 15]
+  ]
+};
+
+// ------------------------------------------------------------------
+// DATASETS_10X10 — 10x10 grids generated to produce instructive semivariogram shapes.
 // `null` marks an unsampled cell (`?`).
 // ------------------------------------------------------------------
-const DATASETS = {
+const DATASETS_10X10 = {
   smooth: {
     label: 'Smooth spatial pattern',
     blurb: 'Short-range autocorrelation — γ(h) rises then plateaus near the sill.',
@@ -573,14 +587,21 @@ const DATASETS = {
 // (diagonal neighbours). This is the correct treatment on a regular grid.
 // Unknown (null) cells are excluded entirely.
 //
-// Far lags (h > MAX_LAG) are dropped from the visible empirical
+// Far lags (h > MAX_LAG_10X10) are dropped from the visible empirical
 // semivariogram because they have few pairs and become dominated by
 // sampling noise / edge effects — the textbook rule of thumb is to
 // limit empirical γ(h) to about half the maximum extent of the data.
 // ------------------------------------------------------------------
-const MAX_LAG = 5.0; // half-extent of the 10×10 grid
+const MAX_LAG_10X10 = 5.0; // half-extent of the 10×10 grid
 
-function computePairs(grid, allDirections) {
+function computePairs(grid, opts = {}) {
+  // Back-compat: a bare `true`/`false` was the old `allDirections` boolean.
+  // The in-browser tests (T1–T4) still pass booleans to exercise this path.
+  if (opts === true) opts = { cardinalOnly: false };
+  else if (opts === false) opts = { cardinalOnly: true };
+  const cardinalOnly = !!opts.cardinalOnly;
+  const maxLag = opts.maxLag;
+
   const known = [];
   for (let r = 0; r < grid.length; r++) {
     for (let c = 0; c < grid[r].length; c++) {
@@ -593,14 +614,15 @@ function computePairs(grid, allDirections) {
     for (let j = i + 1; j < known.length; j++) {
       const a = known[i], b = known[j];
       const dr = b.r - a.r, dc = b.c - a.c;
-      // Cardinal mode excludes diagonals
-      if (!allDirections && dr !== 0 && dc !== 0) continue;
+      if (cardinalOnly && dr !== 0 && dc !== 0) continue;
       const dist = Math.sqrt(dr * dr + dc * dc);
+      if (maxLag !== undefined && dist > maxLag + 1e-9) continue;
       pairs.push({
         a, b, dist,
-        key: dist.toFixed(6),         // exact distance grouping key
-        label: dist.toFixed(2),        // display label, e.g. "1.41"
-        sqDiff: (a.v - b.v) ** 2
+        key: dist.toFixed(6),
+        label: dist.toFixed(2),
+        sqDiff: (a.v - b.v) ** 2,
+        dr, dc
       });
     }
   }
@@ -675,7 +697,7 @@ function computeSemivariogram(pairs, maxLag) {
     eq(lags[1].sumSq, 9, 'T3: sumSq(h=√2) = 9');
   }
 
-  // Test 4: MAX_LAG filter drops far pairs from the visible semivariogram.
+  // Test 4: MAX_LAG_10X10 filter drops far pairs from the visible semivariogram.
   //   grid 1×6: distances available are 1,2,3,4,5. With maxLag=3 we keep h≤3.
   {
     const grid = [[1, 2, 3, 4, 5, 6]];
@@ -683,6 +705,23 @@ function computeSemivariogram(pairs, maxLag) {
     eq(lags.length, 3, 'T4: lags capped at h=3');
     eq(lags[0].h, 1, 'T4: first kept h=1');
     eq(lags[lags.length - 1].h, 3, 'T4: last kept h=3');
+  }
+
+  // Test 5: 3×3 fixed grid, cardinal-only — matches the lecture-slide hand calc.
+  //   h = 1: 12 pairs; sumSq = 52; γ(1) = 52/24
+  //   h = 2: 6 pairs;  sumSq = 100; γ(2) = 100/12
+  {
+    const grid = [[14, 16, 18], [12, 14, 17], [10, 13, 15]];
+    const lags = computeSemivariogram(computePairs(grid, { cardinalOnly: true }));
+    eq(lags.length, 2, 'T5: two distinct lags (h=1, h=2)');
+    eq(lags[0].h, 1, 'T5: first lag is h=1');
+    eq(lags[0].n, 12, 'T5: N(1) = 12');
+    eq(lags[0].sumSq, 52, 'T5: sumSq(1) = 52');
+    eq(lags[0].gamma, 52 / 24, 'T5: γ(1) = 52/24');
+    eq(lags[1].h, 2, 'T5: second lag is h=2');
+    eq(lags[1].n, 6, 'T5: N(2) = 6');
+    eq(lags[1].sumSq, 100, 'T5: sumSq(2) = 100');
+    eq(lags[1].gamma, 100 / 12, 'T5: γ(2) = 100/12');
   }
 
   console.log('%c[semivariogram tests done]', 'color:#1d4ed8;font-weight:bold');
@@ -1008,10 +1047,13 @@ function App() {
   const [revealedCount, setRevealedCount] = useState(0);
   const [hoveredCell, setHoveredCell] = useState(null);
 
-  const preset = DATASETS[presetKey];
+  const preset = DATASETS_10X10[presetKey];
   const grid = preset.grid;
-  const pairs = useMemo(() => computePairs(grid, allDirections), [grid, allDirections]);
-  const lags = useMemo(() => computeSemivariogram(pairs, MAX_LAG), [pairs]);
+  const pairs = useMemo(
+    () => computePairs(grid, { cardinalOnly: !allDirections }),
+    [grid, allDirections]
+  );
+  const lags = useMemo(() => computeSemivariogram(pairs, MAX_LAG_10X10), [pairs]);
 
   // Reset progression when the lag set changes
   useEffect(() => {
@@ -1093,7 +1135,7 @@ function App() {
             <label className="control-label">Dataset preset</label>
             <select className="preset" value={presetKey}
               onChange={e => setPresetKey(e.target.value)}>
-              {Object.entries(DATASETS).map(([k, d]) =>
+              {Object.entries(DATASETS_10X10).map(([k, d]) =>
                 <option key={k} value={k}>{d.label}</option>)}
             </select>
             <div className="preset-blurb">{preset.blurb}</div>
@@ -1187,7 +1229,7 @@ function App() {
           <div className="panel-header">
             <span className="panel-num">§ 3</span>
             <h2 className="panel-title">Empirical semivariogram</h2>
-            <span className="panel-sub">{lags.length} lag distances · h ≤ {MAX_LAG.toFixed(0)}</span>
+            <span className="panel-sub">{lags.length} lag distances · h ≤ {MAX_LAG_10X10.toFixed(0)}</span>
           </div>
 
           <div className="formula">
