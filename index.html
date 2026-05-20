@@ -440,6 +440,22 @@
     font-size: 14px;
     fill: var(--sage);
   }
+  .model-guide {
+    stroke: var(--sage);
+    stroke-width: 0.8;
+    stroke-dasharray: 2 4;
+    opacity: 0.55;
+    fill: none;
+  }
+  .model-guide-label {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 13px;
+    fill: var(--sage);
+    paint-order: stroke;
+    stroke: var(--paper);
+    stroke-width: 3;
+  }
 
   /* SUMMARY */
   .summary-box {
@@ -1378,17 +1394,38 @@ function SemivariogramPlot({ lags, selectedIdx, revealedCount, modelName = 'none
             .join(' ')} />
       )}
 
-      {modelPath && (
-        <g>
-          <path className="model-curve" d={modelPath} />
-          <text className="model-label"
-            x={xScale(maxH * 0.98)}
-            y={yScale(model.sill) - 8}
-            textAnchor="end">
-            {model.name}: c₀={model.c0.toFixed(1)}, sill={model.sill.toFixed(1)}, a={model.a.toFixed(1)}
-          </text>
-        </g>
-      )}
+      {modelPath && model && (() => {
+        const yNugget = yScale(model.c0);
+        const ySill = yScale(model.sill);
+        const xRange = xScale(model.a);
+        const xLeft = margin.left;
+        const xRight = margin.left + innerW;
+        const yTop = margin.top;
+        const yBottom = margin.top + innerH;
+        return (
+          <g>
+            <line className="model-guide" x1={xLeft} x2={xRight} y1={yNugget} y2={yNugget} />
+            <text className="model-guide-label" x={xLeft + 6} y={yNugget - 4}>
+              nugget c₀ = {model.c0.toFixed(2)}
+            </text>
+            <line className="model-guide" x1={xLeft} x2={xRight} y1={ySill} y2={ySill} />
+            <text className="model-guide-label" x={xRight - 6} y={ySill - 4} textAnchor="end">
+              sill c₀+c₁ = {model.sill.toFixed(2)}
+            </text>
+            <line className="model-guide" x1={xRange} x2={xRange} y1={yTop} y2={yBottom} />
+            <text className="model-guide-label" x={xRange + 4} y={yBottom - 6}>
+              range a = {model.a.toFixed(2)}
+            </text>
+            <path className="model-curve" d={modelPath} />
+            <text className="model-label"
+              x={xScale(maxH * 0.98)}
+              y={ySill - 22}
+              textAnchor="end">
+              {model.name}
+            </text>
+          </g>
+        );
+      })()}
 
       {visibleLags.map((l, i) => {
         const selected = i === selectedIdx;
