@@ -509,8 +509,9 @@
 const { useState, useMemo, useEffect, useCallback } = React;
 
 // ------------------------------------------------------------------
-// 3×3 fixed rainfall grid — matches the lecture slides.
-// Cardinal-only mode produces exactly h = 1 (12 pairs) and h = 2 (6 pairs).
+// 3×3 fixed rainfall grid — values come straight from the teaching-demo
+// slides. Cardinal-only mode produces exactly h = 1 (12 pairs) and
+// h = 2 (6 pairs); see test T5 for the expected γ values.
 // ------------------------------------------------------------------
 const DATASET_3X3 = {
   label: '3×3 rainfall demo',
@@ -622,7 +623,7 @@ function computePairs(grid, opts = {}) {
         key: dist.toFixed(6),
         label: dist.toFixed(2),
         sqDiff: (a.v - b.v) ** 2,
-        dr, dc
+        dr, dc  // signed deltas; reserved for directional overlays
       });
     }
   }
@@ -705,13 +706,18 @@ function computeSemivariogram(pairs, maxLag) {
     eq(lags.length, 3, 'T4: lags capped at h=3');
     eq(lags[0].h, 1, 'T4: first kept h=1');
     eq(lags[lags.length - 1].h, 3, 'T4: last kept h=3');
+    // Also verify opts.maxLag pre-filters at the computePairs level.
+    const pairsCapped = computePairs(grid, { cardinalOnly: true, maxLag: 3 });
+    const pairsAll = computePairs(grid, { cardinalOnly: true });
+    eq(pairsAll.length > pairsCapped.length ? 1 : 0, 1, 'T4: opts.maxLag pre-filters in computePairs');
+    eq(pairsCapped.every(p => p.dist <= 3 + 1e-9) ? 1 : 0, 1, 'T4: opts.maxLag drops every pair above the cap');
   }
 
   // Test 5: 3×3 fixed grid, cardinal-only — matches the lecture-slide hand calc.
   //   h = 1: 12 pairs; sumSq = 52; γ(1) = 52/24
   //   h = 2: 6 pairs;  sumSq = 100; γ(2) = 100/12
   {
-    const grid = [[14, 16, 18], [12, 14, 17], [10, 13, 15]];
+    const grid = DATASET_3X3.grid;
     const lags = computeSemivariogram(computePairs(grid, { cardinalOnly: true }));
     eq(lags.length, 2, 'T5: two distinct lags (h=1, h=2)');
     eq(lags[0].h, 1, 'T5: first lag is h=1');
