@@ -185,6 +185,40 @@
     background: var(--rule); margin-bottom: 6px;
   }
 
+  .mode-selector {
+    display: flex;
+    gap: 12px;
+    padding: 24px 40px 4px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .mode-selector button {
+    font-family: 'Manrope', sans-serif;
+    font-size: 17px;
+    font-weight: 600;
+    padding: 12px 24px;
+    border: 1px solid var(--rule);
+    background: var(--paper-soft);
+    color: var(--ink-soft);
+    cursor: pointer;
+    border-radius: 999px;
+    letter-spacing: 0.01em;
+  }
+  .mode-selector button:hover { border-color: var(--accent); color: var(--accent); }
+  .mode-selector button.active {
+    background: var(--accent);
+    color: var(--paper);
+    border-color: var(--accent);
+  }
+  .mode-selector .key-hint {
+    margin-left: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--ink-mute);
+    align-self: center;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
   /* MAIN GRID */
   main.workbench {
     display: grid;
@@ -1750,7 +1784,7 @@ const THREE_STEPS = [
   { label: 'Fit model',       tab: 'plot',    highlight: null,        revealCols: { diff: true,  sq: true,  sum: true,  gamma: true  } }
 ];
 
-function ThreeByThreeMode() {
+const ThreeByThreeMode = React.forwardRef((props, ref) => {
   const [editedGrid, setEditedGrid] = React.useState(null);
   const [hoveredCell, setHoveredCell] = React.useState(null);
   const [revealedStep, setRevealedStep] = React.useState(1);
@@ -1758,6 +1792,18 @@ function ThreeByThreeMode() {
   const [activeTab, setActiveTab] = React.useState('formula');
   const [tabPinned, setTabPinned] = React.useState(false);
   const [modelName, setModelName] = React.useState('none');
+
+  React.useImperativeHandle(ref, () => ({
+    next: () => setRevealedStep(s => Math.min(THREE_STEPS.length, s + 1)),
+    prev: () => setRevealedStep(s => Math.max(1, s - 1)),
+    reset: () => {
+      setRevealedStep(1);
+      setSelectedLagIdx(0);
+      setActiveTab('formula');
+      setTabPinned(false);
+      setModelName('none');
+    }
+  }), []);
 
   const grid = editedGrid || DATASET_3X3.grid;
   const pairs = React.useMemo(
@@ -1903,7 +1949,7 @@ function ThreeByThreeMode() {
       </div>
     </div>
   );
-}
+});
 
 // ------------------------------------------------------------------
 // TenByTenMode — the existing 10×10 workflow rebuilt on the shared
@@ -1917,7 +1963,7 @@ const TEN_STEPS = [
   { label: 'Fit model', tab: 'plot', highlight: null }
 ];
 
-function TenByTenMode() {
+const TenByTenMode = React.forwardRef((props, ref) => {
   const [presetKey, setPresetKey] = React.useState('smooth');
   const [editedGrid, setEditedGrid] = React.useState(null);
   const [allDirections, setAllDirections] = React.useState(true);
@@ -1949,6 +1995,39 @@ function TenByTenMode() {
     }
     return keys;
   }, [editedGrid, preset.grid, grid]);
+
+  React.useImperativeHandle(ref, () => ({
+    next: () => {
+      if (predictOn) return;
+      if (revealedCount < lags.length && revealedStep <= 4) {
+        setRevealedCount(rc => Math.min(lags.length, rc + 1));
+        setSelectedIdx(i => Math.min(lags.length - 1, i + 1));
+        if (revealedCount === 0) setRevealedStep(2);
+        else setRevealedStep(s => Math.max(s, 4));
+      } else {
+        setRevealedStep(s => Math.min(TEN_STEPS.length, s + 1));
+      }
+    },
+    prev: () => {
+      if (predictOn) return;
+      if (revealedCount > 0 && revealedStep >= 4) {
+        setRevealedCount(rc => Math.max(0, rc - 1));
+        setSelectedIdx(i => Math.max(0, i - 1));
+      } else {
+        setRevealedStep(s => Math.max(1, s - 1));
+      }
+    },
+    reset: () => {
+      setRevealedCount(0);
+      setSelectedIdx(0);
+      setRevealedStep(1);
+      setActiveTab('formula');
+      setTabPinned(false);
+      setModelName('none');
+      setPredictOn(false);
+      setPredictTarget(null);
+    }
+  }), [revealedCount, lags.length, revealedStep, predictOn]);
 
   React.useEffect(() => {
     setRevealedCount(0);
@@ -2167,12 +2246,34 @@ function TenByTenMode() {
       </div>
     </div>
   );
-}
+});
 
 // ------------------------------------------------------------------
-// App
+// App — mode router. Two pill buttons up top swap between the modes;
+// both modes stay mounted (display:none on the inactive one) so
+// per-mode edits and progression persist across switches. Arrow keys
+// drive the active mode's step bar.
 // ------------------------------------------------------------------
 function App() {
+  const [mode, setMode] = React.useState('3x3'); // '3x3' | '10x10'
+  const threeRef = React.useRef(null);
+  const tenRef = React.useRef(null);
+  const activeRef = mode === '3x3' ? threeRef : tenRef;
+
+  React.useEffect(() => {
+    const onKey = (e) => {
+      const t = e.target;
+      if (t && (t.tagName === 'SELECT' || t.tagName === 'INPUT' || t.tagName === 'TEXTAREA')) return;
+      const m = activeRef.current;
+      if (!m) return;
+      if (e.key === 'ArrowRight') { e.preventDefault(); m.next(); }
+      else if (e.key === 'ArrowLeft') { e.preventDefault(); m.prev(); }
+      else if (e.key === 'Home') { e.preventDefault(); m.reset(); }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [activeRef]);
+
   return (
     <div className="app">
       <header className="masthead">
@@ -2182,8 +2283,36 @@ function App() {
             Interactive <em>Semivariogram</em> Builder
           </h1>
         </div>
+        <div className="meta">
+          <div><span className="rule-line"></span></div>
+          <div>From a 3×3 hand calc to a fitted 10×10 model</div>
+          <div>← / → to step · Home to reset</div>
+        </div>
       </header>
-      <TenByTenMode />
+
+      <nav className="mode-selector">
+        <button
+          type="button"
+          className={mode === '3x3' ? 'active' : ''}
+          onClick={() => setMode('3x3')}>
+          3×3 Guided Demo
+        </button>
+        <button
+          type="button"
+          className={mode === '10x10' ? 'active' : ''}
+          onClick={() => setMode('10x10')}>
+          10×10 Exploration
+        </button>
+        <span className="key-hint">← / → step · Home reset</span>
+      </nav>
+
+      {/* Both modes mounted so per-mode state persists across mode switches. */}
+      <div style={{ display: mode === '3x3' ? 'block' : 'none' }}>
+        <ThreeByThreeMode ref={threeRef} />
+      </div>
+      <div style={{ display: mode === '10x10' ? 'block' : 'none' }}>
+        <TenByTenMode ref={tenRef} />
+      </div>
     </div>
   );
 }
