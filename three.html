@@ -1,0 +1,1191 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>3×3 Semivariogram Walkthrough</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Manrope:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="lib/theme.css">
+<style>
+  .app { position: relative; z-index: 2; }
+
+  h1.title {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 58px;
+    margin: 0;
+    letter-spacing: -0.02em;
+  }
+  h1.title em { font-style: italic; color: var(--accent); }
+
+  /* GRID */
+  .grid-svg-frame {
+    background: var(--paper-soft);
+    border: 1px solid var(--rule);
+    padding: 18px;
+    display: inline-block;
+  }
+  .grid-svg { display: block; }
+  .cell-rect {
+    fill: var(--paper);
+    stroke: var(--rule);
+    stroke-width: 0.5;
+    transition: fill 0.12s, stroke 0.12s;
+  }
+  .cell-rect.unknown { fill: url(#unknownPattern); }
+  .cell-rect.in-pair {
+    fill: var(--accent-pale);
+    stroke: var(--accent);
+    stroke-width: 1.2;
+  }
+  .cell-rect.is-hovered {
+    fill: var(--accent);
+    stroke: var(--accent-deep);
+    stroke-width: 1.5;
+  }
+  .cell-group { transition: opacity 0.1s; }
+  .cell-group.faded { opacity: 0.18; }
+  .cell-group.interactive { cursor: pointer; }
+  .cell-rect.predict-target {
+    fill: var(--accent-pale);
+    stroke: var(--accent);
+    stroke-width: 2;
+    stroke-dasharray: 4 3;
+  }
+  .cell-rect.edited {
+    stroke: var(--accent);
+    stroke-width: 1.5;
+    stroke-opacity: 0.7;
+  }
+  .predict-line {
+    stroke: var(--accent);
+    stroke-width: 1.2;
+    stroke-dasharray: 4 3;
+    opacity: 0.75;
+    fill: none;
+    pointer-events: none;
+  }
+  .predict-weight {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    fill: var(--accent-deep);
+    font-weight: 600;
+    pointer-events: none;
+    paint-order: stroke;
+    stroke: var(--paper);
+    stroke-width: 3;
+  }
+  .cell-edit-input {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 16px;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    text-align: center;
+    border: 2px solid var(--accent);
+    background: var(--paper);
+    color: var(--ink);
+    padding: 0;
+  }
+  .cell-edit-input:focus { outline: none; }
+  .cell-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 22px;
+    font-weight: 500;
+    fill: var(--ink);
+    text-anchor: middle;
+    dominant-baseline: central;
+    user-select: none;
+    pointer-events: none;
+  }
+  .cell-value.unknown {
+    fill: var(--unknown);
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 32px;
+  }
+  .cell-value.on-hovered { fill: var(--paper-soft); font-weight: 600; }
+  .pair-line {
+    stroke: var(--accent);
+    stroke-width: 1.6;
+    opacity: 0.6;
+    fill: none;
+    stroke-linecap: round;
+    pointer-events: none;
+  }
+  .pair-dot { fill: var(--accent); pointer-events: none; }
+
+  /* MASTHEAD */
+  header.masthead {
+    padding: 36px 48px 26px;
+    border-bottom: 1px solid var(--rule);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 32px;
+  }
+  .masthead .eyebrow {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 17px;
+    color: var(--accent);
+    margin-bottom: 8px;
+    letter-spacing: 0.01em;
+  }
+  .masthead .meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    color: var(--ink-mute);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    text-align: right;
+    line-height: 1.9;
+  }
+  .masthead .meta .rule-line {
+    display: inline-block; width: 80px; height: 1px;
+    background: var(--rule); margin-bottom: 6px;
+  }
+
+  .mode-selector {
+    display: flex;
+    gap: 12px;
+    padding: 24px 40px 4px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .mode-selector button {
+    font-family: 'Manrope', sans-serif;
+    font-size: 17px;
+    font-weight: 600;
+    padding: 12px 24px;
+    border: 1px solid var(--rule);
+    background: var(--paper-soft);
+    color: var(--ink-soft);
+    cursor: pointer;
+    border-radius: 999px;
+    letter-spacing: 0.01em;
+  }
+  .mode-selector button:hover { border-color: var(--accent); color: var(--accent); }
+  .mode-selector button.active {
+    background: var(--accent);
+    color: var(--paper);
+    border-color: var(--accent);
+  }
+  .mode-selector .key-hint {
+    margin-left: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--ink-mute);
+    align-self: center;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  /* CONTROLS */
+  .control-block { margin-bottom: 26px; }
+  .control-label {
+    display: block;
+    font-family: 'Manrope', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ink-soft);
+    margin-bottom: 12px;
+  }
+  select.preset {
+    appearance: none;
+    width: 100%;
+    background: var(--paper-soft);
+    border: 1px solid var(--rule);
+    padding: 14px 40px 14px 16px;
+    font-family: 'Manrope', sans-serif;
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--ink);
+    cursor: pointer;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path d='M1 1l5 5 5-5' stroke='%230c2d5c' stroke-width='1.5' fill='none' stroke-linecap='round'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+  }
+  select.preset:focus { outline: none; border-color: var(--accent); }
+
+  .toggle-group {
+    display: flex;
+    border: 1px solid var(--rule);
+    background: var(--paper-soft);
+  }
+  .toggle-btn {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding: 12px 10px;
+    font-family: 'Manrope', sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--ink-soft);
+    cursor: pointer;
+    border-right: 1px solid var(--rule);
+  }
+  .toggle-btn:last-child { border-right: none; }
+  .toggle-btn.active { background: var(--ink); color: var(--paper); }
+
+  input[type=checkbox].model-toggle {
+    appearance: none;
+    width: 20px; height: 20px;
+    border: 1px solid var(--rule);
+    background: var(--paper-soft);
+    margin-right: 10px;
+    vertical-align: middle;
+    cursor: pointer;
+    position: relative;
+  }
+  input[type=checkbox].model-toggle:checked {
+    background: var(--accent); border-color: var(--accent);
+  }
+  input[type=checkbox].model-toggle:checked::after {
+    content: '✓';
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--paper-soft); font-size: 15px;
+  }
+  .model-toggle-label {
+    font-family: 'Manrope', sans-serif;
+    font-size: 16px;
+    color: var(--ink);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  /* LAG CHIPS */
+  .lag-strip {
+    display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0;
+  }
+  .lag-chip {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 15px;
+    font-weight: 500;
+    background: var(--paper-soft);
+    border: 1px solid var(--rule);
+    color: var(--ink-soft);
+    padding: 9px 14px;
+    cursor: pointer;
+    letter-spacing: 0.02em;
+  }
+  .lag-chip:hover { border-color: var(--ink-mute); }
+  .lag-chip.active {
+    background: var(--accent); color: var(--paper-soft); border-color: var(--accent);
+  }
+  .lag-chip.upcoming { opacity: 0.4; }
+  .lag-chip .n-badge { margin-left: 8px; font-size: 13px; opacity: 0.75; }
+
+  /* STEP BUTTONS */
+  .step-controls { display: flex; gap: 10px; flex-wrap: wrap; }
+  .step-btn {
+    font-family: 'Manrope', sans-serif;
+    font-size: 16px; font-weight: 500;
+    background: var(--paper-soft);
+    border: 1px solid var(--rule);
+    color: var(--ink);
+    padding: 11px 18px;
+    cursor: pointer;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .step-btn:hover:not(:disabled) {
+    background: var(--ink); color: var(--paper); border-color: var(--ink);
+  }
+  .step-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+  .step-btn.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .step-btn.primary:hover:not(:disabled) { background: var(--accent); border-color: var(--accent); }
+
+  /* PLOT */
+  .plot-frame {
+    background: var(--paper-soft);
+    border: 1px solid var(--rule);
+    padding: 16px 10px 10px;
+    margin-bottom: 22px;
+  }
+  .plot-svg { display: block; width: 100%; height: auto; }
+  .axis-line { stroke: var(--ink); stroke-width: 0.9; }
+  .axis-tick { stroke: var(--ink-mute); stroke-width: 0.6; }
+  .axis-text {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    fill: var(--ink-mute);
+  }
+  .axis-label {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 18px;
+    fill: var(--ink);
+  }
+  .gridline { stroke: var(--rule-soft); stroke-width: 0.5; stroke-dasharray: 2 3; }
+  .plot-point {
+    fill: var(--ink);
+    stroke: var(--paper-soft);
+    stroke-width: 1.4;
+  }
+  .plot-point.selected { fill: var(--accent); }
+  .plot-point-ring {
+    fill: none; stroke: var(--accent); stroke-width: 1.3; opacity: 0.5;
+  }
+  .plot-connector {
+    stroke: var(--ink-mute);
+    stroke-width: 0.8;
+    fill: none;
+    stroke-dasharray: 1 4;
+  }
+  .selected-value-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    fill: var(--accent);
+    font-weight: 600;
+  }
+  .model-curve {
+    stroke: var(--sage);
+    stroke-width: 1.6;
+    fill: none;
+    stroke-dasharray: 5 4;
+    opacity: 0.85;
+  }
+  .model-label {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 14px;
+    fill: var(--sage);
+  }
+  .model-guide {
+    stroke: var(--sage);
+    stroke-width: 0.8;
+    stroke-dasharray: 2 4;
+    opacity: 0.55;
+    fill: none;
+  }
+  .model-guide-label {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 13px;
+    fill: var(--sage);
+    paint-order: stroke;
+    stroke: var(--paper);
+    stroke-width: 3;
+  }
+
+  /* STEP BAR */
+  .step-bar {
+    display: flex;
+    gap: 4px;
+    padding: 8px 12px;
+    background: var(--paper-soft);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    margin-bottom: 20px;
+    overflow-x: auto;
+  }
+  .step-bar .step-item {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 3px;
+    cursor: pointer;
+    color: var(--ink-soft);
+    font-family: 'Manrope', sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    transition: background 0.12s, color 0.12s, border-color 0.12s;
+  }
+  .step-bar .step-item:hover { background: var(--paper-deep); }
+  .step-bar .step-item.active {
+    background: var(--accent);
+    color: var(--paper-soft);
+    border-color: var(--accent);
+  }
+  .step-bar .step-item.active .step-num {
+    background: var(--paper-soft);
+    color: var(--accent);
+  }
+  .step-bar .step-num {
+    flex-shrink: 0;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--paper-deep);
+    color: var(--ink-soft);
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .step-bar .step-label {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  @media (max-width: 1280px) {
+    .step-bar .step-label { display: none; }
+    .step-bar .step-item { flex: 0 0 auto; }
+  }
+
+  /* TABBED PANEL */
+  .tabbed-panel {
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .tabbed-panel .tabs {
+    display: flex;
+    border-bottom: 1px solid var(--rule);
+    background: var(--paper-soft);
+  }
+  .tabbed-panel .tab {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding: 14px 18px;
+    font-family: 'Manrope', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--ink-mute);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    border-right: 1px solid var(--rule);
+  }
+  .tabbed-panel .tab:last-child { border-right: none; }
+  .tabbed-panel .tab:hover { color: var(--ink); background: var(--paper-deep); }
+  .tabbed-panel .tab.active {
+    color: var(--accent);
+    border-bottom: 3px solid var(--accent);
+    background: var(--paper);
+    font-weight: 700;
+  }
+  .tabbed-panel .tab-body {
+    padding: 22px 26px;
+    flex: 1;
+    overflow-y: auto;
+  }
+  .tabbed-panel.vertical {
+    flex-direction: row;
+  }
+  .tabbed-panel.vertical .tabs {
+    flex-direction: column;
+    border-bottom: none;
+    border-left: 1px solid var(--rule);
+    background: var(--paper-soft);
+    order: 2;
+    flex: 0 0 56px;
+  }
+  .tabbed-panel.vertical .tab {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    flex: 1;
+    border-right: none;
+    border-bottom: 1px solid var(--rule);
+    border-left: 2px solid transparent;
+    padding: 18px 14px;
+    font-size: 16px;
+  }
+  .tabbed-panel.vertical .tab:last-child { border-bottom: none; }
+  .tabbed-panel.vertical .tab.active {
+    border-left: 2px solid var(--accent);
+    border-bottom: 1px solid var(--rule);
+  }
+  .tabbed-panel.vertical .tab.active:last-child { border-bottom: none; }
+  .tabbed-panel.vertical .tab-body { order: 1; flex: 1; }
+
+  /* FORMULA PANEL */
+  .formula-panel { font-family: 'Fraunces', serif; }
+  .formula-panel .big-formula {
+    font-size: 30px;
+    font-style: italic;
+    line-height: 1.6;
+    text-align: center;
+    color: var(--ink-soft);
+    padding: 18px 0;
+    background: var(--paper-deep);
+    border-radius: 4px;
+    margin-bottom: 18px;
+  }
+  .formula-panel .big-formula .term {
+    padding: 2px 4px;
+    border-radius: 3px;
+    transition: background 0.15s, color 0.15s;
+  }
+  .formula-panel .big-formula .term.hi {
+    background: var(--accent-pale);
+    color: var(--accent-deep);
+    font-weight: 500;
+  }
+  .formula-panel .caption {
+    font-family: 'Manrope', sans-serif;
+    font-style: normal;
+    font-size: 17px;
+    color: var(--ink-soft);
+    line-height: 1.55;
+    margin-bottom: 12px;
+  }
+  .formula-panel .caption strong { color: var(--accent); }
+
+  /* FORMULA BAND — γ(h) formula as a full-width row above the mode-shell */
+  .formula-band {
+    padding: 0 40px 16px;
+  }
+  .formula-band .big-formula {
+    margin-bottom: 0;
+  }
+
+  /* CALCULATION TABLE */
+  .calc-table { font-family: 'Manrope', sans-serif; color: var(--ink-soft); }
+  .calc-table .head-line {
+    display: flex; justify-content: space-between; align-items: baseline;
+    padding: 6px 0;
+    border-bottom: 1px dashed var(--rule-soft);
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 22px;
+    color: var(--ink-mute);
+    margin-bottom: 12px;
+  }
+  .calc-table .head-line strong {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+    font-size: 22px;
+    color: var(--ink);
+    font-style: normal;
+  }
+  .calc-table table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 15px;
+  }
+  .calc-table th, .calc-table td {
+    padding: 6px 8px;
+    text-align: left;
+    border-bottom: 1px dotted var(--rule);
+    font-size: 22px;
+  }
+  .calc-table th {
+    font-family: 'Manrope', sans-serif;
+    font-size: 18px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-mute);
+    border-bottom: 1px solid var(--rule);
+  }
+  .calc-table .hidden-cell { color: var(--rule); }
+  .calc-table .sq { color: var(--accent); font-weight: 500; }
+  .calc-table .footer {
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid var(--rule);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 22px;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    row-gap: 6px;
+    column-gap: 14px;
+  }
+  .calc-table .footer .label {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    color: var(--ink-mute);
+  }
+  .calc-table .footer .val { font-weight: 500; color: var(--ink); }
+  .calc-table .footer .val.big {
+    color: var(--accent);
+    font-size: 28px;
+  }
+  .calc-table .empty {
+    border: 1px dashed var(--rule);
+    padding: 22px;
+    color: var(--ink-mute);
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    text-align: center;
+  }
+
+  /* PREDICTION PANEL */
+  .predict-panel { font-family: 'Manrope', sans-serif; color: var(--ink-soft); }
+  .predict-panel .lead {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 16px;
+    color: var(--ink-mute);
+    margin-bottom: 14px;
+    line-height: 1.5;
+  }
+  .predict-panel .zhat {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--accent);
+    text-align: center;
+    padding: 14px;
+    background: var(--paper-deep);
+    border-radius: 4px;
+    margin-bottom: 14px;
+  }
+  .predict-panel .zhat small {
+    display: block;
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    color: var(--ink-mute);
+    font-size: 14px;
+    font-weight: 400;
+    margin-bottom: 4px;
+  }
+  .predict-panel table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    margin-bottom: 14px;
+  }
+  .predict-panel th, .predict-panel td {
+    padding: 6px 8px;
+    text-align: right;
+    border-bottom: 1px dotted var(--rule);
+  }
+  .predict-panel th {
+    font-family: 'Manrope', sans-serif;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-mute);
+    border-bottom: 1px solid var(--rule);
+    text-align: right;
+  }
+  .predict-panel th:first-child, .predict-panel td:first-child { text-align: left; }
+  .predict-panel .u-bar {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .predict-panel .u-bar .label {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    color: var(--ink-mute);
+  }
+  .predict-panel .u-bar .track {
+    height: 10px;
+    background: var(--paper-deep);
+    border-radius: 5px;
+    overflow: hidden;
+  }
+  .predict-panel .u-bar .fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 5px;
+    transition: width 0.2s;
+  }
+  .predict-panel .u-bar .val {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--ink);
+  }
+  .predict-panel .footnote {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 14px;
+    color: var(--ink-mute);
+    line-height: 1.5;
+    border-top: 1px dashed var(--rule);
+    padding-top: 12px;
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 1280px) {
+    header.masthead { padding: 26px 32px 20px; flex-direction: column; align-items: flex-start; }
+    .masthead .meta { text-align: left; }
+  }
+  @media (min-width: 1700px) {
+    body { font-size: 18px; }
+    h1.title { font-size: 64px; }
+  }
+
+  /* MODE WORKBENCH — used by both ThreeByThreeMode and TenByTenMode */
+  .mode-shell {
+    padding: 28px 40px 36px;
+    display: grid;
+    grid-template-columns: minmax(420px, 1fr) minmax(420px, 1fr);
+    gap: 32px;
+    align-items: start;
+  }
+  @media (max-width: 1280px) {
+    .mode-shell { grid-template-columns: 1fr; }
+  }
+  .mode-shell .grid-pane { display: flex; flex-direction: column; gap: 16px; }
+  .mode-shell .right-pane { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+
+  .mode-header {
+    padding: 22px 40px 6px;
+    display: flex;
+    align-items: baseline;
+    gap: 18px;
+    flex-wrap: wrap;
+  }
+  .mode-header .blurb {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    color: var(--ink-mute);
+    font-size: 16px;
+  }
+  .mode-header .extras { margin-left: auto; display: flex; gap: 14px; align-items: center; }
+
+  .model-radio { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .model-radio label {
+    font-family: 'Manrope', sans-serif;
+    font-size: 14px;
+    color: var(--ink-soft);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+  }
+  .model-radio input[type=radio] { accent-color: var(--accent); }
+
+  .whatif-footer {
+    padding: 12px 40px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid var(--rule-soft);
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    color: var(--ink-mute);
+    font-size: 16px;
+  }
+  .whatif-footer button {
+    font-family: 'Manrope', sans-serif;
+    font-style: normal;
+    font-size: 16px;
+    background: var(--paper-soft);
+    border: 1px solid var(--rule);
+    color: var(--ink);
+    padding: 8px 14px;
+    cursor: pointer;
+  }
+  .whatif-footer button:hover { background: var(--accent-pale); border-color: var(--accent); }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script type="text/babel" data-presets="env,react" src="lib/semivariogram.js"></script>
+
+<script type="text/babel" data-presets="env,react">
+const { useState, useMemo, useEffect, useCallback } = React;
+
+// ------------------------------------------------------------------
+// StepBar — horizontal numbered scaffold. Soft-scaffold: clicking any
+// step jumps to it, nothing is gated.
+//
+// Props:
+//   steps        Array<string>     step labels in order
+//   activeStep   number            1-based index of the active step
+//   onStep       (idx) => void     called with the 1-based step index
+// ------------------------------------------------------------------
+function StepBar({ steps, activeStep, onStep }) {
+  return (
+    <div className="step-bar">
+      {steps.map((label, i) => {
+        const idx = i + 1;
+        const isActive = idx === activeStep;
+        return (
+          <button
+            key={idx}
+            type="button"
+            className={`step-item ${isActive ? 'active' : ''}`}
+            onClick={() => onStep(idx)}
+            title={`${idx}. ${label}`}
+          >
+            <span className="step-num">{idx}</span>
+            <span className="step-label">{label}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+// ------------------------------------------------------------------
+// TabbedPanel — tab strip plus a single visible content slot.
+// `tabs` is [{ key, label }]; `children` is a map { [key]: ReactNode }.
+// ------------------------------------------------------------------
+function TabbedPanel({ tabs, activeTab, onTab, children, orientation = 'horizontal' }) {
+  return (
+    <div className={`tabbed-panel${orientation === 'vertical' ? ' vertical' : ''}`} role="tablist">
+      <div className="tabs">
+        {tabs.map(t => (
+          <button
+            key={t.key}
+            type="button"
+            role="tab"
+            aria-selected={t.key === activeTab}
+            className={`tab ${t.key === activeTab ? 'active' : ''}`}
+            onClick={() => onTab(t.key)}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+      <div className="tab-body">
+        {children[activeTab] ?? (
+          <p style={{ color: 'var(--ink-mute)', fontStyle: 'italic' }}>
+            (no content for tab "{activeTab}")
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ------------------------------------------------------------------
+// FormulaPanel — γ(h) with terms that highlight based on `highlight`.
+//   highlight ∈ 'h' | 'z_i' | 'z_j' | 'diff' | 'sq' | 'sum' | 'N' | 'oneOver2N' | null
+// ------------------------------------------------------------------
+function FormulaPanel({ highlight }) {
+  const klass = (key) => 'term' + (highlight === key ? ' hi' : '');
+  const captions = {
+    null:        'Press the next step to walk through each piece of this formula.',
+    h:           <span><strong>h</strong> is the lag distance — the spacing between the two stations in each pair.</span>,
+    z_i:         <span><strong>Z(x<sub>i</sub>)</strong> is one observed rainfall value at station <em>x<sub>i</sub></em>.</span>,
+    z_j:         <span><strong>Z(x<sub>i</sub> + h)</strong> is the rainfall value at the station <em>h</em> away.</span>,
+    diff:        <span><strong>The difference</strong> of the two paired values tells us how alike they are.</span>,
+    sq:          <span><strong>Squaring</strong> the difference removes the sign and emphasises large gaps.</span>,
+    sum:         <span><strong>Σ</strong> sums the squared differences across every valid pair at this lag.</span>,
+    N:           <span><strong>N(h)</strong> is the number of valid pairs at this lag.</span>,
+    oneOver2N:   <span><strong>1 / [2N(h)]</strong> turns the sum into an average and then halves it — that is the semivariance γ(h).</span>
+  };
+  const caption = captions[highlight] !== undefined ? captions[highlight] : captions[null];
+  return (
+    <div className="formula-panel">
+      <div className="big-formula">
+        γ(<span className={klass('h')}>h</span>) ={' '}
+        <span className={klass('oneOver2N')}>1 / [2<span className={klass('N')}>N(h)</span>]</span>{' '}
+        ·{' '}
+        <span className={klass('sum')}>Σ</span>{' '}
+        <span className={klass('sq')}>[
+          <span className={klass('diff')}>
+            <span className={klass('z_i')}>Z(x<sub>i</sub>)</span>{' '}−{' '}
+            <span className={klass('z_j')}>Z(x<sub>i</sub> + h)</span>
+          </span>
+        ]<sup>2</sup></span>
+      </div>
+      <div className="caption">{caption}</div>
+      <div className="caption" style={{ color: 'var(--ink-mute)' }}>
+        Plain-language: how different are paired observations, on average, at a given distance?
+      </div>
+    </div>
+  );
+}
+
+// ------------------------------------------------------------------
+// CalculationTable — pair-by-pair calculation. `revealColumns` is a
+// Set-like object with boolean flags { diff, sq, sum, gamma } so steps
+// 4–7 fill in columns one at a time.
+// ------------------------------------------------------------------
+function CalculationTable({ lag, revealColumns = { diff: true, sq: true, sum: true, gamma: true }, maxRows = 8 }) {
+  if (!lag) {
+    return (
+      <div className="calc-table">
+        <div className="empty">Choose a lag distance to see the pair calculation.</div>
+      </div>
+    );
+  }
+  const rows = lag.pairs.slice(0, maxRows);
+  const more = lag.pairs.length - rows.length;
+  return (
+    <div className="calc-table">
+      <div className="head-line">
+        <span>lag distance</span><strong>h = {lag.label}</strong>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>(z<sub>i</sub>, z<sub>j</sub>)</th>
+            <th>diff</th>
+            <th>(diff)<sup>2</sup></th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((p, i) => {
+            const diff = p.a.v - p.b.v;
+            return (
+              <tr key={i}>
+                <td>({p.a.v}, {p.b.v})</td>
+                <td className={revealColumns.diff ? '' : 'hidden-cell'}>
+                  {revealColumns.diff ? diff.toFixed(0) : '…'}
+                </td>
+                <td className={'sq ' + (revealColumns.sq ? '' : 'hidden-cell')}>
+                  {revealColumns.sq ? p.sqDiff.toFixed(0) : '…'}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+      {more > 0 && (
+        <div style={{ marginTop: 8, fontStyle: 'italic', color: 'var(--ink-mute)', fontSize: 18 }}>
+          showing first {maxRows} of {lag.pairs.length} pairs
+        </div>
+      )}
+      <div className="footer">
+        <span className="label">N(h)</span>
+        <span className="val">{lag.n}</span>
+        <span className="label">Σ (diff)²</span>
+        <span className="val">{revealColumns.sum ? lag.sumSq.toFixed(2) : '…'}</span>
+        <span className="label">γ(h) = Σ / [2N(h)]</span>
+        <span className="val big">{revealColumns.gamma ? lag.gamma.toFixed(2) : '…'}</span>
+      </div>
+    </div>
+  );
+}
+
+// ------------------------------------------------------------------
+// ThreeByThreeMode — fixed 3×3 grid, cardinal-only, 10-step walk-through
+// of the empirical semivariogram hand-calculation.
+// ------------------------------------------------------------------
+const THREE_STEPS = [
+  { label: 'Grid',            tab: 'calc',    highlight: null,        revealCols: { diff: false, sq: false, sum: false, gamma: false } },
+  { label: 'Select lag',      tab: 'calc',    highlight: 'h',         revealCols: { diff: false, sq: false, sum: false, gamma: false } },
+  { label: 'Highlight pairs', tab: 'calc',    highlight: 'z_i',       revealCols: { diff: false, sq: false, sum: false, gamma: false } },
+  { label: 'Differences',     tab: 'calc',    highlight: 'diff',      revealCols: { diff: true,  sq: false, sum: false, gamma: false } },
+  { label: 'Square them',     tab: 'calc',    highlight: 'sq',        revealCols: { diff: true,  sq: true,  sum: false, gamma: false } },
+  { label: 'Sum',             tab: 'calc',    highlight: 'sum',       revealCols: { diff: true,  sq: true,  sum: true,  gamma: false } },
+  { label: '÷ 2N(h)',          tab: 'calc',    highlight: 'oneOver2N', revealCols: { diff: true,  sq: true,  sum: true,  gamma: true  } },
+  { label: 'Plot γ(h)',        tab: 'plot',    highlight: null,        revealCols: { diff: true,  sq: true,  sum: true,  gamma: true  } },
+  { label: 'Next lag',        tab: 'plot',    highlight: null,        revealCols: { diff: true,  sq: true,  sum: true,  gamma: true  } },
+  { label: 'Fit model',       tab: 'plot',    highlight: null,        revealCols: { diff: true,  sq: true,  sum: true,  gamma: true  } }
+];
+
+const ThreeByThreeMode = React.forwardRef((props, ref) => {
+  const [editedGrid, setEditedGrid] = React.useState(null);
+  const [hoveredCell, setHoveredCell] = React.useState(null);
+  const [revealedStep, setRevealedStep] = React.useState(1);
+  const [selectedLagIdx, setSelectedLagIdx] = React.useState(0);
+  const [activeTab, setActiveTab] = React.useState('calc');
+  const [tabPinned, setTabPinned] = React.useState(false);
+  const [modelName, setModelName] = React.useState('none');
+  const [showPoints, setShowPoints] = React.useState(true);
+
+  React.useImperativeHandle(ref, () => ({
+    next: () => setRevealedStep(s => Math.min(THREE_STEPS.length, s + 1)),
+    prev: () => setRevealedStep(s => Math.max(1, s - 1)),
+    reset: () => {
+      setRevealedStep(1);
+      setSelectedLagIdx(0);
+      setActiveTab('calc');
+      setTabPinned(false);
+      setModelName('none');
+    }
+  }), []);
+
+  const grid = editedGrid || DATASET_3X3.grid;
+  const pairs = React.useMemo(
+    () => computePairs(grid, { cardinalOnly: true }),
+    [grid]
+  );
+  const lags = React.useMemo(() => computeSemivariogram(pairs), [pairs]);
+
+  const editedKeys = React.useMemo(() => {
+    if (!editedGrid) return null;
+    const keys = new Set();
+    for (let r = 0; r < grid.length; r++) {
+      for (let c = 0; c < grid[r].length; c++) {
+        if (grid[r][c] !== DATASET_3X3.grid[r][c]) keys.add(`${r}-${c}`);
+      }
+    }
+    return keys;
+  }, [editedGrid, grid]);
+
+  // revealedCount is derived from revealedStep:
+  //   steps 1–7 = nothing plotted; step 8 = first lag plotted; step 9 = both; step 10 = both + model.
+  const revealedCount = revealedStep >= 9 ? 2 : revealedStep >= 8 ? 1 : 0;
+  const plotSelectedIdx = Math.min(selectedLagIdx, Math.max(0, revealedCount - 1));
+
+  React.useEffect(() => {
+    if (tabPinned) return;
+    setActiveTab(THREE_STEPS[Math.max(0, revealedStep - 1)].tab);
+  }, [revealedStep, tabPinned]);
+
+  React.useEffect(() => {
+    if (revealedStep >= 10 && modelName === 'none') setModelName('spherical');
+  }, [revealedStep, modelName]);
+
+  const selectedLag = lags[selectedLagIdx] || null;
+  const highlightedPairs = revealedStep >= 3 && selectedLag ? selectedLag.pairs : null;
+
+  const onCellEdit = React.useCallback((r, c, value) => {
+    setEditedGrid(prev => {
+      const base = prev || DATASET_3X3.grid;
+      const next = base.map(row => row.slice());
+      next[r][c] = value;
+      return next;
+    });
+  }, []);
+
+  const onResetValues = React.useCallback(() => {
+    setEditedGrid(null);
+  }, []);
+
+  const tabs = [
+    { key: 'calc',    label: 'Calculation' },
+    { key: 'plot',    label: 'Semivariogram plot' }
+  ];
+
+  const stepDef = THREE_STEPS[Math.max(0, revealedStep - 1)];
+
+  return (
+    <div>
+      <div className="mode-header">
+        <span className="blurb">{DATASET_3X3.blurb}</span>
+        <div className="extras">
+          <div className="toggle-group" style={{ width: 220 }}>
+            <button className={`toggle-btn ${selectedLagIdx === 0 ? 'active' : ''}`}
+              onClick={() => { setSelectedLagIdx(0); setRevealedStep(s => Math.max(s, 2)); }}>
+              h = 1
+            </button>
+            <button className={`toggle-btn ${selectedLagIdx === 1 ? 'active' : ''}`}
+              onClick={() => { setSelectedLagIdx(1); setRevealedStep(s => Math.max(s, 2)); }}
+              disabled={lags.length < 2}>
+              h = 2
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div style={{ padding: '0 40px' }}>
+        <StepBar
+          steps={THREE_STEPS.map(s => s.label)}
+          activeStep={revealedStep}
+          onStep={(i) => { setRevealedStep(i); setTabPinned(false); }}
+        />
+      </div>
+
+      <div className="formula-band">
+        <FormulaPanel highlight={stepDef.highlight} />
+      </div>
+      <div className="mode-shell">
+        <div className="grid-pane">
+          <div className="grid-svg-frame" style={{ display: 'flex', justifyContent: 'center', background: 'var(--paper-soft)', border: '1px solid var(--rule)', padding: 16 }}>
+            <GridView
+              grid={grid}
+              highlightedPairs={highlightedPairs}
+              hoveredCell={hoveredCell}
+              onCellHover={setHoveredCell}
+              size={480}
+              onEdit={onCellEdit}
+              editedKeys={editedKeys}
+            />
+          </div>
+          {revealedStep >= 10 && (
+            <div className="model-radio">
+              <span style={{ fontFamily: 'Manrope, sans-serif', fontSize: 13, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--ink-soft)' }}>
+                Fit model:
+              </span>
+              {['spherical', 'exponential', 'gaussian'].map(m =>
+                <label key={m}>
+                  <input type="radio" name="model3" value={m}
+                    checked={modelName === m}
+                    onChange={() => setModelName(m)} />
+                  {m}
+                </label>
+              )}
+              <label style={{ fontFamily: 'Manrope, sans-serif', fontSize: 14, color: 'var(--ink-soft)', display: 'inline-flex', alignItems: 'center', gap: 6, cursor: 'pointer', marginLeft: 12 }}>
+                <input type="checkbox" className="model-toggle"
+                  checked={showPoints}
+                  onChange={e => setShowPoints(e.target.checked)} />
+                Show empirical points
+              </label>
+            </div>
+          )}
+        </div>
+
+        <div className="right-pane">
+          <TabbedPanel
+            tabs={tabs}
+            activeTab={activeTab}
+            onTab={(k) => { setActiveTab(k); setTabPinned(true); }}
+            orientation="vertical"
+          >
+            {{
+              calc:    <CalculationTable
+                         lag={selectedLag}
+                         revealColumns={stepDef.revealCols}
+                       />,
+              plot:    <div className="plot-frame">
+                         <SemivariogramPlot
+                           lags={lags}
+                           selectedIdx={plotSelectedIdx}
+                           revealedCount={revealedCount}
+                           modelName={revealedStep >= 10 ? modelName : 'none'}
+                           showPoints={showPoints}
+                         />
+                       </div>
+            }}
+          </TabbedPanel>
+        </div>
+      </div>
+
+      <div className="whatif-footer">
+        <span>Tip: click any cell to change its value.</span>
+        <button onClick={onResetValues} disabled={!editedGrid}>Reset values</button>
+      </div>
+    </div>
+  );
+});
+
+function App() {
+  const threeRef = React.useRef(null);
+
+  React.useEffect(() => {
+    const onKey = (e) => {
+      const t = e.target;
+      if (t && (t.tagName === 'SELECT' || t.tagName === 'INPUT' || t.tagName === 'TEXTAREA')) return;
+      const m = threeRef.current;
+      if (!m) return;
+      if (e.key === 'ArrowRight') { e.preventDefault(); m.next(); }
+      else if (e.key === 'ArrowLeft') { e.preventDefault(); m.prev(); }
+      else if (e.key === 'Home') { e.preventDefault(); m.reset(); }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
+  return (
+    <div className="app">
+      <header className="masthead">
+        <div>
+          <div className="eyebrow">Ordinary Kriging · Teaching Demonstration</div>
+          <h1 className="title">3×3 <em>Semivariogram</em> Walkthrough</h1>
+        </div>
+        <div className="meta">
+          <div><span className="rule-line"></span></div>
+          <div>Hand-calculation on the lecture-slide grid</div>
+        </div>
+      </header>
+      <ThreeByThreeMode ref={threeRef} />
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
