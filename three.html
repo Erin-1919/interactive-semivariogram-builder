@@ -148,40 +148,6 @@
     background: var(--rule); margin-bottom: 6px;
   }
 
-  .mode-selector {
-    display: flex;
-    gap: 12px;
-    padding: 24px 40px 4px;
-    border-bottom: 1px solid var(--rule-soft);
-  }
-  .mode-selector button {
-    font-family: 'Manrope', sans-serif;
-    font-size: 17px;
-    font-weight: 600;
-    padding: 12px 24px;
-    border: 1px solid var(--rule);
-    background: var(--paper-soft);
-    color: var(--ink-soft);
-    cursor: pointer;
-    border-radius: 999px;
-    letter-spacing: 0.01em;
-  }
-  .mode-selector button:hover { border-color: var(--accent); color: var(--accent); }
-  .mode-selector button.active {
-    background: var(--accent);
-    color: var(--paper);
-    border-color: var(--accent);
-  }
-  .mode-selector .key-hint {
-    margin-left: auto;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 13px;
-    color: var(--ink-mute);
-    align-self: center;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
-
   /* CONTROLS */
   .control-block { margin-bottom: 26px; }
   .control-label {
@@ -615,96 +581,6 @@
     text-align: center;
   }
 
-  /* PREDICTION PANEL */
-  .predict-panel { font-family: 'Manrope', sans-serif; color: var(--ink-soft); }
-  .predict-panel .lead {
-    font-family: 'Fraunces', serif;
-    font-style: italic;
-    font-size: 16px;
-    color: var(--ink-mute);
-    margin-bottom: 14px;
-    line-height: 1.5;
-  }
-  .predict-panel .zhat {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 28px;
-    font-weight: 600;
-    color: var(--accent);
-    text-align: center;
-    padding: 14px;
-    background: var(--paper-deep);
-    border-radius: 4px;
-    margin-bottom: 14px;
-  }
-  .predict-panel .zhat small {
-    display: block;
-    font-family: 'Fraunces', serif;
-    font-style: italic;
-    color: var(--ink-mute);
-    font-size: 14px;
-    font-weight: 400;
-    margin-bottom: 4px;
-  }
-  .predict-panel table {
-    width: 100%;
-    border-collapse: collapse;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 14px;
-    margin-bottom: 14px;
-  }
-  .predict-panel th, .predict-panel td {
-    padding: 6px 8px;
-    text-align: right;
-    border-bottom: 1px dotted var(--rule);
-  }
-  .predict-panel th {
-    font-family: 'Manrope', sans-serif;
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--ink-mute);
-    border-bottom: 1px solid var(--rule);
-    text-align: right;
-  }
-  .predict-panel th:first-child, .predict-panel td:first-child { text-align: left; }
-  .predict-panel .u-bar {
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 14px;
-  }
-  .predict-panel .u-bar .label {
-    font-family: 'Fraunces', serif;
-    font-style: italic;
-    color: var(--ink-mute);
-  }
-  .predict-panel .u-bar .track {
-    height: 10px;
-    background: var(--paper-deep);
-    border-radius: 5px;
-    overflow: hidden;
-  }
-  .predict-panel .u-bar .fill {
-    height: 100%;
-    background: var(--accent);
-    border-radius: 5px;
-    transition: width 0.2s;
-  }
-  .predict-panel .u-bar .val {
-    font-family: 'JetBrains Mono', monospace;
-    color: var(--ink);
-  }
-  .predict-panel .footnote {
-    font-family: 'Fraunces', serif;
-    font-style: italic;
-    font-size: 14px;
-    color: var(--ink-mute);
-    line-height: 1.5;
-    border-top: 1px dashed var(--rule);
-    padding-top: 12px;
-  }
-
   /* RESPONSIVE */
   @media (max-width: 1280px) {
     header.masthead { padding: 26px 32px 20px; flex-direction: column; align-items: flex-start; }
@@ -715,7 +591,7 @@
     h1.title { font-size: 64px; }
   }
 
-  /* MODE WORKBENCH — used by both ThreeByThreeMode and TenByTenMode */
+  /* MODE WORKBENCH — used by ThreeByThreeMode */
   .mode-shell {
     padding: 28px 40px 36px;
     display: grid;
