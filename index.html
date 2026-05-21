@@ -1806,7 +1806,17 @@ function TenByTenMode() {
   }, [revealedStep, tabPinned]);
 
   React.useEffect(() => {
-    if (predictOn) { setTabPinned(false); setActiveTab('predict'); }
+    if (predictOn) {
+      setTabPinned(false);
+      setActiveTab('predict');
+    } else {
+      // Snapshot the step's tab at toggle-off time. revealedStep is intentionally
+      // not in the deps array — we don't want this effect to re-run on every step
+      // change (that fight would re-pin the tab in a loop).
+      const stepDef = TEN_STEPS[Math.max(0, revealedStep - 1)];
+      setActiveTab(stepDef.tab);
+      setTabPinned(false);
+    }
   }, [predictOn]);
 
   const selectedLag = revealedCount > 0 ? lags[selectedIdx] : null;
@@ -1835,7 +1845,12 @@ function TenByTenMode() {
       next[r][c] = value;
       return next;
     });
-  }, [preset.grid]);
+    // If the edited cell was the prediction target and is no longer null,
+    // release the target so the ring doesn't sit on a known cell.
+    if (value !== null && predictTarget && predictTarget.r === r && predictTarget.c === c) {
+      setPredictTarget(null);
+    }
+  }, [preset.grid, predictTarget]);
 
   const onResetValues = React.useCallback(() => {
     setEditedGrid(null);
