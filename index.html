@@ -353,6 +353,59 @@
       </div>
     </div>
   </section>
+
+  <!-- Slide 10: Quick Test (click-reveal) -->
+  <section class="slide" id="slide-10">
+    <div class="slide-content">
+      <h2 class="slide-heading reveal">Quick test: would Ordinary Kriging work here?</h2>
+      <div class="reveal" id="quick-test-wrap" style="cursor: pointer; margin-top: 1rem;">
+        <table class="quick-test" style="width: 100%; border-collapse: collapse; font-size: var(--body-size);">
+          <thead>
+            <tr style="border-bottom: 2px solid var(--rule);">
+              <th style="text-align: left; padding: 0.7rem; color: var(--ink-mute); font-weight: 600;">Scenario</th>
+              <th style="text-align: left; padding: 0.7rem 1rem; color: var(--ink-mute); font-weight: 600; width: 7rem;">Ordinary Kriging?</th>
+              <th style="text-align: left; padding: 0.7rem; color: var(--ink-mute); font-weight: 600;">Why</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr data-row="0" style="border-bottom: 1px solid var(--rule-soft);">
+              <td style="padding: 0.7rem;">Regional temperature with altitude trend</td>
+              <td class="qt-answer" style="padding: 0.7rem 1rem; color: #b91c1c; font-weight: 600; opacity: 0; visibility: hidden;">No</td>
+              <td class="qt-why" style="padding: 0.7rem; color: var(--ink-soft); opacity: 0; visibility: hidden;">Strong altitude trend violates stationarity</td>
+            </tr>
+            <tr data-row="1" style="border-bottom: 1px solid var(--rule-soft);">
+              <td style="padding: 0.7rem;">Land cover class</td>
+              <td class="qt-answer" style="padding: 0.7rem 1rem; color: #b91c1c; font-weight: 600; opacity: 0; visibility: hidden;">No</td>
+              <td class="qt-why" style="padding: 0.7rem; color: var(--ink-soft); opacity: 0; visibility: hidden;">Categorical variable rather than continuous</td>
+            </tr>
+            <tr data-row="2" style="border-bottom: 1px solid var(--rule-soft);">
+              <td style="padding: 0.7rem;">Rainfall of a province with 3 weather stations</td>
+              <td class="qt-answer" style="padding: 0.7rem 1rem; color: #b91c1c; font-weight: 600; opacity: 0; visibility: hidden;">No</td>
+              <td class="qt-why" style="padding: 0.7rem; color: var(--ink-soft); opacity: 0; visibility: hidden;">Sample density too sparse for a reliable variogram</td>
+            </tr>
+            <tr data-row="3" style="border-bottom: 1px solid var(--rule-soft);">
+              <td style="padding: 0.7rem;">Species presence / absence</td>
+              <td class="qt-answer" style="padding: 0.7rem 1rem; color: #b91c1c; font-weight: 600; opacity: 0; visibility: hidden;">No</td>
+              <td class="qt-why" style="padding: 0.7rem; color: var(--ink-soft); opacity: 0; visibility: hidden;">Binary variable rather than continuous</td>
+            </tr>
+            <tr data-row="4" style="border-bottom: 1px solid var(--rule-soft);">
+              <td style="padding: 0.7rem;">Soil nutrients in an agricultural field</td>
+              <td class="qt-answer" style="padding: 0.7rem 1rem; color: #15803d; font-weight: 600; opacity: 0; visibility: hidden;">Yes</td>
+              <td class="qt-why" style="padding: 0.7rem; color: var(--ink-soft); opacity: 0; visibility: hidden;">Continuous, spatially autocorrelated, local mean plausible</td>
+            </tr>
+            <tr data-row="5">
+              <td style="padding: 0.7rem;">Daily rainfall in one watershed</td>
+              <td class="qt-answer" style="padding: 0.7rem 1rem; color: #15803d; font-weight: 600; opacity: 0; visibility: hidden;">Yes</td>
+              <td class="qt-why" style="padding: 0.7rem; color: var(--ink-soft); opacity: 0; visibility: hidden;">Continuous, spatially autocorrelated, local mean plausible</td>
+            </tr>
+          </tbody>
+        </table>
+        <div id="quick-test-status" style="margin-top: 0.8rem; font-size: var(--small-size); color: var(--ink-mute); font-style: italic;">
+          Click table to reveal answers — 0 / 6
+        </div>
+      </div>
+    </div>
+  </section>
 </div>
 
 <div class="slide-counter" id="slide-counter">1 / 21</div>
@@ -415,6 +468,29 @@
       else document.documentElement.requestFullscreen();
     }
   });
+
+  // Slide 10 — Quick Test click-reveal.
+  // Reveal next hidden row's ? + Why cells on each click of the table area.
+  // State persists within the session (held in this closure).
+  const qtWrap = document.getElementById('quick-test-wrap');
+  const qtStatus = document.getElementById('quick-test-status');
+  let qtRevealed = 0;
+  const QT_TOTAL = 6;
+  if (qtWrap) {
+    qtWrap.addEventListener('click', () => {
+      if (qtRevealed >= QT_TOTAL) return;
+      const row = qtWrap.querySelector('tr[data-row="' + qtRevealed + '"]');
+      if (row) {
+        row.querySelectorAll('.qt-answer, .qt-why').forEach(cell => {
+          cell.style.transition = 'opacity 0.25s ease';
+          cell.style.visibility = 'visible';
+          cell.style.opacity = '1';
+        });
+      }
+      qtRevealed += 1;
+      qtStatus.textContent = 'Click table to reveal answers — ' + qtRevealed + ' / ' + QT_TOTAL;
+    });
+  }
 })();
 </script>
 </body>
