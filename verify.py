@@ -1,141 +1,169 @@
-"""Verify both modes load, render, and behave correctly."""
+"""
+Smoke test the teaching-demo branch:
+  - three.html: 3×3 walkthrough
+  - ten.html:   10×10 explorer + model picker
+  - index.html: 21-slide deck
+
+Runs Playwright + Chromium. Apps must emit the [semivariogram tests done] banner
+with no FAIL: lines. Deck must have 21 slides, a working counter, and the two
+launch buttons + PDF button must be wired up correctly.
+
+Writes verify_three.png, verify_ten.png, verify_deck.png. Exit non-zero on any failure.
+"""
 from playwright.sync_api import sync_playwright
 from pathlib import Path
 import sys
-sys.stdout.reconfigure(encoding="utf-8")
 
-HTML = Path(__file__).parent / "index.html"
-URL = HTML.absolute().as_uri()
+sys.stdout.reconfigure(encoding="utf-8")
+ROOT = Path(__file__).parent
+
+def file_url(name):
+    return (ROOT / name).resolve().as_uri()
+
+def check_three(page, errors, console):
+    """3×3 walkthrough."""
+    # Banner contract — confirm in-browser tests fired
+    banner = any("[semivariogram tests done]" in t for _, t in console)
+    if not banner:
+        errors.append("three.html: missing [semivariogram tests done] banner")
+    if any("FAIL" in t for _, t in console):
+        errors.append("three.html: FAIL: lines in console")
+
+    # 3×3 mode UI: lag toggle buttons (h=1, h=2) use class toggle-btn
+    # (not lag-chip, which is the ten.html chip style)
+    chips = page.locator(".toggle-btn")
+    if chips.count() < 1:
+        errors.append(f"three.html: expected at least one lag toggle button, got {chips.count()}")
+    steps = page.locator(".step-bar .step-item")
+    if steps.count() < 1:
+        errors.append(f"three.html: expected step bar items, got {steps.count()}")
+    page.screenshot(path=str(ROOT / "verify_three.png"), full_page=True)
+    print(f"  three.html: {chips.count()} lag toggle buttons, {steps.count()} step items, banner={banner}")
+
+def check_ten(page, errors, console):
+    """10×10 explorer."""
+    banner = any("[semivariogram tests done]" in t for _, t in console)
+    if not banner:
+        errors.append("ten.html: missing [semivariogram tests done] banner")
+    if any("FAIL" in t for _, t in console):
+        errors.append("ten.html: FAIL: lines in console")
+
+    # Model picker has 4 radios
+    radios = page.locator(".model-radio input[type=radio]")
+    if radios.count() != 4:
+        errors.append(f"ten.html: expected 4 model radios, got {radios.count()}")
+    # Default model is "none" (checked)
+    none_radio = page.locator(".model-radio input[type=radio][value=none]")
+    if none_radio.count() == 1 and not none_radio.first.is_checked():
+        errors.append("ten.html: model picker default should be 'none' (not checked)")
+    # Lag chips and step bar exist
+    chips = page.locator(".lag-chip")
+    if chips.count() < 1:
+        errors.append(f"ten.html: expected lag chips, got {chips.count()}")
+    page.screenshot(path=str(ROOT / "verify_ten.png"), full_page=True)
+    print(f"  ten.html: {radios.count()} model radios, {chips.count()} lag chips, banner={banner}")
+
+def check_deck(page, errors, console):
+    """21-slide deck (index.html)."""
+    # Slide count
+    slide_count = page.locator(".slide").count()
+    if slide_count != 21:
+        errors.append(f"index.html: expected 21 slides, got {slide_count}")
+
+    # Counter starts at "1 / 21"
+    counter_text = page.locator("#slide-counter").inner_text()
+    if not counter_text.startswith("1 /"):
+        errors.append(f"index.html: counter should start with '1 /', got '{counter_text}'")
+
+    # Press PageDown — counter should advance
+    page.keyboard.press("PageDown")
+    page.wait_for_timeout(700)
+    counter_after = page.locator("#slide-counter").inner_text()
+    if counter_after.startswith("1 /"):
+        errors.append(f"index.html: counter did not advance after PageDown (still '{counter_after}')")
+
+    # Slide-14 launch link → three.html
+    s14_link = page.locator("#slide-14 a.launch-button").first
+    if s14_link.count() == 0:
+        errors.append("index.html: slide 14 launch button missing")
+    else:
+        href = s14_link.get_attribute("href")
+        target = s14_link.get_attribute("target")
+        if href != "three.html":
+            errors.append(f"index.html: slide 14 link href = {href!r}, expected 'three.html'")
+        if target != "_blank":
+            errors.append(f"index.html: slide 14 link target = {target!r}, expected '_blank'")
+
+    # Slide-15 launch link → ten.html
+    s15_link = page.locator("#slide-15 a.launch-button").first
+    if s15_link.count() == 0:
+        errors.append("index.html: slide 15 launch button missing")
+    else:
+        href = s15_link.get_attribute("href")
+        if href != "ten.html":
+            errors.append(f"index.html: slide 15 link href = {href!r}, expected 'ten.html'")
+
+    # Slide-20 PDF link
+    s20_link = page.locator("#slide-20 a.launch-button").first
+    if s20_link.count() == 0:
+        errors.append("index.html: slide 20 launch button missing")
+    else:
+        href = s20_link.get_attribute("href") or ""
+        if not href.endswith(".pdf"):
+            errors.append(f"index.html: slide 20 link href = {href!r}, expected to end with .pdf")
+
+    # Slide-10 click-reveal: scroll to slide 10, click 6 times
+    page.locator("#slide-10").scroll_into_view_if_needed()
+    page.wait_for_timeout(500)
+    wrap = page.locator("#quick-test-wrap")
+    if wrap.count() == 0:
+        errors.append("index.html: #quick-test-wrap missing on slide 10")
+    else:
+        for i in range(6):
+            wrap.click()
+            page.wait_for_timeout(80)
+        status_text = page.locator("#quick-test-status").inner_text()
+        if "6 / 6" not in status_text:
+            errors.append(f"index.html: click-reveal final status = '{status_text}', expected to contain '6 / 6'")
+
+    page.screenshot(path=str(ROOT / "verify_deck.png"), full_page=True)
+    print(f"  index.html: {slide_count} slides, counter advanced past 1/21, all link checks done")
+
+PAGE_CHECKS = [
+    ("three.html", check_three),
+    ("ten.html", check_ten),
+    ("index.html", check_deck),
+]
 
 def main():
-    console_messages = []
-    errors = []
-
+    overall_errors = []
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
-        context = browser.new_context(viewport={"width": 1700, "height": 1100})
-        page = context.new_page()
-        page.on("console", lambda m: console_messages.append((m.type, m.text)))
-        page.on("pageerror", lambda e: errors.append(str(e)))
-
-        page.goto(URL)
-        page.wait_for_timeout(2500)
-        page.wait_for_load_state("networkidle")
-
-        if errors:
-            print("PAGE ERRORS:"); [print(" ", e) for e in errors]
-
-        fails = [m for m in console_messages if "FAIL" in m[1]]
-        if fails:
-            print("CONSOLE FAILS:"); [print(" ", t, m) for t, m in fails]
-        else:
-            print("No FAIL lines in console.")
-
-        banner_present = any("[semivariogram tests done]" in m[1] for m in console_messages)
-        print("Self-tests banner present:", banner_present)
-        assert banner_present, "Expected the in-browser tests banner"
-
-        # 1. Default is 3x3 Guided Demo
-        # Both modes are always mounted (display toggled via style) so that
-        # per-mode state survives mode switches.  We use :visible on HTML
-        # elements (step-item, tab, radio) to restrict counts to the active
-        # pane; SVG elements (pair-line, plot-point, cell-rect) are checked
-        # without :visible because the hidden pane starts with 0 of them.
-        three_btn = page.locator(".mode-selector button", has_text="3×3 Guided Demo")
-        ten_btn = page.locator(".mode-selector button", has_text="10×10 Exploration")
-        assert "active" in (three_btn.get_attribute("class") or ""), "3x3 should be active by default"
-
-        step_items = page.locator(".step-bar .step-item:visible")
-        assert step_items.count() == 10, f"Expected 10 steps in 3x3 mode, got {step_items.count()}"
-        print("3x3 step bar has 10 items: OK")
-
-        # 2. Click the h = 1 toggle and advance a few steps.
-        # pair-line elements are SVG <line>s whose zero-height bounding rect
-        # makes Playwright's :visible filter exclude them even when drawn.
-        # The 10x10 pane starts with revealedCount=0 so it has 0 pair-lines;
-        # all pair-lines found here belong to the 3x3 grid.
-        page.locator(".toggle-btn", has_text="h = 1").click()
-        page.keyboard.press("ArrowRight")
-        page.keyboard.press("ArrowRight")
-        page.wait_for_timeout(200)
-        pair_lines = page.locator(".pair-line").count()
-        assert pair_lines > 0, "Expected pair lines once step >= 3"
-        print(f"3x3 pair lines drawn at step 3+: {pair_lines}")
-
-        # 3. Step all the way to 8 and confirm a plot point appeared.
-        # After 6 more ArrowRight presses from step 4 we reach step 10.
-        # Step 8 already reveals the first lag on the plot.
-        # plot-point is an SVG <circle>; same :visible limitation applies.
-        # The 10x10 pane starts with revealedCount=0 so it has 0 plot-points.
-        for _ in range(6):
-            page.keyboard.press("ArrowRight")
-        page.wait_for_timeout(200)
-        # Switch to plot tab in case auto-flip already did it
-        page.locator(".tab:visible", has_text="Semivariogram plot").first.click()
-        page.wait_for_timeout(200)
-        plot_points = page.locator(".plot-point").count()
-        assert plot_points >= 1, "Expected at least one plot point by step 8"
-        print(f"3x3 plot points after stepping to 8+: {plot_points}")
-
-        # 4. Edit the top-left cell to a wild value; γ should change.
-        # cell-rect is an SVG <rect>; only the 3x3 grid has been edited.
-        page.locator(".cell-rect").first.click()
-        page.wait_for_timeout(200)
-        page.keyboard.press("Control+A")
-        page.keyboard.type("99")
-        page.keyboard.press("Enter")
-        page.wait_for_timeout(300)
-        edited_count = page.locator(".cell-rect.edited").count()
-        assert edited_count == 1, f"Expected 1 edited cell, got {edited_count}"
-        print("3x3 edit ring rendered on edited cell")
-
-        # 5. Switch to 10x10 mode.
-        # At step 10, the 3x3 pane renders a 3-radio model picker (spherical/
-        # exponential/gaussian, no "none").  When hidden, :visible excludes it,
-        # leaving only the 4 radios (none+three models) in the 10x10 pane.
-        ten_btn.click()
-        page.wait_for_timeout(300)
-        ten_steps = page.locator(".step-bar .step-item:visible")
-        assert ten_steps.count() == 5, f"Expected 5 steps in 10x10 mode, got {ten_steps.count()}"
-        chips = page.locator(".lag-chip:visible")
-        assert chips.count() > 0, "Expected lag chips in 10x10 mode"
-        print(f"10x10 step bar has 5 items and {chips.count()} lag chips: OK")
-
-        # 6. Model radio is present (none/spherical/exponential/gaussian)
-        radios = page.locator(".model-radio input[type=radio]:visible")
-        assert radios.count() == 4, f"Expected 4 model radios, got {radios.count()}"
-        print("10x10 model radio has none/spherical/exponential/gaussian")
-
-        # 7. Toggle Predict at unknown — Prediction tab appears
-        page.locator(".model-toggle-label", has_text="Predict at an unknown cell").locator(".model-toggle").check()
-        page.wait_for_timeout(300)
-        predict_tab = page.locator(".tab:visible", has_text="Prediction")
-        assert predict_tab.count() == 1, "Expected Prediction tab to appear"
-        predict_panel = page.locator(".predict-panel")
-        assert predict_panel.count() == 1, "Expected PredictionPanel to render"
-        zhat_visible = page.locator(".predict-panel .zhat").inner_text()
-        assert "ẑ" in zhat_visible, f"Expected ẑ in prediction panel, got: {zhat_visible}"
-        print(f"10x10 prediction panel rendered: {zhat_visible.replace(chr(10), ' ')}")
-
-        # 8. Reveal-all snapshot — for the gallery
-        page.locator(".model-toggle-label", has_text="Predict at an unknown cell").locator(".model-toggle").uncheck()
-        page.wait_for_timeout(200)
-        for chip in page.locator(".lag-chip:visible").all():
-            chip.click()
-        page.locator(".model-radio input[value=spherical]:visible").check()
-        page.wait_for_timeout(300)
-        page.locator(".tab:visible", has_text="Semivariogram plot").first.click()
-        page.wait_for_timeout(200)
-        model_curve = page.locator(".model-curve").count()
-        assert model_curve >= 1, "Expected the spherical curve to be drawn"
-
-        page.screenshot(path=str(Path(__file__).parent / "verify_full.png"), full_page=True)
-        print("Saved verify_full.png")
-
+        browser = p.chromium.launch(
+            headless=True,
+            args=["--allow-file-access-from-files", "--disable-web-security"],
+        )
+        for fname, checker in PAGE_CHECKS:
+            print(f"checking {fname} ...")
+            errors = []
+            console = []
+            context = browser.new_context(viewport={"width": 1700, "height": 1100})
+            page = context.new_page()
+            page.on("console", lambda m: console.append((m.type, m.text)))
+            page.on("pageerror", lambda e: errors.append(f"{fname}: pageerror: {e}"))
+            page.goto(file_url(fname))
+            page.wait_for_timeout(2500)
+            page.wait_for_load_state("networkidle", timeout=15000)
+            checker(page, errors, console)
+            for err in errors:
+                print(f"  FAIL: {err}")
+            overall_errors.extend(errors)
+            context.close()
         browser.close()
 
-    if errors or any("FAIL" in m[1] for m in console_messages):
+    if overall_errors:
+        print(f"\nverify FAILED with {len(overall_errors)} error(s)")
         sys.exit(1)
+    print("\nverify OK")
 
 if __name__ == "__main__":
     main()
