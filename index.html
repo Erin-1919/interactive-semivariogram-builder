@@ -129,7 +129,7 @@
   .cell-edit-input:focus { outline: none; }
   .cell-value {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 20px;
+    font-size: 22px;
     font-weight: 500;
     fill: var(--ink);
     text-anchor: middle;
@@ -141,7 +141,7 @@
     fill: var(--unknown);
     font-family: 'Fraunces', serif;
     font-style: italic;
-    font-size: 28px;
+    font-size: 32px;
   }
   .cell-value.on-hovered { fill: var(--paper-soft); font-weight: 600; }
   .pair-line {
@@ -434,7 +434,7 @@
     cursor: pointer;
     color: var(--ink-soft);
     font-family: 'Manrope', sans-serif;
-    font-size: 13px;
+    font-size: 16px;
     font-weight: 500;
     transition: background 0.12s, color 0.12s, border-color 0.12s;
   }
@@ -450,13 +450,13 @@
   }
   .step-bar .step-num {
     flex-shrink: 0;
-    width: 22px; height: 22px;
+    width: 28px; height: 28px;
     border-radius: 50%;
     background: var(--paper-deep);
     color: var(--ink-soft);
     font-family: 'Fraunces', serif;
     font-style: italic;
-    font-size: 14px;
+    font-size: 18px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -511,6 +511,34 @@
     flex: 1;
     overflow-y: auto;
   }
+  .tabbed-panel.vertical {
+    flex-direction: row;
+  }
+  .tabbed-panel.vertical .tabs {
+    flex-direction: column;
+    border-bottom: none;
+    border-left: 1px solid var(--rule);
+    background: var(--paper-soft);
+    order: 2;
+    flex: 0 0 56px;
+  }
+  .tabbed-panel.vertical .tab {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    flex: 1;
+    border-right: none;
+    border-bottom: 1px solid var(--rule);
+    border-left: 2px solid transparent;
+    padding: 18px 14px;
+    font-size: 16px;
+  }
+  .tabbed-panel.vertical .tab:last-child { border-bottom: none; }
+  .tabbed-panel.vertical .tab.active {
+    border-left: 2px solid var(--accent);
+    border-bottom: 1px solid var(--rule);
+  }
+  .tabbed-panel.vertical .tab.active:last-child { border-bottom: none; }
+  .tabbed-panel.vertical .tab-body { order: 1; flex: 1; }
 
   /* FORMULA PANEL */
   .formula-panel { font-family: 'Fraunces', serif; }
@@ -544,6 +572,14 @@
     margin-bottom: 12px;
   }
   .formula-panel .caption strong { color: var(--accent); }
+
+  /* FORMULA BAND — γ(h) formula as a full-width row above the mode-shell */
+  .formula-band {
+    padding: 0 40px 16px;
+  }
+  .formula-band .big-formula {
+    margin-bottom: 0;
+  }
 
   /* CALCULATION TABLE */
   .calc-table { font-family: 'Manrope', sans-serif; color: var(--ink-soft); }
@@ -716,7 +752,7 @@
   .mode-shell {
     padding: 28px 40px 36px;
     display: grid;
-    grid-template-columns: minmax(420px, 1.2fr) minmax(520px, 1.4fr);
+    grid-template-columns: minmax(420px, 1fr) minmax(420px, 1fr);
     gap: 32px;
     align-items: start;
   }
@@ -762,10 +798,12 @@
     font-family: 'Fraunces', serif;
     font-style: italic;
     color: var(--ink-mute);
+    font-size: 16px;
   }
   .whatif-footer button {
     font-family: 'Manrope', sans-serif;
     font-style: normal;
+    font-size: 16px;
     background: var(--paper-soft);
     border: 1px solid var(--rule);
     color: var(--ink);
@@ -1327,7 +1365,7 @@ function niceStep(range, targetTicks) {
 // ------------------------------------------------------------------
 // SemivariogramPlot — SVG plot with axes, points, optional model.
 // ------------------------------------------------------------------
-function SemivariogramPlot({ lags, selectedIdx, revealedCount, modelName = 'none', width = 540, height = 340 }) {
+function SemivariogramPlot({ lags, selectedIdx, revealedCount, modelName = 'none', width = 540, height = 340, showPoints = true }) {
   const margin = { top: 22, right: 28, bottom: 56, left: 68 };
   const innerW = width - margin.left - margin.right;
   const innerH = height - margin.top - margin.bottom;
@@ -1404,7 +1442,7 @@ function SemivariogramPlot({ lags, selectedIdx, revealedCount, modelName = 'none
         transform="rotate(-90)"
         textAnchor="middle">semivariance γ(h)</text>
 
-      {visibleLags.length > 1 && (
+      {showPoints && visibleLags.length > 1 && (
         <path className="plot-connector"
           d={visibleLags
             .map((l, i) => `${i === 0 ? 'M' : 'L'} ${xScale(l.h)} ${yScale(l.gamma)}`)
@@ -1448,7 +1486,7 @@ function SemivariogramPlot({ lags, selectedIdx, revealedCount, modelName = 'none
         );
       })()}
 
-      {visibleLags.map((l, i) => {
+      {showPoints && visibleLags.map((l, i) => {
         const selected = i === selectedIdx;
         return (
           <g key={`pt-${i}`}>
@@ -1508,9 +1546,9 @@ function StepBar({ steps, activeStep, onStep }) {
 // TabbedPanel — tab strip plus a single visible content slot.
 // `tabs` is [{ key, label }]; `children` is a map { [key]: ReactNode }.
 // ------------------------------------------------------------------
-function TabbedPanel({ tabs, activeTab, onTab, children }) {
+function TabbedPanel({ tabs, activeTab, onTab, children, orientation = 'horizontal' }) {
   return (
-    <div className="tabbed-panel" role="tablist">
+    <div className={`tabbed-panel${orientation === 'vertical' ? ' vertical' : ''}`} role="tablist">
       <div className="tabs">
         {tabs.map(t => (
           <button
@@ -1702,9 +1740,9 @@ function PredictionPanel({ prediction }) {
 // of the empirical semivariogram hand-calculation.
 // ------------------------------------------------------------------
 const THREE_STEPS = [
-  { label: 'Grid',            tab: 'formula', highlight: null,        revealCols: { diff: false, sq: false, sum: false, gamma: false } },
-  { label: 'Select lag',      tab: 'formula', highlight: 'h',         revealCols: { diff: false, sq: false, sum: false, gamma: false } },
-  { label: 'Highlight pairs', tab: 'formula', highlight: 'z_i',       revealCols: { diff: false, sq: false, sum: false, gamma: false } },
+  { label: 'Grid',            tab: 'calc',    highlight: null,        revealCols: { diff: false, sq: false, sum: false, gamma: false } },
+  { label: 'Select lag',      tab: 'calc',    highlight: 'h',         revealCols: { diff: false, sq: false, sum: false, gamma: false } },
+  { label: 'Highlight pairs', tab: 'calc',    highlight: 'z_i',       revealCols: { diff: false, sq: false, sum: false, gamma: false } },
   { label: 'Differences',     tab: 'calc',    highlight: 'diff',      revealCols: { diff: true,  sq: false, sum: false, gamma: false } },
   { label: 'Square them',     tab: 'calc',    highlight: 'sq',        revealCols: { diff: true,  sq: true,  sum: false, gamma: false } },
   { label: 'Sum',             tab: 'calc',    highlight: 'sum',       revealCols: { diff: true,  sq: true,  sum: true,  gamma: false } },
@@ -1719,9 +1757,10 @@ const ThreeByThreeMode = React.forwardRef((props, ref) => {
   const [hoveredCell, setHoveredCell] = React.useState(null);
   const [revealedStep, setRevealedStep] = React.useState(1);
   const [selectedLagIdx, setSelectedLagIdx] = React.useState(0);
-  const [activeTab, setActiveTab] = React.useState('formula');
+  const [activeTab, setActiveTab] = React.useState('calc');
   const [tabPinned, setTabPinned] = React.useState(false);
   const [modelName, setModelName] = React.useState('none');
+  const [showPoints, setShowPoints] = React.useState(true);
 
   React.useImperativeHandle(ref, () => ({
     next: () => setRevealedStep(s => Math.min(THREE_STEPS.length, s + 1)),
@@ -1729,7 +1768,7 @@ const ThreeByThreeMode = React.forwardRef((props, ref) => {
     reset: () => {
       setRevealedStep(1);
       setSelectedLagIdx(0);
-      setActiveTab('formula');
+      setActiveTab('calc');
       setTabPinned(false);
       setModelName('none');
     }
@@ -1784,7 +1823,6 @@ const ThreeByThreeMode = React.forwardRef((props, ref) => {
   }, []);
 
   const tabs = [
-    { key: 'formula', label: 'γ(h) Formula' },
     { key: 'calc',    label: 'Calculation' },
     { key: 'plot',    label: 'Semivariogram plot' }
   ];
@@ -1818,6 +1856,9 @@ const ThreeByThreeMode = React.forwardRef((props, ref) => {
         />
       </div>
 
+      <div className="formula-band">
+        <FormulaPanel highlight={stepDef.highlight} />
+      </div>
       <div className="mode-shell">
         <div className="grid-pane">
           <div className="grid-svg-frame" style={{ display: 'flex', justifyContent: 'center', background: 'var(--paper-soft)', border: '1px solid var(--rule)', padding: 16 }}>
@@ -1826,7 +1867,7 @@ const ThreeByThreeMode = React.forwardRef((props, ref) => {
               highlightedPairs={highlightedPairs}
               hoveredCell={hoveredCell}
               onCellHover={setHoveredCell}
-              size={420}
+              size={480}
               onEdit={onCellEdit}
               editedKeys={editedKeys}
             />
@@ -1844,6 +1885,12 @@ const ThreeByThreeMode = React.forwardRef((props, ref) => {
                   {m}
                 </label>
               )}
+              <label style={{ fontFamily: 'Manrope, sans-serif', fontSize: 14, color: 'var(--ink-soft)', display: 'inline-flex', alignItems: 'center', gap: 6, cursor: 'pointer', marginLeft: 12 }}>
+                <input type="checkbox" className="model-toggle"
+                  checked={showPoints}
+                  onChange={e => setShowPoints(e.target.checked)} />
+                Show empirical points
+              </label>
             </div>
           )}
         </div>
@@ -1853,9 +1900,9 @@ const ThreeByThreeMode = React.forwardRef((props, ref) => {
             tabs={tabs}
             activeTab={activeTab}
             onTab={(k) => { setActiveTab(k); setTabPinned(true); }}
+            orientation="vertical"
           >
             {{
-              formula: <FormulaPanel highlight={stepDef.highlight} />,
               calc:    <CalculationTable
                          lag={selectedLag}
                          revealColumns={stepDef.revealCols}
@@ -1866,6 +1913,7 @@ const ThreeByThreeMode = React.forwardRef((props, ref) => {
                            selectedIdx={plotSelectedIdx}
                            revealedCount={revealedCount}
                            modelName={revealedStep >= 10 ? modelName : 'none'}
+                           showPoints={showPoints}
                          />
                        </div>
             }}
@@ -1886,8 +1934,8 @@ const ThreeByThreeMode = React.forwardRef((props, ref) => {
 // shell (StepBar + grid + TabbedPanel + what-if footer).
 // ------------------------------------------------------------------
 const TEN_STEPS = [
-  { label: 'Grid', tab: 'formula', highlight: null },
-  { label: 'Pairs', tab: 'formula', highlight: 'z_i' },
+  { label: 'Grid', tab: 'calc', highlight: null },
+  { label: 'Pairs', tab: 'calc', highlight: 'z_i' },
   { label: 'Compute γ(h)', tab: 'calc', highlight: 'oneOver2N' },
   { label: 'Plot point', tab: 'plot', highlight: null },
   { label: 'Fit model', tab: 'plot', highlight: null }
@@ -1904,8 +1952,9 @@ const TenByTenMode = React.forwardRef((props, ref) => {
   const [predictOn, setPredictOn] = React.useState(false);
   const [predictTarget, setPredictTarget] = React.useState(null);
   const [revealedStep, setRevealedStep] = React.useState(1);
-  const [activeTab, setActiveTab] = React.useState('formula');
+  const [activeTab, setActiveTab] = React.useState('calc');
   const [tabPinned, setTabPinned] = React.useState(false);
+  const [showPoints, setShowPoints] = React.useState(true);
 
   const preset = DATASETS_10X10[presetKey];
   const grid = editedGrid || preset.grid;
@@ -1965,7 +2014,7 @@ const TenByTenMode = React.forwardRef((props, ref) => {
       setRevealedCount(0);
       setSelectedIdx(0);
       setRevealedStep(1);
-      setActiveTab('formula');
+      setActiveTab('calc');
       setTabPinned(false);
       setModelName('none');
       setPredictOn(false);
@@ -2069,13 +2118,11 @@ const TenByTenMode = React.forwardRef((props, ref) => {
 
   const tabs = predictOn
     ? [
-        { key: 'formula', label: 'γ(h) Formula' },
         { key: 'calc',    label: 'Calculation' },
         { key: 'plot',    label: 'Semivariogram plot' },
         { key: 'predict', label: 'Prediction' }
       ]
     : [
-        { key: 'formula', label: 'γ(h) Formula' },
         { key: 'calc',    label: 'Calculation' },
         { key: 'plot',    label: 'Semivariogram plot' }
       ];
@@ -2118,6 +2165,9 @@ const TenByTenMode = React.forwardRef((props, ref) => {
         </div>
       )}
 
+      <div className="formula-band">
+        <FormulaPanel highlight={stepHighlight} />
+      </div>
       <div className="mode-shell">
         <div className="grid-pane">
           <div className="grid-svg-frame" style={{ display: 'flex', justifyContent: 'center', background: 'var(--paper-soft)', border: '1px solid var(--rule)', padding: 16 }}>
@@ -2162,13 +2212,18 @@ const TenByTenMode = React.forwardRef((props, ref) => {
                 {m}
               </label>
             )}
+            <label style={{ fontFamily: 'Manrope, sans-serif', fontSize: 14, color: 'var(--ink-soft)', display: 'inline-flex', alignItems: 'center', gap: 6, cursor: 'pointer', marginLeft: 12 }}>
+              <input type="checkbox" className="model-toggle"
+                checked={showPoints}
+                onChange={e => setShowPoints(e.target.checked)} />
+              Show empirical points
+            </label>
           </div>
         </div>
 
         <div className="right-pane">
-          <TabbedPanel tabs={tabs} activeTab={activeTab} onTab={onTab}>
+          <TabbedPanel tabs={tabs} activeTab={activeTab} onTab={onTab} orientation="vertical">
             {{
-              formula: <FormulaPanel highlight={stepHighlight} />,
               calc:    <CalculationTable lag={selectedLag} />,
               plot:    <div className="plot-frame">
                          <SemivariogramPlot
@@ -2176,6 +2231,7 @@ const TenByTenMode = React.forwardRef((props, ref) => {
                            selectedIdx={selectedIdx}
                            revealedCount={revealedCount}
                            modelName={modelName}
+                           showPoints={showPoints}
                          />
                        </div>,
               predict: <PredictionPanel prediction={prediction} />
