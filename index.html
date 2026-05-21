@@ -623,6 +623,57 @@
       </div>
     </div>
   </section>
+
+  <!-- Slide 16: Step 4 — Build the Kriging Matrix (A/B/C/D, no equations) -->
+  <section class="slide" id="slide-16">
+    <div class="slide-content">
+      <div class="eyebrow reveal">Step-by-Step Ordinary Kriging Workflow</div>
+      <h2 class="slide-heading reveal" style="margin-top: 0.4rem;">Step 4 — Build the kriging matrix and solve weights</h2>
+      <div class="reveal" style="font-size: var(--small-size); color: var(--ink-mute); margin-top: 0.5rem;">
+        <strong>Inputs used:</strong> the fitted variogram model, sample-to-sample distances, and sample-to-target distances.
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; margin-top: 1.2rem;">
+        <div class="reveal" style="padding: 1.2rem; background: var(--paper-soft); border-left: 3px solid var(--accent);">
+          <div style="font-family: 'Fraunces', serif; font-size: var(--h3-size); color: var(--accent); font-weight: 500;">A. Calculate semivariance / covariance</div>
+          <ul style="font-size: var(--body-size); color: var(--ink-soft); margin-top: 0.4rem; padding-left: 1.1rem;">
+            <li>Between all sample points</li>
+            <li>Between sample points and the target point</li>
+          </ul>
+        </div>
+        <div class="reveal" style="padding: 1.2rem; background: var(--paper-soft); border-left: 3px solid var(--accent);">
+          <div style="font-family: 'Fraunces', serif; font-size: var(--h3-size); color: var(--accent); font-weight: 500;">B. Build the kriging system</div>
+          <p style="font-size: var(--body-size); color: var(--ink-soft); margin-top: 0.4rem;">
+            Spatial-relationship matrix plus an unbiasedness constraint row and column.
+          </p>
+        </div>
+        <div class="reveal" style="padding: 1.2rem; background: var(--paper-soft); border-left: 3px solid var(--accent);">
+          <div style="font-family: 'Fraunces', serif; font-size: var(--h3-size); color: var(--accent); font-weight: 500;">C. Apply unbiasedness constraint</div>
+        </div>
+        <div class="reveal" style="padding: 1.2rem; background: var(--paper-soft); border-left: 3px solid var(--accent);">
+          <div style="font-family: 'Fraunces', serif; font-size: var(--h3-size); color: var(--accent); font-weight: 500;">D. Solve for weights</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 17: Step 5 — Prediction Surface Generation (combined map figure) -->
+  <section class="slide" id="slide-17">
+    <div class="slide-content">
+      <div class="eyebrow reveal">Step-by-Step Ordinary Kriging Workflow</div>
+      <h2 class="slide-heading reveal" style="margin-top: 0.4rem;">Step 5 — Prediction surface generation</h2>
+      <div class="reveal" style="margin-top: 1rem; text-align: center;">
+        <img src="assets/img/slide17_prediction_uncertainty.png" alt="Prediction surface (left) and uncertainty surface (right)" style="max-width: 100%; max-height: 55vh; object-fit: contain;">
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 1rem; padding: 0 1rem;">
+        <p class="reveal" style="font-size: var(--body-size); color: var(--ink-soft); text-align: center;">
+          <strong>Left — predicted values:</strong> estimated values mapped across the entire study area; the interpolated "best guess" map.
+        </p>
+        <p class="reveal" style="font-size: var(--body-size); color: var(--ink-soft); text-align: center;">
+          <strong>Right — uncertainty:</strong> map of prediction uncertainty, highlighting where the model is confident vs. uncertain.
+        </p>
+      </div>
+    </div>
+  </section>
 </div>
 
 <div class="slide-counter" id="slide-counter">1 / 21</div>
