@@ -287,6 +287,72 @@
       </div>
     </div>
   </section>
+
+  <!-- Slide 8: Ordinary Kriging Core Assumption -->
+  <section class="slide" id="slide-8">
+    <div class="slide-content">
+      <div class="eyebrow reveal">Ordinary Kriging — Core Assumption</div>
+      <h2 class="slide-heading reveal" style="margin-top: 0.4rem;">Unknown but constant local mean</h2>
+      <p class="reveal" style="font-size: var(--body-size); color: var(--ink-soft); margin-top: 1rem; max-width: 75ch;">
+        Ordinary Kriging assumes that within the local neighborhood of prediction, the
+        underlying mean is constant but unknown.
+      </p>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 1.5rem;">
+        <div class="reveal" style="padding: 1.5rem; background: var(--paper-soft); border-radius: 6px;">
+          <div style="font-family: 'JetBrains Mono', monospace; font-size: var(--h3-size); color: var(--accent-deep); text-align: center;">
+            Z(s) = μ + ε(s)
+          </div>
+          <div style="font-size: var(--small-size); color: var(--ink-mute); margin-top: 1rem; line-height: 1.7;">
+            <div><strong>Z(s)</strong> — observed value at location s</div>
+            <div><strong>μ</strong> — unknown but locally constant mean</div>
+            <div><strong>ε(s)</strong> — spatially correlated random component</div>
+          </div>
+        </div>
+        <div class="reveal" style="font-size: var(--body-size); color: var(--ink-soft);">
+          <p>
+            Ordinary Kriging assumes <strong>local stability</strong> without requiring
+            <strong>global uniformity</strong>. It avoids the unrealistic assumption of
+            Simple Kriging (known global mean), while also avoiding the complexity of
+            Universal Kriging (explicit trend modeling).
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 9: When Ordinary Kriging Is Appropriate -->
+  <section class="slide" id="slide-9">
+    <div class="slide-content">
+      <h2 class="slide-heading reveal">When Ordinary Kriging is appropriate</h2>
+      <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; margin-top: 1.5rem;">
+        <div class="reveal" style="padding: 1.2rem; background: var(--paper-soft); border-left: 3px solid var(--accent);">
+          <div style="font-family: 'Fraunces', serif; font-size: var(--h3-size); color: var(--accent); font-weight: 500;">A. Spatial autocorrelation exists</div>
+          <p style="font-size: var(--body-size); color: var(--ink-soft); margin-top: 0.5rem;">
+            Nearby points should be more similar than distant points.
+          </p>
+        </div>
+        <div class="reveal" style="padding: 1.2rem; background: var(--paper-soft); border-left: 3px solid var(--accent);">
+          <div style="font-family: 'Fraunces', serif; font-size: var(--h3-size); color: var(--accent); font-weight: 500;">B. No strong large-scale trend</div>
+          <p style="font-size: var(--body-size); color: var(--ink-soft); margin-top: 0.5rem;">
+            A major directional trend (e.g., temperature decreasing steadily with altitude)
+            will make Ordinary Kriging underperform.
+          </p>
+        </div>
+        <div class="reveal" style="padding: 1.2rem; background: var(--paper-soft); border-left: 3px solid var(--accent);">
+          <div style="font-family: 'Fraunces', serif; font-size: var(--h3-size); color: var(--accent); font-weight: 500;">C. Sufficient sample density</div>
+          <p style="font-size: var(--body-size); color: var(--ink-soft); margin-top: 0.5rem;">
+            A meaningful variogram requires enough data to estimate spatial dependence reliably.
+          </p>
+        </div>
+        <div class="reveal" style="padding: 1.2rem; background: var(--paper-soft); border-left: 3px solid var(--accent);">
+          <div style="font-family: 'Fraunces', serif; font-size: var(--h3-size); color: var(--accent); font-weight: 500;">D. Continuous variables</div>
+          <p style="font-size: var(--body-size); color: var(--ink-soft); margin-top: 0.5rem;">
+            Designed for continuous numeric variables (rainfall, temperature, soil moisture).
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
 </div>
 
 <div class="slide-counter" id="slide-counter">1 / 21</div>
