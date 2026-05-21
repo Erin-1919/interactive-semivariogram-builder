@@ -254,6 +254,39 @@
       </div>
     </div>
   </section>
+
+  <!-- Slide 7: BLUP -->
+  <section class="slide" id="slide-7">
+    <div class="slide-content">
+      <div class="eyebrow reveal">Kriging as BLUP</div>
+      <h2 class="slide-heading reveal" style="margin-top: 0.4rem;">Best Linear Unbiased Prediction</h2>
+      <p class="reveal" style="font-size: var(--body-size); color: var(--ink-soft); margin-top: 0.8rem; max-width: 70ch;">
+        Kriging minimizes prediction error variance. Among all possible linear unbiased
+        estimators, kriging gives the most precise estimate.
+      </p>
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-top: 2rem;">
+        <div class="reveal" style="padding: 1.5rem; background: var(--paper-soft); border-left: 3px solid var(--accent);">
+          <div style="font-family: 'Fraunces', serif; font-size: var(--h2-size); color: var(--accent); font-weight: 500;">Best</div>
+          <p style="font-size: var(--body-size); color: var(--ink-soft); margin-top: 0.5rem;">
+            Minimizes prediction error variance.
+          </p>
+        </div>
+        <div class="reveal" style="padding: 1.5rem; background: var(--paper-soft); border-left: 3px solid var(--accent);">
+          <div style="font-family: 'Fraunces', serif; font-size: var(--h2-size); color: var(--accent); font-weight: 500;">Linear</div>
+          <p style="font-size: var(--body-size); color: var(--ink-soft); margin-top: 0.5rem;">
+            Prediction is a weighted sum of observed values, so Kriging remains
+            mathematically interpretable.
+          </p>
+        </div>
+        <div class="reveal" style="padding: 1.5rem; background: var(--paper-soft); border-left: 3px solid var(--accent);">
+          <div style="font-family: 'Fraunces', serif; font-size: var(--h2-size); color: var(--accent); font-weight: 500;">Unbiased</div>
+          <p style="font-size: var(--body-size); color: var(--ink-soft); margin-top: 0.5rem;">
+            Expected prediction error is zero — Kriging is statistically fair on average.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
 </div>
 
 <div class="slide-counter" id="slide-counter">1 / 21</div>
