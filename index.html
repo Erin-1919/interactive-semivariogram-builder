@@ -674,6 +674,104 @@
       </div>
     </div>
   </section>
+
+  <!-- Slide 18: Step 6 — Validation (LOOCV) -->
+  <section class="slide" id="slide-18">
+    <div class="slide-content">
+      <div class="eyebrow reveal">Step-by-Step Ordinary Kriging Workflow</div>
+      <h2 class="slide-heading reveal" style="margin-top: 0.4rem;">Step 6 — Validation</h2>
+      <p class="reveal" style="font-size: var(--body-size); color: var(--ink-soft); margin-top: 0.6rem;">
+        Evaluate whether the kriging model performs well. A common approach is
+        <strong>leave-one-out cross-validation</strong>:
+      </p>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 1rem;">
+        <div class="reveal">
+          <div style="font-family: 'Manrope', sans-serif; font-size: var(--small-size); letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-mute);">Steps</div>
+          <ol style="font-size: var(--body-size); color: var(--ink); margin-top: 0.5rem; padding-left: 1.3rem; line-height: 1.7;">
+            <li>Remove one observed point</li>
+            <li>Predict its value using the remaining points</li>
+            <li>Compare predicted vs. observed value</li>
+            <li>Repeat for all points</li>
+          </ol>
+        </div>
+        <div class="reveal">
+          <table style="width: 100%; border-collapse: collapse; font-size: var(--body-size);">
+            <thead>
+              <tr style="border-bottom: 2px solid var(--rule);">
+                <th style="text-align: left; padding: 0.5rem; color: var(--ink-mute); font-weight: 600;">Metric</th>
+                <th style="text-align: left; padding: 0.5rem; color: var(--ink-mute); font-weight: 600;">Desired result</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom: 1px solid var(--rule-soft);">
+                <td style="padding: 0.45rem;">Mean Error</td>
+                <td style="padding: 0.45rem; color: var(--ink-soft);">Close to 0</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--rule-soft);">
+                <td style="padding: 0.45rem;">Root Mean Square Error</td>
+                <td style="padding: 0.45rem; color: var(--ink-soft);">As small as possible</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--rule-soft);">
+                <td style="padding: 0.45rem;">Mean Standardized Error</td>
+                <td style="padding: 0.45rem; color: var(--ink-soft);">Close to 0</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--rule-soft);">
+                <td style="padding: 0.45rem;">Root Mean Sq. Standardized Error</td>
+                <td style="padding: 0.45rem; color: var(--ink-soft);">Close to 1</td>
+              </tr>
+              <tr>
+                <td style="padding: 0.45rem;">Prediction error map</td>
+                <td style="padding: 0.45rem; color: var(--ink-soft);">No strong spatial pattern</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 19: Different Types of Kriging (moved here per user note) -->
+  <section class="slide" id="slide-19">
+    <div class="slide-content">
+      <h2 class="slide-heading reveal">Different types of Kriging</h2>
+      <table class="reveal" style="width: 100%; border-collapse: collapse; font-size: var(--body-size); margin-top: 1.2rem;">
+        <thead>
+          <tr style="border-bottom: 2px solid var(--rule);">
+            <th style="text-align: left; padding: 0.65rem; color: var(--ink-mute); font-weight: 600;">Type</th>
+            <th style="text-align: left; padding: 0.65rem; color: var(--ink-mute); font-weight: 600;">Mean assumption</th>
+            <th style="text-align: left; padding: 0.65rem; color: var(--ink-mute); font-weight: 600;">Best for</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom: 1px solid var(--rule-soft);">
+            <td style="padding: 0.55rem;">Simple Kriging</td>
+            <td style="padding: 0.55rem; color: var(--ink-soft);">Known constant</td>
+            <td style="padding: 0.55rem; color: var(--ink-soft);">Rare theoretical cases</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--rule-soft); background: var(--accent-pale);">
+            <td style="padding: 0.55rem; font-weight: 600;">Ordinary Kriging ★</td>
+            <td style="padding: 0.55rem;">Unknown local constant</td>
+            <td style="padding: 0.55rem;">Most common interpolation</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--rule-soft);">
+            <td style="padding: 0.55rem;">Universal Kriging</td>
+            <td style="padding: 0.55rem; color: var(--ink-soft);">Trend / drift present</td>
+            <td style="padding: 0.55rem; color: var(--ink-soft);">Large-scale gradients</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--rule-soft);">
+            <td style="padding: 0.55rem;">Indicator Kriging</td>
+            <td style="padding: 0.55rem; color: var(--ink-soft);">Binary or threshold probabilities</td>
+            <td style="padding: 0.55rem; color: var(--ink-soft);">Probability mapping</td>
+          </tr>
+          <tr>
+            <td style="padding: 0.55rem;">Co-Kriging</td>
+            <td style="padding: 0.55rem; color: var(--ink-soft);">Multiple correlated variables</td>
+            <td style="padding: 0.55rem; color: var(--ink-soft);">Multi-source prediction</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
 </div>
 
 <div class="slide-counter" id="slide-counter">1 / 21</div>
