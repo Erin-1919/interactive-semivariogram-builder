@@ -1999,22 +1999,36 @@ const TenByTenMode = React.forwardRef((props, ref) => {
   React.useImperativeHandle(ref, () => ({
     next: () => {
       if (predictOn) return;
-      if (revealedCount < lags.length && revealedStep <= 4) {
+      // At step 4 (Plot point) with more lags to reveal, advance the lag —
+      // the user stays at step 4 while walking through lags.
+      if (revealedStep === 4 && revealedCount < lags.length) {
         setRevealedCount(rc => Math.min(lags.length, rc + 1));
         setSelectedIdx(i => Math.min(lags.length - 1, i + 1));
-        if (revealedCount === 0) setRevealedStep(2);
-        else setRevealedStep(s => Math.max(s, 4));
-      } else {
-        setRevealedStep(s => Math.min(TEN_STEPS.length, s + 1));
+        return;
+      }
+      // Otherwise advance the step.
+      const nextStep = Math.min(TEN_STEPS.length, revealedStep + 1);
+      setRevealedStep(nextStep);
+      // Entering step 4 from step 3 auto-reveals the first lag.
+      if (nextStep === 4 && revealedCount === 0 && lags.length > 0) {
+        setRevealedCount(1);
+        setSelectedIdx(0);
       }
     },
     prev: () => {
       if (predictOn) return;
-      if (revealedCount > 0 && revealedStep >= 4) {
-        setRevealedCount(rc => Math.max(0, rc - 1));
+      // At step 4 with more than one lag revealed, retreat the lag first.
+      if (revealedStep === 4 && revealedCount > 1) {
+        setRevealedCount(rc => rc - 1);
         setSelectedIdx(i => Math.max(0, i - 1));
-      } else {
-        setRevealedStep(s => Math.max(1, s - 1));
+        return;
+      }
+      // Otherwise retreat the step. Stepping back past step 4 clears lags.
+      const prevStep = Math.max(1, revealedStep - 1);
+      setRevealedStep(prevStep);
+      if (revealedStep === 4 && prevStep === 3) {
+        setRevealedCount(0);
+        setSelectedIdx(0);
       }
     },
     reset: () => {
@@ -2286,7 +2300,6 @@ function App() {
         <div className="meta">
           <div><span className="rule-line"></span></div>
           <div>From a 3×3 hand calc to a fitted 10×10 model</div>
-          <div>← / → to step · Home to reset</div>
         </div>
       </header>
 
