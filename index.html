@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>An Introduction to Ordinary Kriging — Teaching Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Manrope:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="lib/theme.css">
+<style>
+  /* ===========================================
+     VIEWPORT FITTING — each slide = one viewport, no scrolling within a slide.
+     =========================================== */
+  html { scroll-snap-type: y mandatory; scroll-behavior: smooth; }
+  html, body { height: 100%; overflow-x: hidden; }
+
+  :root {
+    --slide-padding: clamp(2rem, 5vw, 5rem);
+    --title-size: clamp(1.8rem, 4.5vw, 3.8rem);
+    --h2-size: clamp(1.3rem, 3vw, 2.4rem);
+    --h3-size: clamp(1rem, 2vw, 1.5rem);
+    --body-size: clamp(0.9rem, 1.3vw, 1.15rem);
+    --small-size: clamp(0.75rem, 1vw, 0.95rem);
+    --content-gap: clamp(0.75rem, 2vw, 2rem);
+  }
+
+  .deck { position: relative; z-index: 2; }
+  .slide {
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    padding: var(--slide-padding);
+    scroll-snap-align: start;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+  }
+  .slide-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    max-height: 100%;
+    overflow: hidden;
+    gap: var(--content-gap);
+  }
+
+  h1.slide-title {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: var(--title-size);
+    letter-spacing: -0.02em;
+    margin: 0;
+  }
+  h1.slide-title em { font-style: italic; color: var(--accent); }
+  h2.slide-heading {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: var(--h2-size);
+    letter-spacing: -0.01em;
+    margin: 0;
+  }
+  .eyebrow {
+    font-family: 'Manrope', sans-serif;
+    font-size: var(--small-size);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+  }
+
+  /* Bottom-right counter */
+  .slide-counter {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    z-index: 50;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: var(--small-size);
+    color: var(--ink-mute);
+    background: rgba(255, 255, 255, 0.7);
+    padding: 0.25rem 0.6rem;
+    border-radius: 4px;
+    pointer-events: none;
+  }
+  @media (max-height: 500px) { .slide-counter { display: none; } }
+
+  /* Reveal animations */
+  .reveal {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  .slide.visible .reveal { opacity: 1; transform: translateY(0); }
+  .slide.visible .reveal:nth-child(1) { transition-delay: 0.08s; }
+  .slide.visible .reveal:nth-child(2) { transition-delay: 0.16s; }
+  .slide.visible .reveal:nth-child(3) { transition-delay: 0.24s; }
+  .slide.visible .reveal:nth-child(4) { transition-delay: 0.32s; }
+  .slide.visible .reveal:nth-child(5) { transition-delay: 0.40s; }
+  .slide.visible .reveal:nth-child(6) { transition-delay: 0.48s; }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .reveal { transition: opacity 0.2s ease; transform: none; }
+  }
+
+  /* Launch button shared style */
+  .launch-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: 'Manrope', sans-serif;
+    font-size: var(--h3-size);
+    font-weight: 600;
+    background: var(--accent);
+    color: var(--paper);
+    border: none;
+    padding: 0.85rem 1.6rem;
+    border-radius: 6px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+    box-shadow: 0 2px 8px rgba(29, 78, 216, 0.2);
+  }
+  .launch-button:hover {
+    background: var(--accent-deep);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(29, 78, 216, 0.3);
+  }
+</style>
+</head>
+<body>
+<div class="deck">
+  <!-- Slides will be added in tasks 11-21 below -->
+  <section class="slide" id="slide-1">
+    <div class="slide-content">
+      <h1 class="slide-title reveal">Scaffold placeholder</h1>
+    </div>
+  </section>
+</div>
+
+<div class="slide-counter" id="slide-counter">1 / 21</div>
+
+<script>
+// ===========================================
+// SLIDE DECK CONTROLLER
+// - Scroll-snap drives slide-by-slide
+// - IntersectionObserver marks the active slide .visible (triggers .reveal animations)
+//   and updates the counter
+// - Keyboard: arrows / space / PgUp / PgDn / Home / End
+// - f: toggle fullscreen
+// ===========================================
+(function() {
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const counter = document.getElementById('slide-counter');
+  const total = slides.length;
+  let activeIdx = 0;
+
+  // IntersectionObserver: when a slide is ≥50% in view, mark it .visible and active.
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting && e.intersectionRatio >= 0.5) {
+        const idx = slides.indexOf(e.target);
+        if (idx >= 0) {
+          activeIdx = idx;
+          slides.forEach((s, i) => s.classList.toggle('visible', i === idx));
+          counter.textContent = `${idx + 1} / ${total}`;
+        }
+      }
+    });
+  }, { threshold: [0.5] });
+  slides.forEach(s => io.observe(s));
+
+  // Scroll to a specific slide.
+  function goTo(idx) {
+    const target = Math.max(0, Math.min(total - 1, idx));
+    slides[target].scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  // Keyboard handlers.
+  window.addEventListener('keydown', (e) => {
+    // Don't intercept while typing in form fields (defensive — none in the deck yet).
+    const t = e.target;
+    if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT')) return;
+
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === 'PageDown' ||
+        (e.key === ' ' && !e.shiftKey)) {
+      e.preventDefault(); goTo(activeIdx + 1);
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === 'PageUp' ||
+               (e.key === ' ' && e.shiftKey)) {
+      e.preventDefault(); goTo(activeIdx - 1);
+    } else if (e.key === 'Home') {
+      e.preventDefault(); goTo(0);
+    } else if (e.key === 'End') {
+      e.preventDefault(); goTo(total - 1);
+    } else if (e.key === 'f' || e.key === 'F') {
+      e.preventDefault();
+      if (document.fullscreenElement) document.exitFullscreen();
+      else document.documentElement.requestFullscreen();
+    }
+  });
+})();
+</script>
+</body>
+</html>
