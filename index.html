@@ -589,14 +589,14 @@
     border-bottom: 1px dashed var(--rule-soft);
     font-family: 'Fraunces', serif;
     font-style: italic;
-    font-size: 17px;
+    font-size: 22px;
     color: var(--ink-mute);
     margin-bottom: 12px;
   }
   .calc-table .head-line strong {
     font-family: 'JetBrains Mono', monospace;
     font-weight: 500;
-    font-size: 17px;
+    font-size: 22px;
     color: var(--ink);
     font-style: normal;
   }
@@ -610,11 +610,11 @@
     padding: 6px 8px;
     text-align: left;
     border-bottom: 1px dotted var(--rule);
-    font-size: 16px;
+    font-size: 22px;
   }
   .calc-table th {
     font-family: 'Manrope', sans-serif;
-    font-size: 14px;
+    font-size: 18px;
     text-transform: uppercase;
     letter-spacing: 0.08em;
     color: var(--ink-mute);
@@ -627,7 +627,7 @@
     padding-top: 10px;
     border-top: 1px solid var(--rule);
     font-family: 'JetBrains Mono', monospace;
-    font-size: 17px;
+    font-size: 22px;
     display: grid;
     grid-template-columns: auto 1fr;
     row-gap: 6px;
@@ -641,7 +641,7 @@
   .calc-table .footer .val { font-weight: 500; color: var(--ink); }
   .calc-table .footer .val.big {
     color: var(--accent);
-    font-size: 24px;
+    font-size: 28px;
   }
   .calc-table .empty {
     border: 1px dashed var(--rule);
@@ -1666,7 +1666,7 @@ function CalculationTable({ lag, revealColumns = { diff: true, sq: true, sum: tr
         </tbody>
       </table>
       {more > 0 && (
-        <div style={{ marginTop: 8, fontStyle: 'italic', color: 'var(--ink-mute)', fontSize: 15 }}>
+        <div style={{ marginTop: 8, fontStyle: 'italic', color: 'var(--ink-mute)', fontSize: 18 }}>
           showing first {maxRows} of {lag.pairs.length} pairs
         </div>
       )}
