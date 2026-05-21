@@ -1,5 +1,15 @@
-"""Generate three 10x10 deterministic datasets that produce semivariograms
-with the desired shapes (rise + sill, flat, irregular)."""
+"""
+Regenerate the 10x10 preset grids used by ten.html.
+
+Outputs JS-formatted grid arrays for the three presets (smooth / random / clustered) —
+copy them into the `DATASETS_10X10` const at the top of lib/semivariogram.js,
+replacing the existing arrays inline.
+
+Also prints gamma(h) for h=1..9 per preset so you can sanity-check that:
+  - smooth: rises and plateaus
+  - random: stays roughly flat
+  - clustered: rises, peaks, then dips (the "hole effect")
+"""
 import numpy as np
 
 SIZE = 10
