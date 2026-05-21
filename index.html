@@ -507,6 +507,56 @@
       </div>
     </div>
   </section>
+
+  <!-- Slide 14: 3×3 Worked Example launch -->
+  <section class="slide" id="slide-14">
+    <div class="slide-content">
+      <div class="eyebrow reveal">Worked example</div>
+      <h2 class="slide-heading reveal" style="margin-top: 0.4rem;">A 3×3 rainfall grid, calculated by hand</h2>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; margin-top: 1.5rem; align-items: center;">
+        <!-- Static SVG 3×3 grid with the lecture values 14/16/18, 12/14/17, 10/13/15 -->
+        <div class="reveal" style="display: flex; justify-content: center;">
+          <svg viewBox="0 0 240 240" width="100%" style="max-width: 360px; background: var(--paper-soft); border: 1px solid var(--rule);">
+            <g font-family="Manrope, sans-serif" font-size="32" font-weight="500" text-anchor="middle" fill="var(--ink)">
+              <rect x="0"   y="0"   width="80" height="80" fill="var(--paper)" stroke="var(--rule)" stroke-width="1"/>
+              <text x="40" y="50">14</text>
+              <rect x="80"  y="0"   width="80" height="80" fill="var(--paper)" stroke="var(--rule)" stroke-width="1"/>
+              <text x="120" y="50">16</text>
+              <rect x="160" y="0"   width="80" height="80" fill="var(--paper)" stroke="var(--rule)" stroke-width="1"/>
+              <text x="200" y="50">18</text>
+              <rect x="0"   y="80"  width="80" height="80" fill="var(--paper)" stroke="var(--rule)" stroke-width="1"/>
+              <text x="40" y="130">12</text>
+              <rect x="80"  y="80"  width="80" height="80" fill="var(--paper)" stroke="var(--rule)" stroke-width="1"/>
+              <text x="120" y="130">14</text>
+              <rect x="160" y="80"  width="80" height="80" fill="var(--paper)" stroke="var(--rule)" stroke-width="1"/>
+              <text x="200" y="130">17</text>
+              <rect x="0"   y="160" width="80" height="80" fill="var(--paper)" stroke="var(--rule)" stroke-width="1"/>
+              <text x="40" y="210">10</text>
+              <rect x="80"  y="160" width="80" height="80" fill="var(--paper)" stroke="var(--rule)" stroke-width="1"/>
+              <text x="120" y="210">13</text>
+              <rect x="160" y="160" width="80" height="80" fill="var(--paper)" stroke="var(--rule)" stroke-width="1"/>
+              <text x="200" y="210">15</text>
+            </g>
+          </svg>
+        </div>
+        <div>
+          <p class="reveal" style="font-size: var(--body-size); color: var(--ink-soft);">
+            Let's walk through the calculation pair-by-pair: enumerate horizontal pairs,
+            vertical pairs, then diagonal pairs at h=√2 and h=2, compute γ(h), and place
+            each point on the semivariogram.
+          </p>
+          <p class="reveal" style="font-size: var(--small-size); color: var(--ink-mute); margin-top: 0.6rem; font-style: italic;">
+            Each grid cell is 1 unit apart.
+          </p>
+          <div class="reveal" style="margin-top: 1.5rem;">
+            <a href="three.html" target="_blank" rel="noopener" class="launch-button">
+              Launch 3×3 walkthrough →
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 </div>
 
 <div class="slide-counter" id="slide-counter">1 / 21</div>
