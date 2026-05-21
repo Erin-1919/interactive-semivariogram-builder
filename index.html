@@ -1734,6 +1734,178 @@ function PredictionPanel({ prediction }) {
 }
 
 // ------------------------------------------------------------------
+// ThreeByThreeMode — fixed 3×3 grid, cardinal-only, 10-step walk-through
+// of the empirical semivariogram hand-calculation.
+// ------------------------------------------------------------------
+const THREE_STEPS = [
+  { label: 'Grid',            tab: 'formula', highlight: null,        revealCols: { diff: false, sq: false, sum: false, gamma: false } },
+  { label: 'Select lag',      tab: 'formula', highlight: 'h',         revealCols: { diff: false, sq: false, sum: false, gamma: false } },
+  { label: 'Highlight pairs', tab: 'formula', highlight: 'z_i',       revealCols: { diff: false, sq: false, sum: false, gamma: false } },
+  { label: 'Differences',     tab: 'calc',    highlight: 'diff',      revealCols: { diff: true,  sq: false, sum: false, gamma: false } },
+  { label: 'Square them',     tab: 'calc',    highlight: 'sq',        revealCols: { diff: true,  sq: true,  sum: false, gamma: false } },
+  { label: 'Sum',             tab: 'calc',    highlight: 'sum',       revealCols: { diff: true,  sq: true,  sum: true,  gamma: false } },
+  { label: '÷ 2N(h)',          tab: 'calc',    highlight: 'oneOver2N', revealCols: { diff: true,  sq: true,  sum: true,  gamma: true  } },
+  { label: 'Plot γ(h)',        tab: 'plot',    highlight: null,        revealCols: { diff: true,  sq: true,  sum: true,  gamma: true  } },
+  { label: 'Next lag',        tab: 'plot',    highlight: null,        revealCols: { diff: true,  sq: true,  sum: true,  gamma: true  } },
+  { label: 'Fit model',       tab: 'plot',    highlight: null,        revealCols: { diff: true,  sq: true,  sum: true,  gamma: true  } }
+];
+
+function ThreeByThreeMode() {
+  const [editedGrid, setEditedGrid] = React.useState(null);
+  const [hoveredCell, setHoveredCell] = React.useState(null);
+  const [revealedStep, setRevealedStep] = React.useState(1);
+  const [selectedLagIdx, setSelectedLagIdx] = React.useState(0);
+  const [activeTab, setActiveTab] = React.useState('formula');
+  const [tabPinned, setTabPinned] = React.useState(false);
+  const [modelName, setModelName] = React.useState('none');
+
+  const grid = editedGrid || DATASET_3X3.grid;
+  const pairs = React.useMemo(
+    () => computePairs(grid, { cardinalOnly: true }),
+    [grid]
+  );
+  const lags = React.useMemo(() => computeSemivariogram(pairs), [pairs]);
+
+  const editedKeys = React.useMemo(() => {
+    if (!editedGrid) return null;
+    const keys = new Set();
+    for (let r = 0; r < grid.length; r++) {
+      for (let c = 0; c < grid[r].length; c++) {
+        if (grid[r][c] !== DATASET_3X3.grid[r][c]) keys.add(`${r}-${c}`);
+      }
+    }
+    return keys;
+  }, [editedGrid, grid]);
+
+  // revealedCount is derived from revealedStep:
+  //   steps 1–7 = nothing plotted; step 8 = first lag plotted; step 9 = both; step 10 = both + model.
+  const revealedCount = revealedStep >= 9 ? 2 : revealedStep >= 8 ? 1 : 0;
+  const plotSelectedIdx = Math.min(selectedLagIdx, Math.max(0, revealedCount - 1));
+
+  React.useEffect(() => {
+    if (tabPinned) return;
+    setActiveTab(THREE_STEPS[Math.max(0, revealedStep - 1)].tab);
+  }, [revealedStep, tabPinned]);
+
+  React.useEffect(() => {
+    if (revealedStep >= 10 && modelName === 'none') setModelName('spherical');
+  }, [revealedStep, modelName]);
+
+  const selectedLag = lags[selectedLagIdx] || null;
+  const highlightedPairs = revealedStep >= 3 && selectedLag ? selectedLag.pairs : null;
+
+  const onCellEdit = React.useCallback((r, c, value) => {
+    setEditedGrid(prev => {
+      const base = prev || DATASET_3X3.grid;
+      const next = base.map(row => row.slice());
+      next[r][c] = value;
+      return next;
+    });
+  }, []);
+
+  const onResetValues = React.useCallback(() => {
+    setEditedGrid(null);
+  }, []);
+
+  const tabs = [
+    { key: 'formula', label: 'γ(h) Formula' },
+    { key: 'calc',    label: 'Calculation' },
+    { key: 'plot',    label: 'Semivariogram plot' }
+  ];
+
+  const stepDef = THREE_STEPS[Math.max(0, revealedStep - 1)];
+
+  return (
+    <div>
+      <div className="mode-header">
+        <span className="blurb">{DATASET_3X3.blurb}</span>
+        <div className="extras">
+          <div className="toggle-group" style={{ width: 220 }}>
+            <button className={`toggle-btn ${selectedLagIdx === 0 ? 'active' : ''}`}
+              onClick={() => { setSelectedLagIdx(0); setRevealedStep(s => Math.max(s, 2)); }}>
+              h = 1
+            </button>
+            <button className={`toggle-btn ${selectedLagIdx === 1 ? 'active' : ''}`}
+              onClick={() => { setSelectedLagIdx(1); setRevealedStep(s => Math.max(s, 2)); }}
+              disabled={lags.length < 2}>
+              h = 2
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div style={{ padding: '0 40px' }}>
+        <StepBar
+          steps={THREE_STEPS.map(s => s.label)}
+          activeStep={revealedStep}
+          onStep={(i) => { setRevealedStep(i); setTabPinned(false); }}
+        />
+      </div>
+
+      <div className="mode-shell">
+        <div className="grid-pane">
+          <div className="grid-svg-frame" style={{ display: 'flex', justifyContent: 'center', background: 'var(--paper-soft)', border: '1px solid var(--rule)', padding: 16 }}>
+            <GridView
+              grid={grid}
+              highlightedPairs={highlightedPairs}
+              hoveredCell={hoveredCell}
+              onCellHover={setHoveredCell}
+              size={420}
+              onEdit={onCellEdit}
+              editedKeys={editedKeys}
+            />
+          </div>
+          {revealedStep >= 10 && (
+            <div className="model-radio">
+              <span style={{ fontFamily: 'Manrope, sans-serif', fontSize: 13, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--ink-soft)' }}>
+                Fit model:
+              </span>
+              {['spherical', 'exponential', 'gaussian'].map(m =>
+                <label key={m}>
+                  <input type="radio" name="model3" value={m}
+                    checked={modelName === m}
+                    onChange={() => setModelName(m)} />
+                  {m}
+                </label>
+              )}
+            </div>
+          )}
+        </div>
+
+        <div className="right-pane">
+          <TabbedPanel
+            tabs={tabs}
+            activeTab={activeTab}
+            onTab={(k) => { setActiveTab(k); setTabPinned(true); }}
+          >
+            {{
+              formula: <FormulaPanel highlight={stepDef.highlight} />,
+              calc:    <CalculationTable
+                         lag={selectedLag}
+                         revealColumns={stepDef.revealCols}
+                       />,
+              plot:    <div className="plot-frame">
+                         <SemivariogramPlot
+                           lags={lags}
+                           selectedIdx={plotSelectedIdx}
+                           revealedCount={revealedCount}
+                           modelName={revealedStep >= 10 ? modelName : 'none'}
+                         />
+                       </div>
+            }}
+          </TabbedPanel>
+        </div>
+      </div>
+
+      <div className="whatif-footer">
+        <span>Tip: click any cell to change its value.</span>
+        <button onClick={onResetValues} disabled={!editedGrid}>Reset values</button>
+      </div>
+    </div>
+  );
+}
+
+// ------------------------------------------------------------------
 // TenByTenMode — the existing 10×10 workflow rebuilt on the shared
 // shell (StepBar + grid + TabbedPanel + what-if footer).
 // ------------------------------------------------------------------
