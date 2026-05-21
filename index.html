@@ -557,6 +557,72 @@
       </div>
     </div>
   </section>
+
+  <!-- Slide 15: Step 3 — Fit Theoretical Semivariogram Model + 10×10 launch -->
+  <section class="slide" id="slide-15">
+    <div class="slide-content">
+      <div class="eyebrow reveal">Step-by-Step Ordinary Kriging Workflow</div>
+      <h2 class="slide-heading reveal" style="margin-top: 0.4rem;">Step 3 — Fit a theoretical semivariogram model</h2>
+      <p class="reveal" style="font-size: var(--body-size); color: var(--ink-soft); margin-top: 0.6rem;">
+        An empirical semivariogram is a scatter of observed γ values — for Kriging we need
+        a smooth, mathematically defined curve.
+      </p>
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.2rem; margin-top: 1.5rem;">
+        <!-- Spherical -->
+        <div class="reveal" style="padding: 1rem; background: var(--paper-soft); border-radius: 6px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="font-family: 'Fraunces', serif; font-size: var(--h3-size); color: var(--accent); font-weight: 500;">Spherical</div>
+            <svg viewBox="0 0 80 40" width="80" height="40" aria-hidden="true">
+              <!-- Spherical: rises then caps -->
+              <path d="M 4 36 Q 16 12 38 8 L 76 8" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div style="font-size: var(--small-size); color: var(--ink-mute); letter-spacing: 0.08em; text-transform: uppercase; margin-top: 0.5rem;">Best used when</div>
+          <ul style="font-size: var(--body-size); color: var(--ink-soft); margin-top: 0.4rem; padding-left: 1.1rem; line-height: 1.4;">
+            <li>Spatial similarity decreases steadily then stops beyond a certain distance</li>
+            <li>General-purpose environmental data</li>
+          </ul>
+        </div>
+        <!-- Exponential -->
+        <div class="reveal" style="padding: 1rem; background: var(--paper-soft); border-radius: 6px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="font-family: 'Fraunces', serif; font-size: var(--h3-size); color: var(--accent); font-weight: 500;">Exponential</div>
+            <svg viewBox="0 0 80 40" width="80" height="40" aria-hidden="true">
+              <!-- Exponential: asymptotic approach -->
+              <path d="M 4 36 C 12 36 24 10 76 8" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div style="font-size: var(--small-size); color: var(--ink-mute); letter-spacing: 0.08em; text-transform: uppercase; margin-top: 0.5rem;">Best used when</div>
+          <ul style="font-size: var(--body-size); color: var(--ink-soft); margin-top: 0.4rem; padding-left: 1.1rem; line-height: 1.4;">
+            <li>Nearby points may differ substantially</li>
+            <li>Patchy or irregular variables</li>
+            <li>Air pollution, contaminant spread</li>
+          </ul>
+        </div>
+        <!-- Gaussian -->
+        <div class="reveal" style="padding: 1rem; background: var(--paper-soft); border-radius: 6px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="font-family: 'Fraunces', serif; font-size: var(--h3-size); color: var(--accent); font-weight: 500;">Gaussian</div>
+            <svg viewBox="0 0 80 40" width="80" height="40" aria-hidden="true">
+              <!-- Gaussian: flat origin, S-curve -->
+              <path d="M 4 36 C 4 36 20 36 36 18 C 52 4 60 8 76 8" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div style="font-size: var(--small-size); color: var(--ink-mute); letter-spacing: 0.08em; text-transform: uppercase; margin-top: 0.5rem;">Best used when</div>
+          <ul style="font-size: var(--body-size); color: var(--ink-soft); margin-top: 0.4rem; padding-left: 1.1rem; line-height: 1.4;">
+            <li>Spatial processes change smoothly over space</li>
+            <li>Highly continuous surfaces</li>
+            <li>Temperature, groundwater surfaces</li>
+          </ul>
+        </div>
+      </div>
+      <div class="reveal" style="text-align: center; margin-top: 1.5rem;">
+        <a href="ten.html" target="_blank" rel="noopener" class="launch-button">
+          Launch 10×10 + model picker →
+        </a>
+      </div>
+    </div>
+  </section>
 </div>
 
 <div class="slide-counter" id="slide-counter">1 / 21</div>
