@@ -134,9 +134,60 @@
 <body>
 <div class="deck">
   <!-- Slides will be added in tasks 11-21 below -->
+  <!-- Slide 1: Title -->
   <section class="slide" id="slide-1">
+    <div class="slide-content" style="align-items: center; text-align: center; justify-content: center;">
+      <div class="eyebrow reveal">Ordinary Kriging · Teaching Demonstration</div>
+      <h1 class="slide-title reveal">An Introduction to<br><em>Ordinary Kriging</em></h1>
+      <div class="reveal" style="margin-top: 1.5rem; font-size: var(--h3-size); color: var(--ink-soft);">
+        Dr. Erin Li
+      </div>
+      <div class="reveal" style="font-size: var(--body-size); color: var(--ink-mute);">
+        UbiSensing &amp; AI Lab, University of Calgary &middot; mingke.li@ucalgary.ca
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 2: Hook -->
+  <section class="slide" id="slide-2">
+    <div class="slide-content" style="flex-direction: row; gap: 3rem; align-items: center;">
+      <div style="flex: 1;">
+        <h2 class="slide-heading reveal">How do we estimate rainfall where we don't observe it?</h2>
+        <p class="reveal" style="font-size: var(--body-size); color: var(--ink-soft); margin-top: 1.2rem;">
+          Is it enough to simply use the nearest stations? Should we only rely on distance,
+          or are there deeper spatial patterns we need to consider?
+        </p>
+      </div>
+      <div class="reveal" style="flex: 1;">
+        <img src="assets/img/slide02_rain_stations.png" alt="Rainfall stations across a region" style="width: 100%; height: auto; max-height: 70vh; object-fit: contain; border-radius: 8px;">
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 3: Learning Outcomes -->
+  <section class="slide" id="slide-3">
     <div class="slide-content">
-      <h1 class="slide-title reveal">Scaffold placeholder</h1>
+      <div class="eyebrow reveal">By the end of today's lecture, you'll learn…</div>
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; margin-top: 1.5rem;">
+        <div class="reveal" style="text-align: center;">
+          <img src="assets/img/slide03_what.svg" alt="What" style="width: 60%; max-width: 180px; height: auto;">
+          <h3 style="font-family: 'Fraunces', serif; font-size: var(--h3-size); margin-top: 1rem;">What Ordinary Kriging is</h3>
+          <p style="font-size: var(--body-size); color: var(--ink-soft); margin-top: 0.5rem;">Understand the core concept of geostatistical interpolation</p>
+        </div>
+        <div class="reveal" style="text-align: center;">
+          <img src="assets/img/slide03_why.svg" alt="Why" style="width: 60%; max-width: 180px; height: auto;">
+          <h3 style="font-family: 'Fraunces', serif; font-size: var(--h3-size); margin-top: 1rem;">Why we use it</h3>
+          <p style="font-size: var(--body-size); color: var(--ink-soft); margin-top: 0.5rem;">See how spatial dependence improves prediction accuracy</p>
+        </div>
+        <div class="reveal" style="text-align: center;">
+          <img src="assets/img/slide03_how.svg" alt="How" style="width: 60%; max-width: 180px; height: auto;">
+          <h3 style="font-family: 'Fraunces', serif; font-size: var(--h3-size); margin-top: 1rem;">How to apply it</h3>
+          <p style="font-size: var(--body-size); color: var(--ink-soft); margin-top: 0.5rem;">Learn the workflow from variogram to prediction map</p>
+        </div>
+      </div>
+      <div class="reveal" style="text-align: center; margin-top: 1.5rem; font-size: var(--small-size); color: var(--ink-mute); font-style: italic;">
+        ** Lab Assignment 6
+      </div>
     </div>
   </section>
 </div>
