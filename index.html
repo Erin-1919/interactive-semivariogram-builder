@@ -190,6 +190,70 @@
       </div>
     </div>
   </section>
+
+  <!-- Slide 4: A Quick Review (IDW) -->
+  <section class="slide" id="slide-4">
+    <div class="slide-content" style="flex-direction: row; gap: 3rem; align-items: center;">
+      <div style="flex: 1.2;">
+        <div class="eyebrow reveal">A Quick Review</div>
+        <h2 class="slide-heading reveal" style="margin-top: 0.5rem;">Spatial interpolation</h2>
+        <p class="reveal" style="font-size: var(--body-size); color: var(--ink-soft); margin-top: 1rem;">
+          The process of predicting unknown values at unsampled locations based on
+          measurements from known locations.
+        </p>
+        <p class="reveal" style="font-size: var(--body-size); color: var(--ink-soft); margin-top: 0.8rem;">
+          <strong>Deterministic interpolation</strong> estimates unknown values using mathematical rules
+          based on nearby observations, relying on distance or smoothness assumptions.
+        </p>
+        <div class="reveal" style="margin-top: 1.2rem;">
+          <div style="font-family: 'Manrope', sans-serif; font-size: var(--small-size); letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-mute);">Common methods</div>
+          <ul style="font-size: var(--body-size); color: var(--ink); margin-top: 0.4rem;">
+            <li>Nearest Neighbor</li>
+            <li>Bilinear</li>
+            <li><strong>Inverse Distance Weighting (IDW)</strong> — Our baseline method</li>
+          </ul>
+          <div style="margin-top: 0.8rem; font-size: var(--small-size); color: var(--ink-mute); font-style: italic;">
+            * IDW key assumption: distance alone determines similarity
+          </div>
+        </div>
+      </div>
+      <div class="reveal" style="flex: 1;">
+        <img src="assets/img/slide04_idw.png" alt="IDW interpolation diagram" style="width: 100%; height: auto; max-height: 65vh; object-fit: contain;">
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 5: Why Distance Alone Is Not Enough -->
+  <section class="slide" id="slide-5">
+    <div class="slide-content" style="align-items: center; text-align: center;">
+      <h2 class="slide-heading reveal">Why distance alone is not enough</h2>
+      <div class="reveal" style="margin-top: 1.5rem;">
+        <img src="assets/img/slide05_why_not.jpg" alt="Distance vs. similarity counter-example" style="max-width: 100%; max-height: 65vh; height: auto; object-fit: contain;">
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 6: What Is Kriging? (Origins) -->
+  <section class="slide" id="slide-6">
+    <div class="slide-content" style="flex-direction: row; gap: 3rem; align-items: center;">
+      <div style="flex: 1.2;">
+        <div class="eyebrow reveal">What is Kriging?</div>
+        <h2 class="slide-heading reveal" style="margin-top: 0.5rem;">A method born from mining geostatistics</h2>
+        <p class="reveal" style="font-size: var(--body-size); color: var(--ink-soft); margin-top: 1.2rem;">
+          <strong>Origins:</strong> Named after Danie G. Krige, a South African mining engineer in the 1950s
+          who developed it to estimate gold ore grades from sparse samples.
+        </p>
+        <p class="reveal" style="font-size: var(--body-size); color: var(--ink-soft); margin-top: 0.8rem;">
+          Where IDW asks <em>how far away</em> each point is, Kriging asks <em>how spatially
+          related</em> they are, <em>how similar</em> they are statistically, and how weights
+          should be optimized to minimize prediction error.
+        </p>
+      </div>
+      <div class="reveal" style="flex: 1;">
+        <img src="assets/img/slide06_krige.jpg" alt="Danie Krige portrait or mining context" style="width: 100%; max-height: 65vh; height: auto; object-fit: contain;">
+      </div>
+    </div>
+  </section>
 </div>
 
 <div class="slide-counter" id="slide-counter">1 / 21</div>
