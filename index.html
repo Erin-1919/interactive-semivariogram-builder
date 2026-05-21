@@ -406,6 +406,107 @@
       </div>
     </div>
   </section>
+
+  <!-- Slide 11: Step 1 — Data Exploration -->
+  <section class="slide" id="slide-11">
+    <div class="slide-content">
+      <div class="eyebrow reveal">Step-by-Step Ordinary Kriging Workflow</div>
+      <h2 class="slide-heading reveal" style="margin-top: 0.4rem;">Step 1 — Data exploration</h2>
+      <p class="reveal" style="font-size: var(--body-size); color: var(--ink-soft); margin-top: 0.8rem;">
+        Before kriging, thoroughly inspect the data to verify its assumptions.
+      </p>
+      <div style="display: grid; grid-template-columns: 1.7fr 1fr; gap: 2rem; margin-top: 1.2rem;">
+        <table class="reveal" style="width: 100%; border-collapse: collapse; font-size: var(--body-size);">
+          <thead>
+            <tr style="border-bottom: 2px solid var(--rule);">
+              <th style="text-align: left; padding: 0.6rem; color: var(--ink-mute); font-weight: 600;">Question</th>
+              <th style="text-align: left; padding: 0.6rem; color: var(--ink-mute); font-weight: 600;">Why it matters</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom: 1px solid var(--rule-soft);">
+              <td style="padding: 0.55rem;">Are values continuous numeric data?</td>
+              <td style="padding: 0.55rem; color: var(--ink-soft);">Kriging is designed for continuous variables</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--rule-soft);">
+              <td style="padding: 0.55rem;">Are there outliers?</td>
+              <td style="padding: 0.55rem; color: var(--ink-soft);">Outliers can distort the variogram</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--rule-soft);">
+              <td style="padding: 0.55rem;">Is the distribution highly skewed?</td>
+              <td style="padding: 0.55rem; color: var(--ink-soft);">Transformation may be needed</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--rule-soft);">
+              <td style="padding: 0.55rem;">Is there a spatial trend?</td>
+              <td style="padding: 0.55rem; color: var(--ink-soft);">Strong trend may require universal kriging</td>
+            </tr>
+            <tr>
+              <td style="padding: 0.55rem;">Are points clustered?</td>
+              <td style="padding: 0.55rem; color: var(--ink-soft);">Clustering affects weights and variogram estimation</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="reveal" style="padding: 1.2rem; background: var(--paper-soft); border-radius: 6px;">
+          <div style="font-family: 'Manrope', sans-serif; font-size: var(--small-size); letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-mute);">Typical tools</div>
+          <ul style="font-size: var(--body-size); color: var(--ink); margin-top: 0.6rem; padding-left: 1.2rem;">
+            <li>Histogram</li>
+            <li>Summary statistics</li>
+            <li>Point map</li>
+            <li>Trend analysis</li>
+            <li>Outlier detection</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 12: Step 2 intuition -->
+  <section class="slide" id="slide-12">
+    <div class="slide-content" style="align-items: center; text-align: center;">
+      <div class="eyebrow reveal">Step-by-Step Ordinary Kriging Workflow</div>
+      <h2 class="slide-heading reveal" style="margin-top: 0.4rem;">Step 2 — Empirical semivariogram</h2>
+      <p class="reveal" style="font-size: var(--body-size); color: var(--ink-soft); margin-top: 1.2rem; max-width: 60ch;">
+        If two locations are close, their values should usually be more similar — lower
+        semivariance. As distance increases, values become less similar, and semivariance
+        tends to increase.
+      </p>
+      <p class="reveal" style="font-size: var(--body-size); color: var(--ink-soft); margin-top: 0.8rem; max-width: 60ch; font-style: italic;">
+        That relationship becomes the statistical foundation for how Kriging assigns weights.
+      </p>
+    </div>
+  </section>
+
+  <!-- Slide 13: Anatomy — Nugget / Range / Sill -->
+  <section class="slide" id="slide-13">
+    <div class="slide-content">
+      <h2 class="slide-heading reveal">Anatomy of an empirical semivariogram</h2>
+      <div style="display: grid; grid-template-columns: 1.3fr 1fr; gap: 2rem; margin-top: 1.2rem; align-items: center;">
+        <div class="reveal">
+          <img src="assets/img/slide13_anatomy.png" alt="Semivariogram with nugget, range, sill labeled" style="width: 100%; max-height: 60vh; object-fit: contain;">
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 0.8rem;">
+          <div class="reveal" style="padding: 1rem; background: var(--paper-soft); border-left: 3px solid var(--accent);">
+            <div style="font-family: 'Fraunces', serif; font-size: var(--h3-size); color: var(--accent); font-weight: 500;">Nugget</div>
+            <p style="font-size: var(--body-size); color: var(--ink-soft); margin-top: 0.3rem;">
+              Value at or near origin (h=0). Represents measurement error or microscale variation.
+            </p>
+          </div>
+          <div class="reveal" style="padding: 1rem; background: var(--paper-soft); border-left: 3px solid var(--accent);">
+            <div style="font-family: 'Fraunces', serif; font-size: var(--h3-size); color: var(--accent); font-weight: 500;">Range</div>
+            <p style="font-size: var(--body-size); color: var(--ink-soft); margin-top: 0.3rem;">
+              Distance where the curve levels off. Beyond this distance, points are effectively uncorrelated.
+            </p>
+          </div>
+          <div class="reveal" style="padding: 1rem; background: var(--paper-soft); border-left: 3px solid var(--accent);">
+            <div style="font-family: 'Fraunces', serif; font-size: var(--h3-size); color: var(--accent); font-weight: 500;">Sill</div>
+            <p style="font-size: var(--body-size); color: var(--ink-soft); margin-top: 0.3rem;">
+              Plateau value. Approximate total variance of the data.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 </div>
 
 <div class="slide-counter" id="slide-counter">1 / 21</div>
