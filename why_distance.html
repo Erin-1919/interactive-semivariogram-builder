@@ -195,16 +195,113 @@ const SCENARIOS = {
     distanceLabel: '1 km',
     showAngle: true,
     explanation: "Spatial dependence can be stronger in one direction than another — orientation matters as much as distance.",
-    value: (x, y) => 45 + 12 * Math.sin(2 * Math.PI * x) + 15 * Math.sin(8 * Math.PI * y),
-    valueMin: 18, valueMax: 72,
+    value: (x, y) => 45 + 3 * Math.sin(2 * Math.PI * x) + 15 * Math.sin(8 * Math.PI * y),
+    valueMin: 26, valueMax: 64,
     colorRamp: (t) => ramp(t, '#fce7f3', '#831843'),
   },
 };
 const SCENARIO_ORDER = ['barrier', 'boundary', 'gradient', 'anisotropy'];
 
-// ----- Ruler geometry placeholder (filled in Task 3) -----
+// ----- Ruler geometry -----
+// All ruler state lives in normalized [0, 1] field coordinates.
+// The ruler is the segment from (cx - dx, cy - dy) to (cx + dx, cy + dy)
+// where (dx, dy) = (L/2 * cos(angle), L/2 * sin(angle)).
+const RULER_LEN = 0.35;  // fraction of field side; constant across scenarios
 
-// ----- self-tests placeholder (filled in Task 3) -----
+function endpoints(ruler) {
+  const dx = (RULER_LEN / 2) * Math.cos(ruler.angle);
+  const dy = (RULER_LEN / 2) * Math.sin(ruler.angle);
+  return {
+    a: { x: ruler.cx - dx, y: ruler.cy - dy },
+    b: { x: ruler.cx + dx, y: ruler.cy + dy },
+  };
+}
+
+function clampRuler(ruler) {
+  const halfLenX = Math.abs((RULER_LEN / 2) * Math.cos(ruler.angle));
+  const halfLenY = Math.abs((RULER_LEN / 2) * Math.sin(ruler.angle));
+  const cx = Math.min(Math.max(ruler.cx, halfLenX), 1 - halfLenX);
+  const cy = Math.min(Math.max(ruler.cy, halfLenY), 1 - halfLenY);
+  return { cx, cy, angle: ruler.angle };
+}
+
+function rotateTowards(ruler, target) {
+  const angle = Math.atan2(target.y - ruler.cy, target.x - ruler.cx);
+  return clampRuler({ ...ruler, angle });
+}
+
+function distanceBetween(a, b) {
+  return Math.hypot(a.x - b.x, a.y - b.y);
+}
+
+function diffAt(scenario, ruler) {
+  const { a, b } = endpoints(ruler);
+  return Math.abs(scenario.value(a.x, a.y) - scenario.value(b.x, b.y));
+}
+
+// ----- Self-tests (run on first load) -----
+(function runTests() {
+  function near(a, b, tol, msg) {
+    if (Math.abs(a - b) > tol) console.error('FAIL:', msg, 'got', a, 'want', b);
+    else console.log('ok  ', msg);
+  }
+  function gt(a, b, msg) {
+    if (!(a > b)) console.error('FAIL:', msg, 'got', a, 'want >', b);
+    else console.log('ok  ', msg);
+  }
+  function lt(a, b, msg) {
+    if (!(a < b)) console.error('FAIL:', msg, 'got', a, 'want <', b);
+    else console.log('ok  ', msg);
+  }
+
+  // T1: ruler length is preserved under translate
+  const r1 = { cx: 0.5, cy: 0.5, angle: 0.3 };
+  const e1 = endpoints(r1);
+  near(distanceBetween(e1.a, e1.b), RULER_LEN, 1e-9, 'T1 ruler length under translate');
+
+  // T2: ruler length is preserved under rotate
+  const r2 = rotateTowards(r1, { x: 0.7, y: 0.9 });
+  const e2 = endpoints(r2);
+  near(distanceBetween(e2.a, e2.b), RULER_LEN, 1e-9, 'T2 ruler length under rotate');
+
+  // T3: clamp keeps both endpoints in [0, 1] for an extreme target
+  const r3 = clampRuler({ cx: 1.5, cy: -0.2, angle: 0 });
+  const e3 = endpoints(r3);
+  if (e3.a.x < -1e-9 || e3.b.x > 1 + 1e-9 || e3.a.y < -1e-9 || e3.b.y > 1 + 1e-9) {
+    console.error('FAIL: T3 clamp endpoints in [0,1]', e3);
+  } else console.log('ok   T3 clamp endpoints in [0,1]');
+
+  // T4–T7: per-scenario big-diff and small-diff placements
+  // BARRIER: ridge along y = x. Pair straddling the ridge → big; pair on same side → small.
+  const barrier = SCENARIOS.barrier;
+  const barBig = { cx: 0.5, cy: 0.5, angle: Math.PI / 2 };       // vertical, crosses y=x
+  const barSmall = { cx: 0.2, cy: 0.7, angle: Math.PI / 2 };     // vertical, both above ridge
+  gt(diffAt(barrier, barBig), 30, 'T4 barrier big-diff');
+  lt(diffAt(barrier, barSmall), 10, 'T4 barrier small-diff');
+
+  // BOUNDARY: curved split near y = 0.5. Pair straddling → big; pair on same side → small.
+  const boundary = SCENARIOS.boundary;
+  const bndBig = { cx: 0.5, cy: 0.5, angle: Math.PI / 2 };
+  const bndSmall = { cx: 0.5, cy: 0.85, angle: 0 };
+  gt(diffAt(boundary, bndBig), 200, 'T5 boundary big-diff');
+  lt(diffAt(boundary, bndSmall), 80, 'T5 boundary small-diff');
+
+  // GRADIENT: along-x ramp. Horizontal pair → big; vertical pair → small.
+  const gradient = SCENARIOS.gradient;
+  const grdBig = { cx: 0.5, cy: 0.5, angle: 0 };
+  const grdSmall = { cx: 0.5, cy: 0.5, angle: Math.PI / 2 };
+  gt(diffAt(gradient, grdBig), 8, 'T6 gradient big-diff (horizontal)');
+  lt(diffAt(gradient, grdSmall), 4, 'T6 gradient small-diff (vertical)');
+
+  // ANISOTROPY: fast variation along y, slow along x. Vertical pair → big; horizontal → small.
+  const aniso = SCENARIOS.anisotropy;
+  const anBig = { cx: 0.5, cy: 0.5, angle: Math.PI / 2 };
+  const anSmall = { cx: 0.5, cy: 0.5, angle: 0 };
+  gt(diffAt(aniso, anBig), 15, 'T7 anisotropy big-diff (vertical)');
+  lt(diffAt(aniso, anSmall), 10, 'T7 anisotropy small-diff (horizontal)');
+
+  console.log('%c[why-distance tests done]', 'color:#1d4ed8;font-weight:bold');
+})();
 
 function WhyDistanceApp() {
   return (
