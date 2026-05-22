@@ -686,6 +686,27 @@
     body { font-size: 22px; }
     h1.title { font-size: 64px; }
   }
+  /* Phone: scale SVG grid to viewport, shrink padding + type. */
+  @media (max-width: 700px) {
+    body { font-size: 16px; }
+    h1.title { font-size: 34px; }
+    header.masthead { padding: 18px 16px 14px; }
+    .mode-shell { padding: 16px 14px 24px; gap: 18px; }
+    .mode-header { padding: 14px 14px 4px; gap: 10px; }
+    .mode-header .blurb { font-size: 16px; }
+    .whatif-footer { padding: 10px 14px 18px; }
+    .grid-svg-frame {
+      display: block;
+      width: 100%;
+      padding: 10px;
+    }
+    .grid-svg { width: 100%; height: auto; max-width: 100%; }
+    .tabbed-panel .tab { padding: 10px 12px; font-size: 16px; }
+    .tabbed-panel .tab-body { padding: 14px 16px; }
+    .model-radio label { font-size: 16px; }
+    .step-bar .step-item { padding: 6px 10px; }
+    .lag-chip { font-size: 14px; padding: 4px 8px; }
+  }
 
   /* MODE WORKBENCH — used by TenByTenMode */
   .mode-shell {

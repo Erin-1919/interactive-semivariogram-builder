@@ -118,6 +118,34 @@
     color: var(--ink-soft);
     line-height: 1.6;
   }
+
+  /* Mobile: collapse two-column layout, scale field SVG to viewport. */
+  @media (max-width: 900px) {
+    .app { padding: 20px 16px; }
+    h1.title { font-size: 32px; }
+    .subtitle { font-size: 16px; margin-bottom: 20px; }
+    .tabs { gap: 6px; margin-bottom: 18px; }
+    .tab-btn { font-size: 15px; padding: 8px 14px; border-radius: 6px; }
+    .work-area {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 20px;
+    }
+    .field-frame {
+      padding: 8px;
+      display: block;
+      width: 100%;
+    }
+    .field-svg {
+      width: 100%;
+      height: auto;
+      max-width: 100%;
+    }
+    .readout { padding: 16px 18px; font-size: 16px; }
+    .readout-row.emphasis { font-size: 18px; }
+    .explain { padding: 14px 18px; }
+    .explain-toggle { font-size: 15px; }
+    .explain-text { font-size: 15px; }
+  }
 </style>
 </head>
 <body>

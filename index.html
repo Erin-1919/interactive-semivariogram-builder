@@ -110,6 +110,32 @@
     .reveal { transition: opacity 0.2s ease; transform: none; }
   }
 
+  /* Phone: let slides grow vertically, stack side-by-side content, drop scroll-snap.
+     Inline styles on .slide-content and inner grids are overridden with !important. */
+  @media (max-width: 700px) {
+    html { scroll-snap-type: none; }
+    .slide {
+      height: auto;
+      min-height: 100vh;
+      min-height: 100dvh;
+      padding: 1.5rem 1rem;
+      overflow: visible;
+    }
+    .slide-content,
+    .slide-content[style] {
+      flex-direction: column !important;
+      gap: 1.1rem !important;
+      max-height: none !important;
+      overflow: visible !important;
+    }
+    .slide [style*="grid-template-columns"] {
+      grid-template-columns: 1fr !important;
+      gap: 1.1rem !important;
+    }
+    .slide img { max-width: 100%; height: auto; }
+    .launch-button { font-size: 1.15rem; padding: 0.7rem 1.2rem; }
+  }
+
   /* Launch button shared style */
   .launch-button {
     display: inline-flex;
