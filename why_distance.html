@@ -303,11 +303,54 @@ function diffAt(scenario, ruler) {
   console.log('%c[why-distance tests done]', 'color:#1d4ed8;font-weight:bold');
 })();
 
+const FIELD_PX = 520;       // pixel size of the field SVG (width and height)
+const GRID_N = 20;          // cells per side
+
+function FieldCanvas({ scenario }) {
+  const cells = useMemo(() => {
+    const out = [];
+    const cell = FIELD_PX / GRID_N;
+    for (let r = 0; r < GRID_N; r++) {
+      for (let c = 0; c < GRID_N; c++) {
+        const x = (c + 0.5) / GRID_N;
+        const y = (r + 0.5) / GRID_N;
+        const v = scenario.value(x, y);
+        const t = (v - scenario.valueMin) / (scenario.valueMax - scenario.valueMin);
+        out.push({
+          key: `${r}-${c}`,
+          x: c * cell, y: r * cell, w: cell, h: cell,
+          fill: scenario.colorRamp(t),
+        });
+      }
+    }
+    return out;
+  }, [scenario]);
+
+  return (
+    <div className="field-frame">
+      <svg className="field-svg" width={FIELD_PX} height={FIELD_PX}
+           viewBox={`0 0 ${FIELD_PX} ${FIELD_PX}`}>
+        <g>
+          {cells.map(c => (
+            <rect className="cell-rect"
+                  key={c.key} x={c.x} y={c.y} width={c.w} height={c.h} fill={c.fill} />
+          ))}
+        </g>
+      </svg>
+    </div>
+  );
+}
+
 function WhyDistanceApp() {
+  const scenario = SCENARIOS.barrier;
   return (
     <div className="app">
       <h1 className="title">Why distance is <em>not</em> enough</h1>
       <p className="subtitle">Drag the ruler. Same length — different difference.</p>
+      <div className="work-area">
+        <FieldCanvas scenario={scenario} />
+        <div /> {/* readout placeholder, Task 7 */}
+      </div>
     </div>
   );
 }
