@@ -474,12 +474,12 @@
     <div class="slide-content" style="align-items: center; text-align: center;">
       <div class="eyebrow reveal">Step-by-Step Ordinary Kriging Workflow</div>
       <h2 class="slide-heading reveal" style="margin-top: 0.4rem;">Step 2 — Empirical semivariogram</h2>
-      <p class="reveal" style="font-size: var(--body-size); color: var(--ink-soft); margin-top: 1.2rem; max-width: 60ch;">
+      <p class="reveal" style="font-size: clamp(1.6rem, 2.4vw, 2.4rem); color: var(--ink-soft); margin-top: 2rem; max-width: 32ch; line-height: 1.55;">
         If two locations are close, their values should usually be more similar — lower
         semivariance. As distance increases, values become less similar, and semivariance
         tends to increase.
       </p>
-      <p class="reveal" style="font-size: var(--body-size); color: var(--ink-soft); margin-top: 0.8rem; max-width: 60ch; font-style: italic;">
+      <p class="reveal" style="font-size: clamp(1.5rem, 2.2vw, 2.2rem); color: var(--accent); margin-top: 2.4rem; max-width: 32ch; font-style: italic; font-weight: 500; line-height: 1.5;">
         That relationship becomes the statistical foundation for how Kriging assigns weights.
       </p>
     </div>
@@ -696,7 +696,7 @@
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 1rem;">
         <div class="reveal">
           <div style="font-family: 'Inter', sans-serif; font-size: var(--small-size); letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-mute);">Steps</div>
-          <ol style="font-size: var(--body-size); color: var(--ink); margin-top: 0.5rem; padding-left: 1.3rem; line-height: 1.7;">
+          <ol style="font-size: var(--body-size); color: var(--ink); margin-top: 0.5rem; margin-left: 0; padding-left: 2.2rem; line-height: 1.8; list-style-position: outside;">
             <li>Remove one observed point</li>
             <li>Predict its value using the remaining points</li>
             <li>Compare predicted vs. observed value</li>
@@ -784,14 +784,16 @@
 
   <!-- Slide 20: Lab Assignment 6 + PDF button -->
   <section class="slide" id="slide-20">
-    <div class="slide-content" style="align-items: center; text-align: center;">
-      <h2 class="slide-heading reveal">Lab Assignment 6</h2>
-      <p class="reveal" style="font-size: var(--h3-size); color: var(--ink-soft); margin-top: 1rem; max-width: 60ch;">
+    <div class="slide-content" style="align-items: center; text-align: center; justify-content: center;">
+      <h2 class="reveal" style="font-family: 'Inter', sans-serif; font-weight: 700; font-size: clamp(3rem, 6vw, 5.5rem); color: var(--ink); margin: 0; letter-spacing: -0.025em;">
+        Lab Assignment 6
+      </h2>
+      <p class="reveal" style="font-size: clamp(1.5rem, 2.4vw, 2.3rem); color: var(--ink-soft); margin-top: 2.5rem; max-width: 30ch; line-height: 1.5;">
         Move from theory into practice: hands-on Ordinary Kriging in ArcGIS Pro to
         reinforce today's lecture.
       </p>
-      <div class="reveal" style="margin-top: 2rem;">
-        <a href="assets/lab/Ordinary-Kriging-Laurier-Lab-EL_2026_05_26.pdf" target="_blank" rel="noopener" class="launch-button">
+      <div class="reveal" style="margin-top: 3.5rem;">
+        <a href="assets/lab/Ordinary-Kriging-Laurier-Lab-EL_2026_05_26.pdf" target="_blank" rel="noopener" class="launch-button" style="font-size: clamp(1.4rem, 2.2vw, 2rem); padding: 1.2rem 2.4rem;">
           Open Lab Assignment 6 (PDF) →
         </a>
       </div>
@@ -801,13 +803,13 @@
   <!-- Slide 21: Resources -->
   <section class="slide" id="slide-21">
     <div class="slide-content">
-      <h2 class="slide-heading reveal">Resources</h2>
-      <ul class="reveal" style="font-size: var(--body-size); color: var(--ink); line-height: 1.7; margin-top: 1rem; padding-left: 1.4rem;">
-        <li>Burrough, P. A., McDonnell, R. A., &amp; Lloyd, C. D. (2015). <em>Principles of Geographical Information Systems</em> (3rd ed.). Oxford University Press.</li>
-        <li>Cressie, N. A. C. (1993). <em>Statistics for Spatial Data</em> (rev. ed.). Wiley.</li>
-        <li>Isaaks, E. H., &amp; Srivastava, R. M. (1989). <em>An Introduction to Applied Geostatistics</em>. Oxford University Press.</li>
-        <li>Li, J., &amp; Heap, A. D. (2008). A review of spatial interpolation methods for environmental scientists. <em>Geoscience Australia, Record 2008/23</em>, 1–137.</li>
-        <li>Tobler, W. R. (1970). A computer movie simulating urban growth in the Detroit region. <em>Economic Geography, 46</em>(2), 234–240.</li>
+      <h2 class="slide-heading reveal" style="margin-bottom: 1.2rem;">Resources</h2>
+      <ul class="reveal" style="font-size: clamp(1.4rem, 1.85vw, 1.85rem); color: var(--ink); line-height: 1.8; margin: 0; padding-left: 2.2rem; list-style-position: outside;">
+        <li style="margin-bottom: 0.85rem;">Burrough, P. A., McDonnell, R. A., &amp; Lloyd, C. D. (2015). <em>Principles of Geographical Information Systems</em> (3rd ed.). Oxford University Press.</li>
+        <li style="margin-bottom: 0.85rem;">Cressie, N. A. C. (1993). <em>Statistics for Spatial Data</em> (rev. ed.). Wiley.</li>
+        <li style="margin-bottom: 0.85rem;">Isaaks, E. H., &amp; Srivastava, R. M. (1989). <em>An Introduction to Applied Geostatistics</em>. Oxford University Press.</li>
+        <li style="margin-bottom: 0.85rem;">Li, J., &amp; Heap, A. D. (2008). A review of spatial interpolation methods for environmental scientists. <em>Geoscience Australia, Record 2008/23</em>, 1–137.</li>
+        <li style="margin-bottom: 0.85rem;">Tobler, W. R. (1970). A computer movie simulating urban growth in the Detroit region. <em>Economic Geography, 46</em>(2), 234–240.</li>
         <li>Webster, R., &amp; Oliver, M. A. (2007). <em>Geostatistics for Environmental Scientists</em> (2nd ed.). Wiley.</li>
       </ul>
     </div>
