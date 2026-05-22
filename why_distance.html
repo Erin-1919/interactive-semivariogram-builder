@@ -399,16 +399,92 @@ function FieldCanvas({ scenario, ruler, onRulerChange }) {
   );
 }
 
+function ScenarioTabs({ activeId, onChange }) {
+  return (
+    <div className="tabs">
+      {SCENARIO_ORDER.map(id => (
+        <button key={id}
+                className={`tab-btn ${id === activeId ? 'active' : ''}`}
+                onClick={() => onChange(id)}>
+          {SCENARIOS[id].label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function ReadoutPanel({ scenario, ruler }) {
+  const { a, b } = endpoints(ruler);
+  const va = scenario.value(a.x, a.y);
+  const vb = scenario.value(b.x, b.y);
+  const diff = Math.abs(va - vb);
+  const fmt = (n) => n.toFixed(1);
+  // Angle: convert atan2 result to a positive 0..180 (line orientation is symmetric)
+  const deg = ((ruler.angle * 180 / Math.PI) % 180 + 180) % 180;
+  return (
+    <div className="readout">
+      <div className="readout-row">
+        <span className="readout-label">Value at A</span>
+        <span>{fmt(va)}</span>
+      </div>
+      <div className="readout-row">
+        <span className="readout-label">Value at B</span>
+        <span>{fmt(vb)}</span>
+      </div>
+      <div className="readout-row emphasis">
+        <span>|A − B|</span>
+        <span>{fmt(diff)}</span>
+      </div>
+      <div className="readout-row muted">
+        <span className="readout-label">Distance</span>
+        <span>{scenario.distanceLabel}</span>
+      </div>
+      {scenario.showAngle && (
+        <div className="readout-row muted">
+          <span className="readout-label">Orientation</span>
+          <span>{deg.toFixed(0)}°</span>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ExplanationPanel({ scenario, open, onToggle }) {
+  return (
+    <div className="explain">
+      <button className="explain-toggle" onClick={onToggle}>
+        {open ? '▾' : '▸'} {open ? 'Hide explanation' : 'Reveal explanation'}
+      </button>
+      {open && <div className="explain-text">{scenario.explanation}</div>}
+    </div>
+  );
+}
+
 function WhyDistanceApp() {
-  const scenario = SCENARIOS.barrier;
+  const [scenarioId, setScenarioId] = useState('barrier');
   const [ruler, setRuler] = useState({ cx: 0.5, cy: 0.5, angle: 0 });
+  const [explanationOpen, setExplanationOpen] = useState(false);
+  const scenario = SCENARIOS[scenarioId];
+
+  const onTabChange = (id) => {
+    setScenarioId(id);
+    setRuler({ cx: 0.5, cy: 0.5, angle: 0 });
+    setExplanationOpen(false);
+  };
+
   return (
     <div className="app">
       <h1 className="title">Why distance is <em>not</em> enough</h1>
       <p className="subtitle">Drag the ruler. Same length — different difference.</p>
+      <ScenarioTabs activeId={scenarioId} onChange={onTabChange} />
       <div className="work-area">
         <FieldCanvas scenario={scenario} ruler={ruler} onRulerChange={setRuler} />
-        <div /> {/* readout placeholder, Task 7 */}
+        <div>
+          <ReadoutPanel scenario={scenario} ruler={ruler} />
+          <ExplanationPanel scenario={scenario}
+                            open={explanationOpen}
+                            onToggle={() => setExplanationOpen(o => !o)} />
+        </div>
       </div>
     </div>
   );
