@@ -1,0 +1,47 @@
+<!--
+Removed from index.html on 2026-05-21 to trim lecture length.
+Original position: slide 18 (between cross-validation slide and Lab Assignment).
+Re-insert as a <section class="slide" id="slide-N"> and renumber subsequent
+slides + verify.py + CLAUDE.md if you want it back.
+-->
+<section class="slide" id="slide-18">
+  <div class="slide-content">
+    <h2 class="slide-heading reveal">Different types of Kriging</h2>
+    <table class="reveal" style="width: 100%; border-collapse: collapse; font-size: var(--body-size); margin-top: 1.2rem;">
+      <thead>
+        <tr style="border-bottom: 2px solid var(--rule);">
+          <th style="text-align: left; padding: 0.65rem; color: var(--ink-mute); font-weight: 600;">Type</th>
+          <th style="text-align: left; padding: 0.65rem; color: var(--ink-mute); font-weight: 600;">Mean assumption</th>
+          <th style="text-align: left; padding: 0.65rem; color: var(--ink-mute); font-weight: 600;">Best for</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom: 1px solid var(--rule-soft);">
+          <td style="padding: 0.55rem;">Simple Kriging</td>
+          <td style="padding: 0.55rem; color: var(--ink-soft);">Known constant</td>
+          <td style="padding: 0.55rem; color: var(--ink-soft);">Rare theoretical cases</td>
+        </tr>
+        <tr style="border-bottom: 1px solid var(--rule-soft); background: var(--accent-pale);">
+          <td style="padding: 0.55rem; font-weight: 600;">Ordinary Kriging ★</td>
+          <td style="padding: 0.55rem;">Unknown local constant</td>
+          <td style="padding: 0.55rem;">Most common interpolation</td>
+        </tr>
+        <tr style="border-bottom: 1px solid var(--rule-soft);">
+          <td style="padding: 0.55rem;">Universal Kriging</td>
+          <td style="padding: 0.55rem; color: var(--ink-soft);">Trend / drift present</td>
+          <td style="padding: 0.55rem; color: var(--ink-soft);">Large-scale gradients</td>
+        </tr>
+        <tr style="border-bottom: 1px solid var(--rule-soft);">
+          <td style="padding: 0.55rem;">Indicator Kriging</td>
+          <td style="padding: 0.55rem; color: var(--ink-soft);">Binary or threshold probabilities</td>
+          <td style="padding: 0.55rem; color: var(--ink-soft);">Probability mapping</td>
+        </tr>
+        <tr>
+          <td style="padding: 0.55rem;">Co-Kriging</td>
+          <td style="padding: 0.55rem; color: var(--ink-soft);">Multiple correlated variables</td>
+          <td style="padding: 0.55rem; color: var(--ink-soft);">Multi-source prediction</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>

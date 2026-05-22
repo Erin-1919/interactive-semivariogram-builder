@@ -2,10 +2,10 @@
 Smoke test the teaching-demo branch:
   - three.html: 3×3 walkthrough
   - ten.html:   10×10 explorer + model picker
-  - index.html: 21-slide deck
+  - index.html: 16-slide deck
 
 Runs Playwright + Chromium. Apps must emit the [semivariogram tests done] banner
-with no FAIL: lines. Deck must have 21 slides, a working counter, and the two
+with no FAIL: lines. Deck must have 16 slides, a working counter, and the two
 launch buttons + PDF button must be wired up correctly.
 
 Writes verify_three.png, verify_ten.png, verify_deck.png. Exit non-zero on any failure.
@@ -64,11 +64,11 @@ def check_ten(page, errors, console):
     print(f"  ten.html: {radios.count()} model radios, {chips.count()} lag chips, banner={banner}")
 
 def check_deck(page, errors, console):
-    """21-slide deck (index.html)."""
+    """16-slide deck (index.html)."""
     # Slide count
     slide_count = page.locator(".slide").count()
-    if slide_count != 21:
-        errors.append(f"index.html: expected 21 slides, got {slide_count}")
+    if slide_count != 16:
+        errors.append(f"index.html: expected 16 slides, got {slide_count}")
 
     # Counter starts at "1 / 21"
     counter_text = page.locator("#slide-counter").inner_text()
@@ -82,35 +82,35 @@ def check_deck(page, errors, console):
     if counter_after.startswith("1 /"):
         errors.append(f"index.html: counter did not advance after PageDown (still '{counter_after}')")
 
-    # Slide-14 launch link → three.html
-    s14_link = page.locator("#slide-14 a.launch-button").first
+    # Slide-13 launch link → three.html
+    s14_link = page.locator("#slide-12 a.launch-button").first
     if s14_link.count() == 0:
-        errors.append("index.html: slide 14 launch button missing")
+        errors.append("index.html: slide 12 launch button missing")
     else:
         href = s14_link.get_attribute("href")
         target = s14_link.get_attribute("target")
         if href != "three.html":
-            errors.append(f"index.html: slide 14 link href = {href!r}, expected 'three.html'")
+            errors.append(f"index.html: slide 12 link href = {href!r}, expected 'three.html'")
         if target != "_blank":
-            errors.append(f"index.html: slide 14 link target = {target!r}, expected '_blank'")
+            errors.append(f"index.html: slide 12 link target = {target!r}, expected '_blank'")
 
-    # Slide-15 launch link → ten.html
-    s15_link = page.locator("#slide-15 a.launch-button").first
+    # Slide-14 launch link → ten.html
+    s15_link = page.locator("#slide-13 a.launch-button").first
     if s15_link.count() == 0:
-        errors.append("index.html: slide 15 launch button missing")
+        errors.append("index.html: slide 13 launch button missing")
     else:
         href = s15_link.get_attribute("href")
         if href != "ten.html":
-            errors.append(f"index.html: slide 15 link href = {href!r}, expected 'ten.html'")
+            errors.append(f"index.html: slide 13 link href = {href!r}, expected 'ten.html'")
 
-    # Slide-20 PDF link
-    s20_link = page.locator("#slide-20 a.launch-button").first
+    # Slide-15 PDF link
+    s20_link = page.locator("#slide-15 a.launch-button").first
     if s20_link.count() == 0:
-        errors.append("index.html: slide 20 launch button missing")
+        errors.append("index.html: slide 15 launch button missing")
     else:
         href = s20_link.get_attribute("href") or ""
         if not href.endswith(".pdf"):
-            errors.append(f"index.html: slide 20 link href = {href!r}, expected to end with .pdf")
+            errors.append(f"index.html: slide 15 link href = {href!r}, expected to end with .pdf")
 
     # Slide-10 click-reveal: scroll to slide 10, click 6 times
     page.locator("#slide-10").scroll_into_view_if_needed()
@@ -127,7 +127,7 @@ def check_deck(page, errors, console):
             errors.append(f"index.html: click-reveal final status = '{status_text}', expected to contain '6 / 6'")
 
     page.screenshot(path=str(ROOT / "verify_deck.png"), full_page=True)
-    print(f"  index.html: {slide_count} slides, counter advanced past 1/21, all link checks done")
+    print(f"  index.html: {slide_count} slides, counter advanced past 1/20, all link checks done")
 
 PAGE_CHECKS = [
     ("three.html", check_three),

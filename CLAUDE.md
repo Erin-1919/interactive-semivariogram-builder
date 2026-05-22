@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-A single-page teaching deck (`index.html`) for Ordinary Kriging — 21 scroll-snap slides
+A single-page teaching deck (`index.html`) for Ordinary Kriging — 16 scroll-snap slides
 that convert the lecture PowerPoint into a web format — plus two sibling interactive
 apps that the deck launches in new tabs:
 
@@ -32,7 +32,7 @@ python verify.py
 
 `verify.py` smoke-tests all three pages and writes `verify_three.png`, `verify_ten.png`,
 `verify_deck.png` (all gitignored). It checks the apps' in-browser self-tests emit the
-`[semivariogram tests done]` banner with no `FAIL:` lines, verifies the deck has 21
+`[semivariogram tests done]` banner with no `FAIL:` lines, verifies the deck has 16
 slides, the three launch buttons are wired correctly, and the slide-10 click-reveal
 animation advances 0→6.
 

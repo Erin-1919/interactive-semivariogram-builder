@@ -1,0 +1,38 @@
+<!--
+Removed from index.html on 2026-05-21. The anatomy graph (Nugget / Range / Sill)
+now lives on slide 11 alongside the empirical-semivariogram equation. The Nugget /
+Range / Sill explanatory cards below were dropped to save lecture time.
+
+Re-insert as a <section class="slide" id="slide-N"> and renumber subsequent
+slides + verify.py + CLAUDE.md if you want it back.
+-->
+<section class="slide" id="slide-12">
+  <div class="slide-content">
+    <h2 class="slide-heading reveal">Anatomy of an empirical semivariogram</h2>
+    <div style="display: grid; grid-template-columns: 1.3fr 1fr; gap: 2rem; margin-top: 1.2rem; align-items: center;">
+      <div class="reveal">
+        <img src="assets/img/slide13_anatomy.png" alt="Semivariogram with nugget, range, sill labeled" style="width: 100%; max-height: 75vh; object-fit: contain;">
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 0.8rem;">
+        <div class="reveal" style="padding: 1rem; background: var(--paper-soft); border-left: 3px solid var(--accent);">
+          <div style="font-family: 'Inter', sans-serif; font-size: var(--h3-size); color: var(--accent); font-weight: 500;">Nugget</div>
+          <p style="font-size: var(--body-size); color: var(--ink-soft); margin-top: 0.3rem;">
+            Value at or near origin (h=0). Represents measurement error or microscale variation.
+          </p>
+        </div>
+        <div class="reveal" style="padding: 1rem; background: var(--paper-soft); border-left: 3px solid var(--accent);">
+          <div style="font-family: 'Inter', sans-serif; font-size: var(--h3-size); color: var(--accent); font-weight: 500;">Range</div>
+          <p style="font-size: var(--body-size); color: var(--ink-soft); margin-top: 0.3rem;">
+            Distance where the curve levels off. Beyond this distance, points are effectively uncorrelated.
+          </p>
+        </div>
+        <div class="reveal" style="padding: 1rem; background: var(--paper-soft); border-left: 3px solid var(--accent);">
+          <div style="font-family: 'Inter', sans-serif; font-size: var(--h3-size); color: var(--accent); font-weight: 500;">Sill</div>
+          <p style="font-size: var(--body-size); color: var(--ink-soft); margin-top: 0.3rem;">
+            Plateau value. Approximate total variance of the data.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

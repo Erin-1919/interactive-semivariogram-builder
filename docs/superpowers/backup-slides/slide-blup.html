@@ -1,0 +1,33 @@
+<!--
+Removed from index.html on 2026-05-21 to trim lecture length.
+Original position: slide 7 (between "What Is Kriging?" and "Ordinary Kriging — Core Assumption").
+Re-insert as a <section class="slide" id="slide-N"> in index.html and renumber
+subsequent slides + verify.py + CLAUDE.md if you want it back.
+-->
+<section class="slide" id="slide-7">
+  <div class="slide-content">
+    <div class="eyebrow reveal" style="font-size: clamp(1.8rem, 2.6vw, 2.6rem); letter-spacing: 0.08em;">Kriging as BLUP</div>
+    <h2 class="slide-heading reveal" style="margin-top: 0.6rem;">Best Linear Unbiased Prediction</h2>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-top: 2.5rem;">
+      <div class="reveal" style="padding: 1.5rem; background: var(--paper-soft); border-left: 3px solid var(--accent);">
+        <div style="font-family: 'Inter', sans-serif; font-size: var(--h2-size); color: var(--accent); font-weight: 500;">Best</div>
+        <p style="font-size: var(--body-size); color: var(--ink-soft); margin-top: 0.5rem;">
+          Minimizes prediction error variance.
+        </p>
+      </div>
+      <div class="reveal" style="padding: 1.5rem; background: var(--paper-soft); border-left: 3px solid var(--accent);">
+        <div style="font-family: 'Inter', sans-serif; font-size: var(--h2-size); color: var(--accent); font-weight: 500;">Linear</div>
+        <p style="font-size: var(--body-size); color: var(--ink-soft); margin-top: 0.5rem;">
+          Prediction is a weighted sum of observed values, so Kriging remains
+          mathematically interpretable.
+        </p>
+      </div>
+      <div class="reveal" style="padding: 1.5rem; background: var(--paper-soft); border-left: 3px solid var(--accent);">
+        <div style="font-family: 'Inter', sans-serif; font-size: var(--h2-size); color: var(--accent); font-weight: 500;">Unbiased</div>
+        <p style="font-size: var(--body-size); color: var(--ink-soft); margin-top: 0.5rem;">
+          Expected prediction error is zero — Kriging is statistically fair on average.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>

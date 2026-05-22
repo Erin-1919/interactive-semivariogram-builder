@@ -1,0 +1,172 @@
+<!--
+Removed from index.html on 2026-05-21 to fit the lecture into one period.
+These four detailed slides (Steps 3-6) were collapsed into a single overview slide;
+Steps 4-6 are now marked as next-lecture material. Re-insert by replacing the combined
+slide back with the four below, and renumber verify.py + CLAUDE.md.
+-->
+  <!-- Slide 15: Step 3 — Fit Theoretical Semivariogram Model -->
+  <section class="slide" id="slide-14">
+    <div class="slide-content">
+      <h2 class="workflow-title reveal">Step-by-Step Ordinary Kriging Workflow</h2>
+      <h3 class="reveal step-sub">Step 3. Fit a Theoretical Semivariogram Model</h3>
+      <p class="reveal" style="font-size: var(--body-size); color: var(--ink-soft); margin-top: 0.6rem;">
+        An empirical semivariogram is a scatter of observed γ values — for Kriging we need
+        a smooth, mathematically defined curve.
+      </p>
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.2rem; margin-top: 1.5rem;">
+        <!-- Spherical -->
+        <div class="reveal" style="padding: 1rem; background: var(--paper-soft); border-radius: 6px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="font-family: 'Inter', sans-serif; font-size: var(--h3-size); color: var(--accent); font-weight: 500;">Spherical</div>
+            <svg viewBox="0 0 80 40" width="80" height="40" aria-hidden="true">
+              <!-- Spherical: rises then caps -->
+              <path d="M 4 36 Q 16 12 38 8 L 76 8" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div style="font-size: var(--small-size); color: var(--ink-mute); letter-spacing: 0.08em; text-transform: uppercase; margin-top: 0.5rem;">Best used when</div>
+          <ul style="font-size: var(--body-size); color: var(--ink-soft); margin-top: 0.4rem; padding-left: 1.1rem; line-height: 1.4;">
+            <li>Spatial similarity decreases steadily then stops beyond a certain distance</li>
+            <li>General-purpose environmental data</li>
+          </ul>
+        </div>
+        <!-- Exponential -->
+        <div class="reveal" style="padding: 1rem; background: var(--paper-soft); border-radius: 6px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="font-family: 'Inter', sans-serif; font-size: var(--h3-size); color: var(--accent); font-weight: 500;">Exponential</div>
+            <svg viewBox="0 0 80 40" width="80" height="40" aria-hidden="true">
+              <!-- Exponential: asymptotic approach -->
+              <path d="M 4 36 C 12 36 24 10 76 8" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div style="font-size: var(--small-size); color: var(--ink-mute); letter-spacing: 0.08em; text-transform: uppercase; margin-top: 0.5rem;">Best used when</div>
+          <ul style="font-size: var(--body-size); color: var(--ink-soft); margin-top: 0.4rem; padding-left: 1.1rem; line-height: 1.4;">
+            <li>Nearby points may differ substantially</li>
+            <li>Patchy or irregular variables</li>
+            <li>Air pollution, contaminant spread</li>
+          </ul>
+        </div>
+        <!-- Gaussian -->
+        <div class="reveal" style="padding: 1rem; background: var(--paper-soft); border-radius: 6px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="font-family: 'Inter', sans-serif; font-size: var(--h3-size); color: var(--accent); font-weight: 500;">Gaussian</div>
+            <svg viewBox="0 0 80 40" width="80" height="40" aria-hidden="true">
+              <!-- Gaussian: flat origin, S-curve -->
+              <path d="M 4 36 C 4 36 20 36 36 18 C 52 4 60 8 76 8" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div style="font-size: var(--small-size); color: var(--ink-mute); letter-spacing: 0.08em; text-transform: uppercase; margin-top: 0.5rem;">Best used when</div>
+          <ul style="font-size: var(--body-size); color: var(--ink-soft); margin-top: 0.4rem; padding-left: 1.1rem; line-height: 1.4;">
+            <li>Spatial processes change smoothly over space</li>
+            <li>Highly continuous surfaces</li>
+            <li>Temperature, groundwater surfaces</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 15: Step 4 — Build the Kriging Matrix (A/B/C/D, no equations) -->
+  <section class="slide" id="slide-15">
+    <div class="slide-content">
+      <h2 class="workflow-title reveal">Step-by-Step Ordinary Kriging Workflow</h2>
+      <h3 class="reveal step-sub">Step 4. Build the Kriging Matrix and Solve Weights</h3>
+      <div class="reveal" style="font-size: var(--small-size); color: var(--ink-mute); margin-top: 0.5rem;">
+        <strong>Inputs used:</strong> the fitted variogram model, sample-to-sample distances, and sample-to-target distances.
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; margin-top: 1.2rem;">
+        <div class="reveal" style="padding: 1.2rem; background: var(--paper-soft); border-left: 3px solid var(--accent);">
+          <div style="font-family: 'Inter', sans-serif; font-size: var(--h3-size); color: var(--accent); font-weight: 500;">A. Calculate semivariance / covariance</div>
+          <ul style="font-size: var(--body-size); color: var(--ink-soft); margin-top: 0.4rem; padding-left: 1.1rem;">
+            <li>Between all sample points</li>
+            <li>Between sample points and the target point</li>
+          </ul>
+        </div>
+        <div class="reveal" style="padding: 1.2rem; background: var(--paper-soft); border-left: 3px solid var(--accent);">
+          <div style="font-family: 'Inter', sans-serif; font-size: var(--h3-size); color: var(--accent); font-weight: 500;">B. Build the kriging system</div>
+          <p style="font-size: var(--body-size); color: var(--ink-soft); margin-top: 0.4rem;">
+            Spatial-relationship matrix plus an unbiasedness constraint row and column.
+          </p>
+        </div>
+        <div class="reveal" style="padding: 1.2rem; background: var(--paper-soft); border-left: 3px solid var(--accent);">
+          <div style="font-family: 'Inter', sans-serif; font-size: var(--h3-size); color: var(--accent); font-weight: 500;">C. Apply unbiasedness constraint</div>
+        </div>
+        <div class="reveal" style="padding: 1.2rem; background: var(--paper-soft); border-left: 3px solid var(--accent);">
+          <div style="font-family: 'Inter', sans-serif; font-size: var(--h3-size); color: var(--accent); font-weight: 500;">D. Solve for weights</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 16: Step 5 — Prediction Surface Generation (combined map figure) -->
+  <section class="slide" id="slide-16">
+    <div class="slide-content">
+      <h2 class="workflow-title reveal">Step-by-Step Ordinary Kriging Workflow</h2>
+      <h3 class="reveal step-sub">Step 5. Prediction Surface Generation</h3>
+      <div class="reveal" style="margin-top: 1rem; text-align: center;">
+        <img src="assets/img/slide17_prediction_uncertainty.png" alt="Prediction surface (left) and uncertainty surface (right)" style="max-width: 100%; max-height: 62vh; object-fit: contain;">
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 1rem; padding: 0 1rem;">
+        <p class="reveal" style="font-size: var(--body-size); color: var(--ink-soft); text-align: center;">
+          <strong>Left — predicted values:</strong> estimated values mapped across the entire study area; the interpolated "best guess" map.
+        </p>
+        <p class="reveal" style="font-size: var(--body-size); color: var(--ink-soft); text-align: center;">
+          <strong>Right — uncertainty:</strong> map of prediction uncertainty, highlighting where the model is confident vs. uncertain.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 17: Step 6 — Validation (LOOCV) -->
+  <section class="slide" id="slide-17">
+    <div class="slide-content">
+      <h2 class="workflow-title reveal">Step-by-Step Ordinary Kriging Workflow</h2>
+      <h3 class="reveal step-sub">Step 6. Validation</h3>
+      <p class="reveal" style="font-size: var(--body-size); color: var(--ink-soft); margin-top: 0.6rem;">
+        Evaluate whether the kriging model performs well. A common approach is
+        <strong>leave-one-out cross-validation</strong>:
+      </p>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 1rem;">
+        <div class="reveal">
+          <div style="font-family: 'Inter', sans-serif; font-size: var(--small-size); letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-mute);">Steps</div>
+          <ol style="font-size: var(--body-size); color: var(--ink); margin-top: 0.5rem; margin-left: 0; padding-left: 2.2rem; line-height: 1.8; list-style-position: outside;">
+            <li>Remove one observed point</li>
+            <li>Predict its value using the remaining points</li>
+            <li>Compare predicted vs. observed value</li>
+            <li>Repeat for all points</li>
+          </ol>
+        </div>
+        <div class="reveal">
+          <table style="width: 100%; border-collapse: collapse; font-size: var(--body-size);">
+            <thead>
+              <tr style="border-bottom: 2px solid var(--rule);">
+                <th style="text-align: left; padding: 0.7rem; color: var(--ink-mute); font-weight: 600;">Metric</th>
+                <th style="text-align: left; padding: 0.7rem; color: var(--ink-mute); font-weight: 600;">Desired result</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom: 1px solid var(--rule-soft);">
+                <td style="padding: 0.7rem;">Mean Error</td>
+                <td style="padding: 0.7rem; color: var(--ink-soft);">Close to 0</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--rule-soft);">
+                <td style="padding: 0.7rem;">Root Mean Square Error</td>
+                <td style="padding: 0.7rem; color: var(--ink-soft);">As small as possible</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--rule-soft);">
+                <td style="padding: 0.7rem;">Mean Standardized Error</td>
+                <td style="padding: 0.7rem; color: var(--ink-soft);">Close to 0</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--rule-soft);">
+                <td style="padding: 0.7rem;">Root Mean Sq. Standardized Error</td>
+                <td style="padding: 0.7rem; color: var(--ink-soft);">Close to 1</td>
+              </tr>
+              <tr>
+                <td style="padding: 0.7rem;">Prediction error map</td>
+                <td style="padding: 0.7rem; color: var(--ink-soft);">No strong spatial pattern</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
