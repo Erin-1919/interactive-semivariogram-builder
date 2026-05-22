@@ -306,7 +306,7 @@ function diffAt(scenario, ruler) {
 const FIELD_PX = 520;       // pixel size of the field SVG (width and height)
 const GRID_N = 20;          // cells per side
 
-function FieldCanvas({ scenario }) {
+function FieldCanvas({ scenario, ruler }) {
   const cells = useMemo(() => {
     const out = [];
     const cell = FIELD_PX / GRID_N;
@@ -326,6 +326,11 @@ function FieldCanvas({ scenario }) {
     return out;
   }, [scenario]);
 
+  const { a, b } = endpoints(ruler);
+  const ax = a.x * FIELD_PX, ay = a.y * FIELD_PX;
+  const bx = b.x * FIELD_PX, by = b.y * FIELD_PX;
+  const mx = ruler.cx * FIELD_PX, my = ruler.cy * FIELD_PX;
+
   return (
     <div className="field-frame">
       <svg className="field-svg" width={FIELD_PX} height={FIELD_PX}
@@ -336,6 +341,10 @@ function FieldCanvas({ scenario }) {
                   key={c.key} x={c.x} y={c.y} width={c.w} height={c.h} fill={c.fill} />
           ))}
         </g>
+        <line className="ruler-line" x1={ax} y1={ay} x2={bx} y2={by} />
+        <circle className="handle" data-handle="a" cx={ax} cy={ay} r={9} />
+        <circle className="handle" data-handle="b" cx={bx} cy={by} r={9} />
+        <circle className="handle midpoint" data-handle="mid" cx={mx} cy={my} r={11} />
       </svg>
     </div>
   );
@@ -343,12 +352,13 @@ function FieldCanvas({ scenario }) {
 
 function WhyDistanceApp() {
   const scenario = SCENARIOS.barrier;
+  const [ruler, setRuler] = useState({ cx: 0.5, cy: 0.5, angle: 0 });
   return (
     <div className="app">
       <h1 className="title">Why distance is <em>not</em> enough</h1>
       <p className="subtitle">Drag the ruler. Same length — different difference.</p>
       <div className="work-area">
-        <FieldCanvas scenario={scenario} />
+        <FieldCanvas scenario={scenario} ruler={ruler} />
         <div /> {/* readout placeholder, Task 7 */}
       </div>
     </div>
