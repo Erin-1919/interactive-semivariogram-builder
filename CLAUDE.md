@@ -5,12 +5,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## What this is
 
 A single-page teaching deck (`index.html`) for Ordinary Kriging — 16 scroll-snap slides
-that convert the lecture PowerPoint into a web format — plus two sibling interactive
+that convert the lecture PowerPoint into a web format — plus three sibling interactive
 apps that the deck launches in new tabs:
 
-- `three.html` — 3×3 hand-calculation walkthrough
-- `ten.html` — 10×10 explorer with empirical lags and theoretical model fitting
-  (Spherical / Exponential / Gaussian)
+- `why_distance.html` — four-scenario "ruler" explorer (slide 5)
+- `three.html` — 3×3 hand-calculation walkthrough (slide 12)
+- `ten.html` — 10×10 explorer with empirical lags and theoretical model fitting (slide 13)
 
 Shared math + React components live in `lib/semivariogram.js`; the shared palette and
 base styles in `lib/theme.css`. All four files (deck + two apps + lib) are plain HTML
@@ -39,11 +39,12 @@ start ten.html
 python verify.py
 ```
 
-`verify.py` smoke-tests all three pages and writes `verify_three.png`, `verify_ten.png`,
-`verify_deck.png` (all gitignored). It checks the apps' in-browser self-tests emit the
-`[semivariogram tests done]` banner with no `FAIL:` lines, verifies the deck has 16
-slides, the three launch buttons are wired correctly, and the slide-10 click-reveal
-animation advances 0→6.
+`verify.py` smoke-tests all four pages and writes `verify_three.png`, `verify_ten.png`,
+`verify_why_distance.png`, `verify_deck.png` (all gitignored). It checks the apps'
+in-browser self-tests emit `[semivariogram tests done]` (three.html, ten.html) and
+`[why-distance tests done]` (why_distance.html) with no `FAIL:` lines, verifies the
+deck has 16 slides, the three launch buttons (slides 5, 12, 13) and the PDF button
+(slide 16) are wired correctly, and the slide-9 click-reveal animation advances 0→6.
 
 In-browser self-tests now live inside `lib/semivariogram.js` and run on first load of
 either app. They emit `[semivariogram tests done]` on success.
