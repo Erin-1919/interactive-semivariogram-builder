@@ -79,7 +79,7 @@
   }
   .cell-edit-input {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 16px;
+    font-size: 22px;
     width: 100%;
     height: 100%;
     box-sizing: border-box;
@@ -129,14 +129,14 @@
   .masthead .eyebrow {
     font-family: 'Fraunces', serif;
     font-style: italic;
-    font-size: 17px;
+    font-size: 22px;
     color: var(--accent);
     margin-bottom: 8px;
     letter-spacing: 0.01em;
   }
   .masthead .meta {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 14px;
+    font-size: 22px;
     color: var(--ink-mute);
     text-transform: uppercase;
     letter-spacing: 0.06em;
@@ -154,7 +154,7 @@
     display: block;
     font-family: 'Manrope', sans-serif;
     font-weight: 600;
-    font-size: 13px;
+    font-size: 22px;
     text-transform: uppercase;
     letter-spacing: 0.12em;
     color: var(--ink-soft);
@@ -167,7 +167,7 @@
     border: 1px solid var(--rule);
     padding: 14px 40px 14px 16px;
     font-family: 'Manrope', sans-serif;
-    font-size: 17px;
+    font-size: 22px;
     font-weight: 500;
     color: var(--ink);
     cursor: pointer;
@@ -188,7 +188,7 @@
     border: none;
     padding: 12px 10px;
     font-family: 'Manrope', sans-serif;
-    font-size: 16px;
+    font-size: 22px;
     font-weight: 500;
     color: var(--ink-soft);
     cursor: pointer;
@@ -218,7 +218,7 @@
   }
   .model-toggle-label {
     font-family: 'Manrope', sans-serif;
-    font-size: 16px;
+    font-size: 22px;
     color: var(--ink);
     cursor: pointer;
     display: inline-flex;
@@ -231,7 +231,7 @@
   }
   .lag-chip {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 15px;
+    font-size: 22px;
     font-weight: 500;
     background: var(--paper-soft);
     border: 1px solid var(--rule);
@@ -245,13 +245,13 @@
     background: var(--accent); color: var(--paper-soft); border-color: var(--accent);
   }
   .lag-chip.upcoming { opacity: 0.4; }
-  .lag-chip .n-badge { margin-left: 8px; font-size: 13px; opacity: 0.75; }
+  .lag-chip .n-badge { margin-left: 8px; font-size: 22px; opacity: 0.75; }
 
   /* STEP BUTTONS */
   .step-controls { display: flex; gap: 10px; flex-wrap: wrap; }
   .step-btn {
     font-family: 'Manrope', sans-serif;
-    font-size: 16px; font-weight: 500;
+    font-size: 22px; font-weight: 500;
     background: var(--paper-soft);
     border: 1px solid var(--rule);
     color: var(--ink);
@@ -355,15 +355,15 @@
     min-width: 0;
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 8px 10px;
+    gap: 10px;
+    padding: 10px 12px;
     background: transparent;
     border: 1px solid transparent;
     border-radius: 3px;
     cursor: pointer;
     color: var(--ink-soft);
     font-family: 'Manrope', sans-serif;
-    font-size: 16px;
+    font-size: 20px;
     font-weight: 500;
     transition: background 0.12s, color 0.12s, border-color 0.12s;
   }
@@ -379,13 +379,13 @@
   }
   .step-bar .step-num {
     flex-shrink: 0;
-    width: 28px; height: 28px;
+    width: 34px; height: 34px;
     border-radius: 50%;
     background: var(--paper-deep);
     color: var(--ink-soft);
     font-family: 'Fraunces', serif;
     font-style: italic;
-    font-size: 18px;
+    font-size: 22px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -420,7 +420,7 @@
     border: none;
     padding: 14px 18px;
     font-family: 'Manrope', sans-serif;
-    font-size: 15px;
+    font-size: 22px;
     font-weight: 500;
     color: var(--ink-mute);
     cursor: pointer;
@@ -459,7 +459,7 @@
     border-bottom: 1px solid var(--rule);
     border-left: 2px solid transparent;
     padding: 18px 14px;
-    font-size: 16px;
+    font-size: 22px;
   }
   .tabbed-panel.vertical .tab:last-child { border-bottom: none; }
   .tabbed-panel.vertical .tab.active {
@@ -472,33 +472,71 @@
   /* FORMULA PANEL */
   .formula-panel { font-family: 'Fraunces', serif; }
   .formula-panel .big-formula {
-    font-size: 30px;
+    font-size: 34px;
+    font-family: 'Cambria Math','Latin Modern Math','Fraunces',serif;
     font-style: italic;
-    line-height: 1.6;
-    text-align: center;
+    line-height: 1.4;
     color: var(--ink-soft);
-    padding: 18px 0;
+    padding: 22px 12px;
     background: var(--paper-deep);
     border-radius: 4px;
     margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5em;
+    flex-wrap: wrap;
   }
-  .formula-panel .big-formula .term {
-    padding: 2px 4px;
-    border-radius: 3px;
-    transition: background 0.15s, color 0.15s;
+  .formula-panel .big-formula .kf-part {
+    padding: 0.05em 0.25em;
+    border-radius: 4px;
+    cursor: help;
+    transition: color 0.2s ease, background 0.2s ease, opacity 0.2s ease;
   }
-  .formula-panel .big-formula .term.hi {
-    background: var(--accent-pale);
+  .formula-panel .big-formula.has-focus .kf-part:not(.hi),
+  .formula-panel .big-formula.has-focus .kf-static {
+    color: var(--ink-mute);
+    opacity: 0.32;
+  }
+  .formula-panel .big-formula .kf-part.hi {
     color: var(--accent-deep);
-    font-weight: 500;
+    background: var(--accent-pale);
+    font-weight: 600;
   }
+  .formula-panel .big-formula .kf-static { padding: 0 0.1em; font-style: normal; }
+  .formula-panel .big-formula .frac {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1.05;
+    font-style: normal;
+  }
+  .formula-panel .big-formula .frac-top {
+    border-bottom: 1.5px solid currentColor;
+    padding: 0 0.3em;
+  }
+  .formula-panel .big-formula .frac-bot { padding: 0 0.3em; }
+  .formula-panel .big-formula .bigsum {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1;
+    font-style: normal;
+  }
+  .formula-panel .big-formula .sum-top,
+  .formula-panel .big-formula .sum-bot {
+    font-size: 0.5em;
+    font-style: italic;
+  }
+  .formula-panel .big-formula .sum-mid { font-size: 1.25em; }
   .formula-panel .caption {
     font-family: 'Manrope', sans-serif;
     font-style: normal;
-    font-size: 17px;
+    font-size: 22px;
     color: var(--ink-soft);
     line-height: 1.55;
     margin-bottom: 12px;
+    text-align: center;
   }
   .formula-panel .caption strong { color: var(--accent); }
 
@@ -533,7 +571,7 @@
     width: 100%;
     border-collapse: collapse;
     font-family: 'JetBrains Mono', monospace;
-    font-size: 15px;
+    font-size: 22px;
   }
   .calc-table th, .calc-table td {
     padding: 6px 8px;
@@ -543,7 +581,7 @@
   }
   .calc-table th {
     font-family: 'Manrope', sans-serif;
-    font-size: 18px;
+    font-size: 22px;
     text-transform: uppercase;
     letter-spacing: 0.08em;
     color: var(--ink-mute);
@@ -587,7 +625,7 @@
     .masthead .meta { text-align: left; }
   }
   @media (min-width: 1700px) {
-    body { font-size: 18px; }
+    body { font-size: 22px; }
     h1.title { font-size: 64px; }
   }
 
@@ -616,14 +654,14 @@
     font-family: 'Fraunces', serif;
     font-style: italic;
     color: var(--ink-mute);
-    font-size: 16px;
+    font-size: 22px;
   }
   .mode-header .extras { margin-left: auto; display: flex; gap: 14px; align-items: center; }
 
   .model-radio { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
   .model-radio label {
     font-family: 'Manrope', sans-serif;
-    font-size: 14px;
+    font-size: 22px;
     color: var(--ink-soft);
     display: inline-flex;
     align-items: center;
@@ -641,12 +679,12 @@
     font-family: 'Fraunces', serif;
     font-style: italic;
     color: var(--ink-mute);
-    font-size: 16px;
+    font-size: 22px;
   }
   .whatif-footer button {
     font-family: 'Manrope', sans-serif;
     font-style: normal;
-    font-size: 16px;
+    font-size: 22px;
     background: var(--paper-soft);
     border: 1px solid var(--rule);
     color: var(--ink);
@@ -740,6 +778,38 @@ const DATASETS_10X10 = {
       [ 12,  13,  14,  14,  15,  28,  30,  30,  30,  30],
       [ 14,  13,  14,  14,  17,  27,  31,  30, null,  30],
       [ 14,  14,  13,  14,  16,  27,  29,  29,  30,  30]
+    ]
+  },
+  gradient: {
+    label: 'Global trend',
+    blurb: 'Non-stationary field — values rise from NW to SE, so γ(h) climbs without ever reaching a sill.',
+    grid: [
+      [ 12,  14,  14,  15,  17,  19,  19,  20,  21,  23],
+      [ 14,  14,  15,  18,  18,  19,  21,  22,  23,  25],
+      [ 14,  16,  18,  18,  20, null,  21,  23,  25,  26],
+      [ 16,  18,  18,  20,  21,  21,  24,  24,  26,  28],
+      [ 17,  19,  20,  19,  22,  24,  25,  26,  28,  27],
+      [ 19,  19,  21,  22,  24,  25,  26, null,  28,  30],
+      [ 20,  21,  22,  24,  25,  25,  28,  28,  30,  32],
+      [ 21,  23,  24,  25,  26,  28,  28,  29,  31,  33],
+      [ 23,  24, null,  27,  28,  29,  30,  32,  33,  34],
+      [ 24,  25,  27,  28,  30,  31,  32,  33,  35,  36]
+    ]
+  },
+  outliers: {
+    label: 'Outliers',
+    blurb: 'Uniform background with two extreme values — γ(h) is inflated at every lag that touches an outlier.',
+    grid: [
+      [ 25,  24,  26,  25,  24,  26,  25,  24,  26,  25],
+      [ 24,  26,  25,  24,  26,  25,  24,  26,  25,  24],
+      [ 26,  25,  24,  26,  25, null,  26,  25,  24,  26],
+      [ 25,  24,  26,  25,  24,  26,  25,  24,  26,  25],
+      [ 24,  26,  25,  24,   3,  24,  26,  25,  24,  26],
+      [ 26,  25,  24,  26,  25,  24,  26, null,  24,  26],
+      [ 25,  24,  26,  25,  24,  26,  25,  24,  26,  25],
+      [ 24,  26,  25,  24,  26,  25,  24,  50,  25,  24],
+      [ 26,  25, null,  25,  24,  26,  25,  24,  26,  25],
+      [ 25,  24,  26,  26,  25,  24,  26,  25,  24,  26]
     ]
   }
 };
@@ -1216,11 +1286,13 @@ function GridView({
 // ------------------------------------------------------------------
 // SemivariogramPlot — SVG plot with axes, points, optional model.
 // ------------------------------------------------------------------
-function SemivariogramPlot({ lags, selectedIdx, revealedCount, modelName = 'none', width = 540, height = 340, showPoints = true }) {
+function SemivariogramPlot({ lags, selectedIdx, revealedCount, visibleLagIndices = null, modelName = 'none', width = 540, height = 340, showPoints = true, showConnector = true }) {
   const margin = { top: 22, right: 28, bottom: 56, left: 68 };
   const innerW = width - margin.left - margin.right;
   const innerH = height - margin.top - margin.bottom;
-  const visibleLags = lags.slice(0, revealedCount);
+  const visibleLags = visibleLagIndices
+    ? visibleLagIndices.map(i => lags[i]).filter(Boolean)
+    : lags.slice(0, revealedCount);
 
   // Use the full lag set for axis domains so axes stay stable across reveals
   const maxH = Math.max(...lags.map(l => l.h), 1);
@@ -1340,7 +1412,8 @@ function SemivariogramPlot({ lags, selectedIdx, revealedCount, modelName = 'none
       })()}
 
       {showPoints && visibleLags.map((l, i) => {
-        const selected = i === selectedIdx;
+        const lagIdx = visibleLagIndices ? visibleLagIndices[i] : i;
+        const selected = lagIdx === selectedIdx;
         return (
           <g key={`pt-${i}`}>
             {selected && (
@@ -1433,9 +1506,9 @@ function TabbedPanel({ tabs, activeTab, onTab, children, orientation = 'horizont
 //   highlight ∈ 'h' | 'z_i' | 'z_j' | 'diff' | 'sq' | 'sum' | 'N' | 'oneOver2N' | null
 // ------------------------------------------------------------------
 function FormulaPanel({ highlight }) {
-  const klass = (key) => 'term' + (highlight === key ? ' hi' : '');
-  const captions = {
-    null:        'Press the next step to walk through each piece of this formula.',
+  const [hovered, setHovered] = React.useState(null);
+
+  const stepCaptions = {
     h:           <span><strong>h</strong> is the lag distance — the spacing between the two stations in each pair.</span>,
     z_i:         <span><strong>Z(x<sub>i</sub>)</strong> is one observed rainfall value at station <em>x<sub>i</sub></em>.</span>,
     z_j:         <span><strong>Z(x<sub>i</sub> + h)</strong> is the rainfall value at the station <em>h</em> away.</span>,
@@ -1445,20 +1518,52 @@ function FormulaPanel({ highlight }) {
     N:           <span><strong>N(h)</strong> is the number of valid pairs at this lag.</span>,
     oneOver2N:   <span><strong>1 / [2N(h)]</strong> turns the sum into an average and then halves it — that is the semivariance γ(h).</span>
   };
-  const caption = captions[highlight] !== undefined ? captions[highlight] : captions[null];
+  const hoverCaptions = {
+    gamma:  <span><strong>γ(h)</strong> — semivariance at distance <em>h</em>.</span>,
+    frac:   <span><strong>1 / [2N(h)]</strong> — normalisation: divide by twice the number of pairs at distance <em>h</em>.</span>,
+    sum:    <span><strong>Σ</strong> — sum over all <em>N(h)</em> point pairs separated by distance <em>h</em>.</span>,
+    sqdiff: <span><strong>[Z(x<sub>i</sub>) − Z(x<sub>i</sub> + h)]<sup>2</sup></strong> — squared difference between values at locations <em>x<sub>i</sub></em> and <em>x<sub>i</sub> + h</em>.</span>
+  };
+  const stepToGroup = {
+    h: 'gamma',
+    z_i: 'sqdiff', z_j: 'sqdiff', diff: 'sqdiff', sq: 'sqdiff',
+    sum: 'sum',
+    N: 'frac', oneOver2N: 'frac'
+  };
+  const activeGroup = hovered || (highlight ? stepToGroup[highlight] : null);
+  const caption = hovered
+    ? hoverCaptions[hovered]
+    : (highlight && stepCaptions[highlight]
+        ? stepCaptions[highlight]
+        : <span style={{ fontStyle: 'italic', color: 'var(--ink-mute)' }}>Hover any term in the formula to see its role.</span>);
+
+  const grpProps = (g) => ({
+    className: 'kf-part' + (activeGroup === g ? ' hi' : ''),
+    onMouseEnter: () => setHovered(g),
+    onMouseLeave: () => setHovered(null)
+  });
+
   return (
     <div className="formula-panel">
-      <div className="big-formula">
-        γ(<span className={klass('h')}>h</span>) ={' '}
-        <span className={klass('oneOver2N')}>1 / [2<span className={klass('N')}>N(h)</span>]</span>{' '}
-        ·{' '}
-        <span className={klass('sum')}>Σ</span>{' '}
-        <span className={klass('sq')}>[
-          <span className={klass('diff')}>
-            <span className={klass('z_i')}>Z(x<sub>i</sub>)</span>{' '}−{' '}
-            <span className={klass('z_j')}>Z(x<sub>i</sub> + h)</span>
+      <div className={'big-formula' + (activeGroup ? ' has-focus' : '')}>
+        <span {...grpProps('gamma')}><i>γ</i>(<i>h</i>)</span>
+        <span className="kf-static">=</span>
+        <span {...grpProps('frac')}>
+          <span className="frac">
+            <span className="frac-top">1</span>
+            <span className="frac-bot">2<i>N</i>(<i>h</i>)</span>
           </span>
-        ]<sup>2</sup></span>
+        </span>
+        <span {...grpProps('sum')}>
+          <span className="bigsum">
+            <span className="sum-top"><i>N</i>(<i>h</i>)</span>
+            <span className="sum-mid">Σ</span>
+            <span className="sum-bot"><i>i</i>=1</span>
+          </span>
+        </span>
+        <span {...grpProps('sqdiff')}>
+          [<i>Z</i>(<i>x</i><sub>i</sub>) − <i>Z</i>(<i>x</i><sub>i</sub> + <i>h</i>)]<sup>2</sup>
+        </span>
       </div>
       <div className="caption">{caption}</div>
       <div className="caption" style={{ color: 'var(--ink-mute)' }}>
@@ -1473,7 +1578,7 @@ function FormulaPanel({ highlight }) {
 // Set-like object with boolean flags { diff, sq, sum, gamma } so steps
 // 4–7 fill in columns one at a time.
 // ------------------------------------------------------------------
-function CalculationTable({ lag, revealColumns = { diff: true, sq: true, sum: true, gamma: true }, maxRows = 8 }) {
+function CalculationTable({ lag, revealColumns = { pairs: true, diff: true, sq: true, sum: true, gamma: true }, maxRows = 99 }) {
   if (!lag) {
     return (
       <div className="calc-table">
@@ -1481,6 +1586,7 @@ function CalculationTable({ lag, revealColumns = { diff: true, sq: true, sum: tr
       </div>
     );
   }
+  const showPairs = revealColumns.pairs !== false;
   const rows = lag.pairs.slice(0, maxRows);
   const more = lag.pairs.length - rows.length;
   return (
@@ -1501,7 +1607,9 @@ function CalculationTable({ lag, revealColumns = { diff: true, sq: true, sum: tr
             const diff = p.a.v - p.b.v;
             return (
               <tr key={i}>
-                <td>({p.a.v}, {p.b.v})</td>
+                <td className={showPairs ? '' : 'hidden-cell'}>
+                  {showPairs ? `(${p.a.v}, ${p.b.v})` : '…'}
+                </td>
                 <td className={revealColumns.diff ? '' : 'hidden-cell'}>
                   {revealColumns.diff ? diff.toFixed(0) : '…'}
                 </td>
@@ -1514,13 +1622,13 @@ function CalculationTable({ lag, revealColumns = { diff: true, sq: true, sum: tr
         </tbody>
       </table>
       {more > 0 && (
-        <div style={{ marginTop: 8, fontStyle: 'italic', color: 'var(--ink-mute)', fontSize: 18 }}>
+        <div style={{ marginTop: 8, fontStyle: 'italic', color: 'var(--ink-mute)', fontSize: 22 }}>
           showing first {maxRows} of {lag.pairs.length} pairs
         </div>
       )}
       <div className="footer">
         <span className="label">N(h)</span>
-        <span className="val">{lag.n}</span>
+        <span className="val">{showPairs ? lag.n : '…'}</span>
         <span className="label">Σ (diff)²</span>
         <span className="val">{revealColumns.sum ? lag.sumSq.toFixed(2) : '…'}</span>
         <span className="label">γ(h) = Σ / [2N(h)]</span>
@@ -1535,16 +1643,13 @@ function CalculationTable({ lag, revealColumns = { diff: true, sq: true, sum: tr
 // of the empirical semivariogram hand-calculation.
 // ------------------------------------------------------------------
 const THREE_STEPS = [
-  { label: 'Grid',            tab: 'calc',    highlight: null,        revealCols: { diff: false, sq: false, sum: false, gamma: false } },
-  { label: 'Select lag',      tab: 'calc',    highlight: 'h',         revealCols: { diff: false, sq: false, sum: false, gamma: false } },
-  { label: 'Highlight pairs', tab: 'calc',    highlight: 'z_i',       revealCols: { diff: false, sq: false, sum: false, gamma: false } },
-  { label: 'Differences',     tab: 'calc',    highlight: 'diff',      revealCols: { diff: true,  sq: false, sum: false, gamma: false } },
-  { label: 'Square them',     tab: 'calc',    highlight: 'sq',        revealCols: { diff: true,  sq: true,  sum: false, gamma: false } },
-  { label: 'Sum',             tab: 'calc',    highlight: 'sum',       revealCols: { diff: true,  sq: true,  sum: true,  gamma: false } },
-  { label: '÷ 2N(h)',          tab: 'calc',    highlight: 'oneOver2N', revealCols: { diff: true,  sq: true,  sum: true,  gamma: true  } },
-  { label: 'Plot γ(h)',        tab: 'plot',    highlight: null,        revealCols: { diff: true,  sq: true,  sum: true,  gamma: true  } },
-  { label: 'Next lag',        tab: 'plot',    highlight: null,        revealCols: { diff: true,  sq: true,  sum: true,  gamma: true  } },
-  { label: 'Fit model',       tab: 'plot',    highlight: null,        revealCols: { diff: true,  sq: true,  sum: true,  gamma: true  } }
+  { label: 'Select lag',      tab: 'calc',    highlight: 'h',         revealCols: { pairs: false, diff: false, sq: false, sum: false, gamma: false } },
+  { label: 'Highlight pairs', tab: 'calc',    highlight: 'z_i',       revealCols: { pairs: true,  diff: false, sq: false, sum: false, gamma: false } },
+  { label: 'Differences',     tab: 'calc',    highlight: 'diff',      revealCols: { pairs: true,  diff: true,  sq: false, sum: false, gamma: false } },
+  { label: 'Square them',     tab: 'calc',    highlight: 'sq',        revealCols: { pairs: true,  diff: true,  sq: true,  sum: false, gamma: false } },
+  { label: 'Sum',             tab: 'calc',    highlight: 'sum',       revealCols: { pairs: true,  diff: true,  sq: true,  sum: true,  gamma: false } },
+  { label: '÷ 2N(h)',          tab: 'calc',    highlight: 'oneOver2N', revealCols: { pairs: true,  diff: true,  sq: true,  sum: true,  gamma: true  } },
+  { label: 'Plot γ(h)',        tab: 'plot',    highlight: null,        revealCols: { pairs: true,  diff: true,  sq: true,  sum: true,  gamma: true  } }
 ];
 
 const ThreeByThreeMode = React.forwardRef((props, ref) => {
@@ -1554,20 +1659,15 @@ const ThreeByThreeMode = React.forwardRef((props, ref) => {
   const [selectedLagIdx, setSelectedLagIdx] = React.useState(0);
   const [activeTab, setActiveTab] = React.useState('calc');
   const [tabPinned, setTabPinned] = React.useState(false);
-  const [modelName, setModelName] = React.useState('none');
-  const [showPoints, setShowPoints] = React.useState(true);
 
-  React.useImperativeHandle(ref, () => ({
-    next: () => setRevealedStep(s => Math.min(THREE_STEPS.length, s + 1)),
-    prev: () => setRevealedStep(s => Math.max(1, s - 1)),
-    reset: () => {
-      setRevealedStep(1);
-      setSelectedLagIdx(0);
-      setActiveTab('calc');
-      setTabPinned(false);
-      setModelName('none');
-    }
-  }), []);
+  const resetAll = React.useCallback(() => {
+    setEditedGrid(null);
+    setRevealedStep(1);
+    setSelectedLagIdx(0);
+    setActiveTab('calc');
+    setTabPinned(false);
+    setHoveredCell(null);
+  }, []);
 
   const grid = editedGrid || DATASET_3X3.grid;
   const pairs = React.useMemo(
@@ -1575,6 +1675,30 @@ const ThreeByThreeMode = React.forwardRef((props, ref) => {
     [grid]
   );
   const lags = React.useMemo(() => computeSemivariogram(pairs), [pairs]);
+
+  React.useImperativeHandle(ref, () => ({
+    next: () => {
+      if (revealedStep < THREE_STEPS.length) {
+        setRevealedStep(revealedStep + 1);
+      } else if (selectedLagIdx < lags.length - 1) {
+        // End of walkthrough for this lag — advance to next lag, restart at step 1.
+        setSelectedLagIdx(selectedLagIdx + 1);
+        setRevealedStep(1);
+        setTabPinned(false);
+      }
+    },
+    prev: () => {
+      if (revealedStep > 1) {
+        setRevealedStep(revealedStep - 1);
+      } else if (selectedLagIdx > 0) {
+        // Back to previous lag at its final step.
+        setSelectedLagIdx(selectedLagIdx - 1);
+        setRevealedStep(THREE_STEPS.length);
+        setTabPinned(false);
+      }
+    },
+    reset: resetAll
+  }), [revealedStep, selectedLagIdx, lags.length, resetAll]);
 
   const editedKeys = React.useMemo(() => {
     if (!editedGrid) return null;
@@ -1589,7 +1713,7 @@ const ThreeByThreeMode = React.forwardRef((props, ref) => {
 
   // revealedCount is derived from revealedStep:
   //   steps 1–7 = nothing plotted; step 8 = first lag plotted; step 9 = both; step 10 = both + model.
-  const revealedCount = revealedStep >= 9 ? 2 : revealedStep >= 8 ? 1 : 0;
+  const revealedCount = revealedStep >= 7 ? lags.length : 0;
   const plotSelectedIdx = Math.min(selectedLagIdx, Math.max(0, revealedCount - 1));
 
   React.useEffect(() => {
@@ -1597,12 +1721,8 @@ const ThreeByThreeMode = React.forwardRef((props, ref) => {
     setActiveTab(THREE_STEPS[Math.max(0, revealedStep - 1)].tab);
   }, [revealedStep, tabPinned]);
 
-  React.useEffect(() => {
-    if (revealedStep >= 10 && modelName === 'none') setModelName('spherical');
-  }, [revealedStep, modelName]);
-
   const selectedLag = lags[selectedLagIdx] || null;
-  const highlightedPairs = revealedStep >= 3 && selectedLag ? selectedLag.pairs : null;
+  const highlightedPairs = revealedStep >= 2 && selectedLag ? selectedLag.pairs : null;
 
   const onCellEdit = React.useCallback((r, c, value) => {
     setEditedGrid(prev => {
@@ -1611,10 +1731,6 @@ const ThreeByThreeMode = React.forwardRef((props, ref) => {
       next[r][c] = value;
       return next;
     });
-  }, []);
-
-  const onResetValues = React.useCallback(() => {
-    setEditedGrid(null);
   }, []);
 
   const tabs = [
@@ -1628,19 +1744,6 @@ const ThreeByThreeMode = React.forwardRef((props, ref) => {
     <div>
       <div className="mode-header">
         <span className="blurb">{DATASET_3X3.blurb}</span>
-        <div className="extras">
-          <div className="toggle-group" style={{ width: 220 }}>
-            <button className={`toggle-btn ${selectedLagIdx === 0 ? 'active' : ''}`}
-              onClick={() => { setSelectedLagIdx(0); setRevealedStep(s => Math.max(s, 2)); }}>
-              h = 1
-            </button>
-            <button className={`toggle-btn ${selectedLagIdx === 1 ? 'active' : ''}`}
-              onClick={() => { setSelectedLagIdx(1); setRevealedStep(s => Math.max(s, 2)); }}
-              disabled={lags.length < 2}>
-              h = 2
-            </button>
-          </div>
-        </div>
       </div>
 
       <div style={{ padding: '0 40px' }}>
@@ -1667,27 +1770,17 @@ const ThreeByThreeMode = React.forwardRef((props, ref) => {
               editedKeys={editedKeys}
             />
           </div>
-          {revealedStep >= 10 && (
-            <div className="model-radio">
-              <span style={{ fontFamily: 'Manrope, sans-serif', fontSize: 13, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--ink-soft)' }}>
-                Fit model:
-              </span>
-              {['spherical', 'exponential', 'gaussian'].map(m =>
-                <label key={m}>
-                  <input type="radio" name="model3" value={m}
-                    checked={modelName === m}
-                    onChange={() => setModelName(m)} />
-                  {m}
-                </label>
-              )}
-              <label style={{ fontFamily: 'Manrope, sans-serif', fontSize: 14, color: 'var(--ink-soft)', display: 'inline-flex', alignItems: 'center', gap: 6, cursor: 'pointer', marginLeft: 12 }}>
-                <input type="checkbox" className="model-toggle"
-                  checked={showPoints}
-                  onChange={e => setShowPoints(e.target.checked)} />
-                Show empirical points
-              </label>
-            </div>
-          )}
+          <div className="toggle-group" style={{ alignSelf: 'center', width: 'min(360px, 100%)' }}>
+            <button className={`toggle-btn ${selectedLagIdx === 0 ? 'active' : ''}`}
+              onClick={() => setSelectedLagIdx(0)}>
+              h = 1
+            </button>
+            <button className={`toggle-btn ${selectedLagIdx === 1 ? 'active' : ''}`}
+              onClick={() => setSelectedLagIdx(1)}
+              disabled={lags.length < 2}>
+              h = 2
+            </button>
+          </div>
         </div>
 
         <div className="right-pane">
@@ -1707,8 +1800,9 @@ const ThreeByThreeMode = React.forwardRef((props, ref) => {
                            lags={lags}
                            selectedIdx={plotSelectedIdx}
                            revealedCount={revealedCount}
-                           modelName={revealedStep >= 10 ? modelName : 'none'}
-                           showPoints={showPoints}
+                           visibleLagIndices={revealedStep >= 7
+                             ? Array.from({ length: selectedLagIdx + 1 }, (_, i) => i)
+                             : []}
                          />
                        </div>
             }}
@@ -1717,8 +1811,8 @@ const ThreeByThreeMode = React.forwardRef((props, ref) => {
       </div>
 
       <div className="whatif-footer">
-        <span>Tip: click any cell to change its value.</span>
-        <button onClick={onResetValues} disabled={!editedGrid}>Reset values</button>
+        <span>Tip: click any cell to change its value. Use → / ← to step forward and back, Home to reset.</span>
+        <button onClick={resetAll}>Reset</button>
       </div>
     </div>
   );

@@ -79,7 +79,7 @@
   }
   .cell-edit-input {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 16px;
+    font-size: 22px;
     width: 100%;
     height: 100%;
     box-sizing: border-box;
@@ -129,14 +129,14 @@
   .masthead .eyebrow {
     font-family: 'Fraunces', serif;
     font-style: italic;
-    font-size: 17px;
+    font-size: 22px;
     color: var(--accent);
     margin-bottom: 8px;
     letter-spacing: 0.01em;
   }
   .masthead .meta {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 14px;
+    font-size: 22px;
     color: var(--ink-mute);
     text-transform: uppercase;
     letter-spacing: 0.06em;
@@ -156,7 +156,7 @@
     border: 1px solid var(--rule);
     padding: 14px 40px 14px 16px;
     font-family: 'Manrope', sans-serif;
-    font-size: 17px;
+    font-size: 22px;
     font-weight: 500;
     color: var(--ink);
     cursor: pointer;
@@ -175,9 +175,10 @@
     flex: 1;
     background: transparent;
     border: none;
-    padding: 12px 10px;
+    padding: 14px 16px;
+    white-space: nowrap;
     font-family: 'Manrope', sans-serif;
-    font-size: 16px;
+    font-size: 22px;
     font-weight: 500;
     color: var(--ink-soft);
     cursor: pointer;
@@ -207,7 +208,7 @@
   }
   .model-toggle-label {
     font-family: 'Manrope', sans-serif;
-    font-size: 16px;
+    font-size: 22px;
     color: var(--ink);
     cursor: pointer;
     display: inline-flex;
@@ -217,7 +218,7 @@
   /* LAG CHIPS */
   .lag-chip {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 15px;
+    font-size: 22px;
     font-weight: 500;
     background: var(--paper-soft);
     border: 1px solid var(--rule);
@@ -231,7 +232,7 @@
     background: var(--accent); color: var(--paper-soft); border-color: var(--accent);
   }
   .lag-chip.upcoming { opacity: 0.4; }
-  .lag-chip .n-badge { margin-left: 8px; font-size: 13px; opacity: 0.75; }
+  .lag-chip .n-badge { margin-left: 8px; font-size: 22px; opacity: 0.75; }
 
   /* PLOT */
   .plot-frame {
@@ -322,15 +323,15 @@
     min-width: 0;
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 8px 10px;
+    gap: 10px;
+    padding: 10px 12px;
     background: transparent;
     border: 1px solid transparent;
     border-radius: 3px;
     cursor: pointer;
     color: var(--ink-soft);
     font-family: 'Manrope', sans-serif;
-    font-size: 16px;
+    font-size: 20px;
     font-weight: 500;
     transition: background 0.12s, color 0.12s, border-color 0.12s;
   }
@@ -346,13 +347,13 @@
   }
   .step-bar .step-num {
     flex-shrink: 0;
-    width: 28px; height: 28px;
+    width: 34px; height: 34px;
     border-radius: 50%;
     background: var(--paper-deep);
     color: var(--ink-soft);
     font-family: 'Fraunces', serif;
     font-style: italic;
-    font-size: 18px;
+    font-size: 22px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -387,7 +388,7 @@
     border: none;
     padding: 14px 18px;
     font-family: 'Manrope', sans-serif;
-    font-size: 15px;
+    font-size: 22px;
     font-weight: 500;
     color: var(--ink-mute);
     cursor: pointer;
@@ -426,7 +427,7 @@
     border-bottom: 1px solid var(--rule);
     border-left: 2px solid transparent;
     padding: 18px 14px;
-    font-size: 16px;
+    font-size: 22px;
   }
   .tabbed-panel.vertical .tab:last-child { border-bottom: none; }
   .tabbed-panel.vertical .tab.active {
@@ -439,33 +440,71 @@
   /* FORMULA PANEL */
   .formula-panel { font-family: 'Fraunces', serif; }
   .formula-panel .big-formula {
-    font-size: 30px;
+    font-size: 34px;
+    font-family: 'Cambria Math','Latin Modern Math','Fraunces',serif;
     font-style: italic;
-    line-height: 1.6;
-    text-align: center;
+    line-height: 1.4;
     color: var(--ink-soft);
-    padding: 18px 0;
+    padding: 22px 12px;
     background: var(--paper-deep);
     border-radius: 4px;
     margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5em;
+    flex-wrap: wrap;
   }
-  .formula-panel .big-formula .term {
-    padding: 2px 4px;
-    border-radius: 3px;
-    transition: background 0.15s, color 0.15s;
+  .formula-panel .big-formula .kf-part {
+    padding: 0.05em 0.25em;
+    border-radius: 4px;
+    cursor: help;
+    transition: color 0.2s ease, background 0.2s ease, opacity 0.2s ease;
   }
-  .formula-panel .big-formula .term.hi {
-    background: var(--accent-pale);
+  .formula-panel .big-formula.has-focus .kf-part:not(.hi),
+  .formula-panel .big-formula.has-focus .kf-static {
+    color: var(--ink-mute);
+    opacity: 0.32;
+  }
+  .formula-panel .big-formula .kf-part.hi {
     color: var(--accent-deep);
-    font-weight: 500;
+    background: var(--accent-pale);
+    font-weight: 600;
   }
+  .formula-panel .big-formula .kf-static { padding: 0 0.1em; font-style: normal; }
+  .formula-panel .big-formula .frac {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1.05;
+    font-style: normal;
+  }
+  .formula-panel .big-formula .frac-top {
+    border-bottom: 1.5px solid currentColor;
+    padding: 0 0.3em;
+  }
+  .formula-panel .big-formula .frac-bot { padding: 0 0.3em; }
+  .formula-panel .big-formula .bigsum {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1;
+    font-style: normal;
+  }
+  .formula-panel .big-formula .sum-top,
+  .formula-panel .big-formula .sum-bot {
+    font-size: 0.5em;
+    font-style: italic;
+  }
+  .formula-panel .big-formula .sum-mid { font-size: 1.25em; }
   .formula-panel .caption {
     font-family: 'Manrope', sans-serif;
     font-style: normal;
-    font-size: 17px;
+    font-size: 22px;
     color: var(--ink-soft);
     line-height: 1.55;
     margin-bottom: 12px;
+    text-align: center;
   }
   .formula-panel .caption strong { color: var(--accent); }
 
@@ -500,7 +539,7 @@
     width: 100%;
     border-collapse: collapse;
     font-family: 'JetBrains Mono', monospace;
-    font-size: 15px;
+    font-size: 22px;
   }
   .calc-table th, .calc-table td {
     padding: 6px 8px;
@@ -510,7 +549,7 @@
   }
   .calc-table th {
     font-family: 'Manrope', sans-serif;
-    font-size: 18px;
+    font-size: 22px;
     text-transform: uppercase;
     letter-spacing: 0.08em;
     color: var(--ink-mute);
@@ -553,7 +592,7 @@
   .predict-panel .lead {
     font-family: 'Fraunces', serif;
     font-style: italic;
-    font-size: 16px;
+    font-size: 22px;
     color: var(--ink-mute);
     margin-bottom: 14px;
     line-height: 1.5;
@@ -574,7 +613,7 @@
     font-family: 'Fraunces', serif;
     font-style: italic;
     color: var(--ink-mute);
-    font-size: 14px;
+    font-size: 22px;
     font-weight: 400;
     margin-bottom: 4px;
   }
@@ -582,7 +621,7 @@
     width: 100%;
     border-collapse: collapse;
     font-family: 'JetBrains Mono', monospace;
-    font-size: 14px;
+    font-size: 22px;
     margin-bottom: 14px;
   }
   .predict-panel th, .predict-panel td {
@@ -592,7 +631,7 @@
   }
   .predict-panel th {
     font-family: 'Manrope', sans-serif;
-    font-size: 12px;
+    font-size: 22px;
     text-transform: uppercase;
     letter-spacing: 0.08em;
     color: var(--ink-mute);
@@ -631,7 +670,7 @@
   .predict-panel .footnote {
     font-family: 'Fraunces', serif;
     font-style: italic;
-    font-size: 14px;
+    font-size: 22px;
     color: var(--ink-mute);
     line-height: 1.5;
     border-top: 1px dashed var(--rule);
@@ -644,7 +683,7 @@
     .masthead .meta { text-align: left; }
   }
   @media (min-width: 1700px) {
-    body { font-size: 18px; }
+    body { font-size: 22px; }
     h1.title { font-size: 64px; }
   }
 
@@ -673,14 +712,14 @@
     font-family: 'Fraunces', serif;
     font-style: italic;
     color: var(--ink-mute);
-    font-size: 16px;
+    font-size: 22px;
   }
   .mode-header .extras { margin-left: auto; display: flex; gap: 14px; align-items: center; }
 
   .model-radio { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
   .model-radio label {
     font-family: 'Manrope', sans-serif;
-    font-size: 14px;
+    font-size: 22px;
     color: var(--ink-soft);
     display: inline-flex;
     align-items: center;
@@ -698,12 +737,12 @@
     font-family: 'Fraunces', serif;
     font-style: italic;
     color: var(--ink-mute);
-    font-size: 16px;
+    font-size: 22px;
   }
   .whatif-footer button {
     font-family: 'Manrope', sans-serif;
     font-style: normal;
-    font-size: 16px;
+    font-size: 22px;
     background: var(--paper-soft);
     border: 1px solid var(--rule);
     color: var(--ink);
@@ -797,6 +836,38 @@ const DATASETS_10X10 = {
       [ 12,  13,  14,  14,  15,  28,  30,  30,  30,  30],
       [ 14,  13,  14,  14,  17,  27,  31,  30, null,  30],
       [ 14,  14,  13,  14,  16,  27,  29,  29,  30,  30]
+    ]
+  },
+  gradient: {
+    label: 'Global trend',
+    blurb: 'Non-stationary field — values rise from NW to SE, so γ(h) climbs without ever reaching a sill.',
+    grid: [
+      [ 12,  14,  14,  15,  17,  19,  19,  20,  21,  23],
+      [ 14,  14,  15,  18,  18,  19,  21,  22,  23,  25],
+      [ 14,  16,  18,  18,  20, null,  21,  23,  25,  26],
+      [ 16,  18,  18,  20,  21,  21,  24,  24,  26,  28],
+      [ 17,  19,  20,  19,  22,  24,  25,  26,  28,  27],
+      [ 19,  19,  21,  22,  24,  25,  26, null,  28,  30],
+      [ 20,  21,  22,  24,  25,  25,  28,  28,  30,  32],
+      [ 21,  23,  24,  25,  26,  28,  28,  29,  31,  33],
+      [ 23,  24, null,  27,  28,  29,  30,  32,  33,  34],
+      [ 24,  25,  27,  28,  30,  31,  32,  33,  35,  36]
+    ]
+  },
+  outliers: {
+    label: 'Outliers',
+    blurb: 'Uniform background with two extreme values — γ(h) is inflated at every lag that touches an outlier.',
+    grid: [
+      [ 25,  24,  26,  25,  24,  26,  25,  24,  26,  25],
+      [ 24,  26,  25,  24,  26,  25,  24,  26,  25,  24],
+      [ 26,  25,  24,  26,  25, null,  26,  25,  24,  26],
+      [ 25,  24,  26,  25,  24,  26,  25,  24,  26,  25],
+      [ 24,  26,  25,  24,   3,  24,  26,  25,  24,  26],
+      [ 26,  25,  24,  26,  25,  24,  26, null,  24,  26],
+      [ 25,  24,  26,  25,  24,  26,  25,  24,  26,  25],
+      [ 24,  26,  25,  24,  26,  25,  24,  50,  25,  24],
+      [ 26,  25, null,  25,  24,  26,  25,  24,  26,  25],
+      [ 25,  24,  26,  26,  25,  24,  26,  25,  24,  26]
     ]
   }
 };
@@ -1489,9 +1560,9 @@ function TabbedPanel({ tabs, activeTab, onTab, children, orientation = 'horizont
 //   highlight ∈ 'h' | 'z_i' | 'z_j' | 'diff' | 'sq' | 'sum' | 'N' | 'oneOver2N' | null
 // ------------------------------------------------------------------
 function FormulaPanel({ highlight }) {
-  const klass = (key) => 'term' + (highlight === key ? ' hi' : '');
-  const captions = {
-    null:        'Press the next step to walk through each piece of this formula.',
+  const [hovered, setHovered] = React.useState(null);
+
+  const stepCaptions = {
     h:           <span><strong>h</strong> is the lag distance — the spacing between the two stations in each pair.</span>,
     z_i:         <span><strong>Z(x<sub>i</sub>)</strong> is one observed rainfall value at station <em>x<sub>i</sub></em>.</span>,
     z_j:         <span><strong>Z(x<sub>i</sub> + h)</strong> is the rainfall value at the station <em>h</em> away.</span>,
@@ -1501,20 +1572,52 @@ function FormulaPanel({ highlight }) {
     N:           <span><strong>N(h)</strong> is the number of valid pairs at this lag.</span>,
     oneOver2N:   <span><strong>1 / [2N(h)]</strong> turns the sum into an average and then halves it — that is the semivariance γ(h).</span>
   };
-  const caption = captions[highlight] !== undefined ? captions[highlight] : captions[null];
+  const hoverCaptions = {
+    gamma:  <span><strong>γ(h)</strong> — semivariance at distance <em>h</em>.</span>,
+    frac:   <span><strong>1 / [2N(h)]</strong> — normalisation: divide by twice the number of pairs at distance <em>h</em>.</span>,
+    sum:    <span><strong>Σ</strong> — sum over all <em>N(h)</em> point pairs separated by distance <em>h</em>.</span>,
+    sqdiff: <span><strong>[Z(x<sub>i</sub>) − Z(x<sub>i</sub> + h)]<sup>2</sup></strong> — squared difference between values at locations <em>x<sub>i</sub></em> and <em>x<sub>i</sub> + h</em>.</span>
+  };
+  const stepToGroup = {
+    h: 'gamma',
+    z_i: 'sqdiff', z_j: 'sqdiff', diff: 'sqdiff', sq: 'sqdiff',
+    sum: 'sum',
+    N: 'frac', oneOver2N: 'frac'
+  };
+  const activeGroup = hovered || (highlight ? stepToGroup[highlight] : null);
+  const caption = hovered
+    ? hoverCaptions[hovered]
+    : (highlight && stepCaptions[highlight]
+        ? stepCaptions[highlight]
+        : <span style={{ fontStyle: 'italic', color: 'var(--ink-mute)' }}>Hover any term in the formula to see its role.</span>);
+
+  const grpProps = (g) => ({
+    className: 'kf-part' + (activeGroup === g ? ' hi' : ''),
+    onMouseEnter: () => setHovered(g),
+    onMouseLeave: () => setHovered(null)
+  });
+
   return (
     <div className="formula-panel">
-      <div className="big-formula">
-        γ(<span className={klass('h')}>h</span>) ={' '}
-        <span className={klass('oneOver2N')}>1 / [2<span className={klass('N')}>N(h)</span>]</span>{' '}
-        ·{' '}
-        <span className={klass('sum')}>Σ</span>{' '}
-        <span className={klass('sq')}>[
-          <span className={klass('diff')}>
-            <span className={klass('z_i')}>Z(x<sub>i</sub>)</span>{' '}−{' '}
-            <span className={klass('z_j')}>Z(x<sub>i</sub> + h)</span>
+      <div className={'big-formula' + (activeGroup ? ' has-focus' : '')}>
+        <span {...grpProps('gamma')}><i>γ</i>(<i>h</i>)</span>
+        <span className="kf-static">=</span>
+        <span {...grpProps('frac')}>
+          <span className="frac">
+            <span className="frac-top">1</span>
+            <span className="frac-bot">2<i>N</i>(<i>h</i>)</span>
           </span>
-        ]<sup>2</sup></span>
+        </span>
+        <span {...grpProps('sum')}>
+          <span className="bigsum">
+            <span className="sum-top"><i>N</i>(<i>h</i>)</span>
+            <span className="sum-mid">Σ</span>
+            <span className="sum-bot"><i>i</i>=1</span>
+          </span>
+        </span>
+        <span {...grpProps('sqdiff')}>
+          [<i>Z</i>(<i>x</i><sub>i</sub>) − <i>Z</i>(<i>x</i><sub>i</sub> + <i>h</i>)]<sup>2</sup>
+        </span>
       </div>
       <div className="caption">{caption}</div>
       <div className="caption" style={{ color: 'var(--ink-mute)' }}>
@@ -1570,7 +1673,7 @@ function CalculationTable({ lag, revealColumns = { diff: true, sq: true, sum: tr
         </tbody>
       </table>
       {more > 0 && (
-        <div style={{ marginTop: 8, fontStyle: 'italic', color: 'var(--ink-mute)', fontSize: 18 }}>
+        <div style={{ marginTop: 8, fontStyle: 'italic', color: 'var(--ink-mute)', fontSize: 22 }}>
           showing first {maxRows} of {lag.pairs.length} pairs
         </div>
       )}
@@ -1652,8 +1755,6 @@ function PredictionPanel({ prediction }) {
 // ------------------------------------------------------------------
 const TEN_STEPS = [
   { label: 'Grid', tab: 'calc', highlight: null },
-  { label: 'Pairs', tab: 'calc', highlight: 'z_i' },
-  { label: 'Compute γ(h)', tab: 'calc', highlight: 'oneOver2N' },
   { label: 'Plot point', tab: 'plot', highlight: null },
   { label: 'Fit model', tab: 'plot', highlight: null }
 ];
@@ -1695,28 +1796,31 @@ const TenByTenMode = React.forwardRef((props, ref) => {
   React.useImperativeHandle(ref, () => ({
     next: () => {
       if (predictOn) return;
-      if (revealedStep === 4 && revealedCount < lags.length) {
+      if (revealedStep === 2 && revealedCount < lags.length) {
         setRevealedCount(rc => Math.min(lags.length, rc + 1));
         setSelectedIdx(i => Math.min(lags.length - 1, i + 1));
         return;
       }
       const nextStep = Math.min(TEN_STEPS.length, revealedStep + 1);
       setRevealedStep(nextStep);
-      if (nextStep === 4 && revealedCount === 0 && lags.length > 0) {
+      if (nextStep === 2 && revealedCount === 0 && lags.length > 0) {
         setRevealedCount(1);
         setSelectedIdx(0);
+      }
+      if (nextStep === 3) {
+        setModelName(m => m === 'none' ? 'spherical' : m);
       }
     },
     prev: () => {
       if (predictOn) return;
-      if (revealedStep === 4 && revealedCount > 1) {
+      if (revealedStep === 2 && revealedCount > 1) {
         setRevealedCount(rc => rc - 1);
         setSelectedIdx(i => Math.max(0, i - 1));
         return;
       }
       const prevStep = Math.max(1, revealedStep - 1);
       setRevealedStep(prevStep);
-      if (revealedStep === 4 && prevStep === 3) {
+      if (revealedStep === 2 && prevStep === 1) {
         setRevealedCount(0);
         setSelectedIdx(0);
       }
@@ -1809,17 +1913,27 @@ const TenByTenMode = React.forwardRef((props, ref) => {
 
   const onResetValues = React.useCallback(() => {
     setEditedGrid(null);
+    setRevealedCount(0);
+    setSelectedIdx(0);
+    setRevealedStep(1);
+    setActiveTab('calc');
+    setTabPinned(false);
+    setModelName('none');
+    setPredictOn(false);
+    setPredictTarget(null);
+    setHoveredCell(null);
   }, []);
 
   const onChipClick = React.useCallback((i) => {
     setRevealedCount(rc => Math.max(rc, i + 1));
     setSelectedIdx(i);
-    setRevealedStep(s => Math.max(s, 4));
+    setRevealedStep(s => Math.max(s, 2));
   }, []);
 
   const onStep = React.useCallback((i) => {
     setRevealedStep(i);
     setTabPinned(false);
+    if (i === 3) setModelName(m => m === 'none' ? 'spherical' : m);
   }, []);
 
   const onTab = React.useCallback((k) => {
@@ -1847,11 +1961,11 @@ const TenByTenMode = React.forwardRef((props, ref) => {
         <div className="extras">
           <select className="preset" value={presetKey}
             onChange={e => setPresetKey(e.target.value)}
-            style={{ width: 220 }}>
+            style={{ width: 340 }}>
             {Object.entries(DATASETS_10X10).map(([k, d]) =>
               <option key={k} value={k}>{d.label}</option>)}
           </select>
-          <div className="toggle-group" style={{ width: 280 }}>
+          <div className="toggle-group" style={{ width: 340 }}>
             <button className={`toggle-btn ${!allDirections ? 'active' : ''}`}
               onClick={() => setAllDirections(false)}>Cardinal</button>
             <button className={`toggle-btn ${allDirections ? 'active' : ''}`}
@@ -1909,7 +2023,7 @@ const TenByTenMode = React.forwardRef((props, ref) => {
             })}
           </div>
           <div className="model-radio">
-            <span style={{ fontFamily: 'Manrope, sans-serif', fontSize: 13, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--ink-soft)' }}>
+            <span style={{ fontFamily: 'Manrope, sans-serif', fontSize: 22, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--ink-soft)' }}>
               Fit model:
             </span>
             {['none', 'spherical', 'exponential', 'gaussian'].map(m =>
@@ -1918,12 +2032,12 @@ const TenByTenMode = React.forwardRef((props, ref) => {
                   checked={modelName === m}
                   onChange={() => {
                     setModelName(m);
-                    if (m !== 'none') setRevealedStep(s => Math.max(s, 5));
+                    if (m !== 'none') setRevealedStep(s => Math.max(s, 3));
                   }} />
                 {m}
               </label>
             )}
-            <label style={{ fontFamily: 'Manrope, sans-serif', fontSize: 14, color: 'var(--ink-soft)', display: 'inline-flex', alignItems: 'center', gap: 6, cursor: 'pointer', marginLeft: 12 }}>
+            <label style={{ fontFamily: 'Manrope, sans-serif', fontSize: 22, color: 'var(--ink-soft)', display: 'inline-flex', alignItems: 'center', gap: 6, cursor: 'pointer', marginLeft: 12 }}>
               <input type="checkbox" className="model-toggle"
                 checked={showPoints}
                 onChange={e => setShowPoints(e.target.checked)} />
@@ -1953,7 +2067,7 @@ const TenByTenMode = React.forwardRef((props, ref) => {
 
       <div className="whatif-footer">
         <span>Tip: click any cell to change its value.</span>
-        <button onClick={onResetValues} disabled={!editedGrid}>Reset values</button>
+        <button onClick={onResetValues}>Reset values</button>
       </div>
     </div>
   );

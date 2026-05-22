@@ -1,14 +1,16 @@
 """
 Regenerate the 10x10 preset grids used by ten.html.
 
-Outputs JS-formatted grid arrays for the three presets (smooth / random / clustered) —
-copy them into the `DATASETS_10X10` const at the top of lib/semivariogram.js,
-replacing the existing arrays inline.
+Outputs JS-formatted grid arrays for the five presets — copy them into the
+`DATASETS_10X10` const at the top of lib/semivariogram.js, replacing the
+existing arrays inline.
 
 Also prints gamma(h) for h=1..9 per preset so you can sanity-check that:
-  - smooth: rises and plateaus
-  - random: stays roughly flat
+  - smooth:    rises and plateaus
+  - random:    stays roughly flat
   - clustered: rises, peaks, then dips (the "hole effect")
+  - gradient:  climbs without leveling off (non-stationary trend)
+  - outliers:  uniformly inflated by two extreme cells at every lag
 """
 import numpy as np
 
@@ -59,6 +61,23 @@ def clustered_dataset(seed=23):
             out[r, c] = np.average(vals, weights=weights) + rng.normal(0, 0.6)
     return np.round(out).astype(int)
 
+def gradient_dataset(seed=11, base=12, slope=1.2, noise_sd=0.7):
+    """NW->SE linear trend with mild noise — illustrates an unbounded variogram."""
+    rng = np.random.default_rng(seed)
+    out = np.zeros((SIZE, SIZE), dtype=float)
+    for r in range(SIZE):
+        for c in range(SIZE):
+            out[r, c] = base + slope * (r + c) + rng.normal(0, noise_sd)
+    return np.round(out).astype(int)
+
+def outliers_dataset(seed=42, base=25, jitter=1, outliers=((4, 4, 3), (7, 7, 50))):
+    """Near-uniform background with two extreme cells — inflates gamma at every lag."""
+    rng = np.random.default_rng(seed)
+    out = base + rng.integers(-jitter, jitter + 1, size=(SIZE, SIZE))
+    for (r, c, v) in outliers:
+        out[r, c] = v
+    return out.astype(int)
+
 def gamma_at(grid, h_target, tol=0.5):
     pairs = []
     for r1 in range(SIZE):
@@ -91,9 +110,12 @@ def fmt_js(grid):
 smooth = place_unknowns(smooth_dataset(), [(2, 5), (5, 7), (8, 2)])
 random_ = place_unknowns(random_dataset(), [(3, 6), (7, 1), (4, 8)])
 clustered = place_unknowns(clustered_dataset(), [(2, 6), (6, 3), (8, 8)])
+gradient = place_unknowns(gradient_dataset(), [(2, 5), (5, 7), (8, 2)])
+outliers = place_unknowns(outliers_dataset(), [(2, 5), (5, 7), (8, 2)])
 
 # Diagnostic: print gamma at h=1, 3, 5, 7, 9 to verify shape
-for name, g in [("smooth", smooth), ("random", random_), ("clustered", clustered)]:
+for name, g in [("smooth", smooth), ("random", random_), ("clustered", clustered),
+                ("gradient", gradient), ("outliers", outliers)]:
     print(f"\n--- {name} ---")
     for h in [1, 2, 3, 4, 5, 6, 7, 8, 9]:
         gh, n = gamma_at(g, h, 0.5)

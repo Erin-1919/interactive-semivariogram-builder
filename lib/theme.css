@@ -24,7 +24,7 @@ body {
   background: var(--paper-soft);
   color: var(--ink);
   font-family: 'Inter', sans-serif;
-  font-size: 17px;
+  font-size: 22px;
   line-height: 1.55;
   min-height: 100vh;
 }
