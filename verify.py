@@ -138,10 +138,7 @@ PAGE_CHECKS = [
 def main():
     overall_errors = []
     with sync_playwright() as p:
-        browser = p.chromium.launch(
-            headless=True,
-            args=["--allow-file-access-from-files", "--disable-web-security"],
-        )
+        browser = p.chromium.launch(headless=True)
         for fname, checker in PAGE_CHECKS:
             print(f"checking {fname} ...")
             errors = []
