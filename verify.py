@@ -63,6 +63,29 @@ def check_ten(page, errors, console):
     page.screenshot(path=str(ROOT / "verify_ten.png"), full_page=True)
     print(f"  ten.html: {radios.count()} model radios, {chips.count()} lag chips, banner={banner}")
 
+def check_why_distance(page, errors, console):
+    """why_distance.html — slide-5 launch app."""
+    banner = any("[why-distance tests done]" in t for _, t in console)
+    if not banner:
+        errors.append("why_distance.html: missing [why-distance tests done] banner")
+    if any("FAIL" in t for _, t in console):
+        errors.append("why_distance.html: FAIL: lines in console")
+
+    # Four scenario tabs
+    tabs = page.locator(".tab-btn")
+    if tabs.count() != 4:
+        errors.append(f"why_distance.html: expected 4 scenario tabs, got {tabs.count()}")
+    # Three drag handles
+    handles = page.locator("circle.handle")
+    if handles.count() != 3:
+        errors.append(f"why_distance.html: expected 3 ruler handles, got {handles.count()}")
+    # Field grid (20×20 = 400 cells)
+    cells = page.locator("rect.cell-rect")
+    if cells.count() != 400:
+        errors.append(f"why_distance.html: expected 400 field cells, got {cells.count()}")
+    page.screenshot(path=str(ROOT / "verify_why_distance.png"), full_page=True)
+    print(f"  why_distance.html: {tabs.count()} tabs, {handles.count()} handles, banner={banner}")
+
 def check_deck(page, errors, console):
     """16-slide deck (index.html)."""
     # Slide count
@@ -81,6 +104,18 @@ def check_deck(page, errors, console):
     counter_after = page.locator("#slide-counter").inner_text()
     if counter_after.startswith("1 /"):
         errors.append(f"index.html: counter did not advance after PageDown (still '{counter_after}')")
+
+    # Slide-5 launch link → why_distance.html
+    s5_link = page.locator("#slide-5 a.launch-button").first
+    if s5_link.count() == 0:
+        errors.append("index.html: slide 5 launch button missing")
+    else:
+        href = s5_link.get_attribute("href")
+        target = s5_link.get_attribute("target")
+        if href != "why_distance.html":
+            errors.append(f"index.html: slide 5 link href = {href!r}, expected 'why_distance.html'")
+        if target != "_blank":
+            errors.append(f"index.html: slide 5 link target = {target!r}, expected '_blank'")
 
     # Slide-13 launch link → three.html
     s14_link = page.locator("#slide-12 a.launch-button").first
@@ -103,14 +138,14 @@ def check_deck(page, errors, console):
         if href != "ten.html":
             errors.append(f"index.html: slide 13 link href = {href!r}, expected 'ten.html'")
 
-    # Slide-15 PDF link
-    s20_link = page.locator("#slide-15 a.launch-button").first
-    if s20_link.count() == 0:
-        errors.append("index.html: slide 15 launch button missing")
+    # Slide-16 PDF link (Lab Assignment 6)
+    s16_link = page.locator("#slide-16 a.launch-button").first
+    if s16_link.count() == 0:
+        errors.append("index.html: slide 16 launch button missing")
     else:
-        href = s20_link.get_attribute("href") or ""
+        href = s16_link.get_attribute("href") or ""
         if not href.endswith(".pdf"):
-            errors.append(f"index.html: slide 15 link href = {href!r}, expected to end with .pdf")
+            errors.append(f"index.html: slide 16 link href = {href!r}, expected to end with .pdf")
 
     # Slide-10 click-reveal: scroll to slide 10, click 6 times
     page.locator("#slide-10").scroll_into_view_if_needed()
@@ -132,6 +167,7 @@ def check_deck(page, errors, console):
 PAGE_CHECKS = [
     ("three.html", check_three),
     ("ten.html", check_ten),
+    ("why_distance.html", check_why_distance),
     ("index.html", check_deck),
 ]
 
