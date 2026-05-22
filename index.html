@@ -6,7 +6,7 @@
 <title>An Introduction to Ordinary Kriging — Teaching Demo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Manrope:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="lib/theme.css">
 <style>
   /* ===========================================
@@ -17,14 +17,14 @@
 
   :root {
     --slide-padding: clamp(2rem, 4vw, 4rem);
-    --title-size: clamp(2.6rem, 6.5vw, 5.5rem);
-    --h2-size: clamp(2rem, 4.5vw, 3.8rem);
-    --h3-size: clamp(1.35rem, 2.6vw, 2.1rem);
-    --body-size: clamp(1.15rem, 1.85vw, 1.7rem);
-    --small-size: clamp(0.95rem, 1.25vw, 1.25rem);
+    --title-size: clamp(2.8rem, 7vw, 6rem);
+    --h2-size: clamp(2.2rem, 4.6vw, 4rem);
+    --h3-size: clamp(1.6rem, 2.6vw, 2.3rem);
+    --body-size: clamp(1.45rem, 2vw, 2rem);
+    --small-size: clamp(1.25rem, 1.6vw, 1.65rem);
     --content-gap: clamp(0.75rem, 1.8vw, 1.8rem);
   }
-  body { font-size: clamp(1.15rem, 1.85vw, 1.7rem); }
+  body { font-family: 'Inter', sans-serif; font-size: var(--body-size); color: var(--ink); }
 
   .deck { position: relative; z-index: 2; }
   .slide {
@@ -50,26 +50,29 @@
   }
 
   h1.slide-title {
-    font-family: 'Fraunces', serif;
-    font-weight: 500;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
     font-size: var(--title-size);
-    letter-spacing: -0.02em;
+    letter-spacing: -0.025em;
+    color: var(--ink);
     margin: 0;
   }
-  h1.slide-title em { font-style: italic; color: var(--accent); }
+  h1.slide-title em { font-style: normal; color: var(--ink); }
   h2.slide-heading {
-    font-family: 'Fraunces', serif;
-    font-weight: 500;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
     font-size: var(--h2-size);
-    letter-spacing: -0.01em;
+    letter-spacing: -0.02em;
+    color: var(--ink);
     margin: 0;
   }
   .eyebrow {
-    font-family: 'Manrope', sans-serif;
+    font-family: 'Inter', sans-serif;
     font-size: var(--small-size);
-    letter-spacing: 0.18em;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: var(--ink-mute);
+    color: var(--accent);
+    font-weight: 600;
   }
 
   /* Bottom-right counter */
@@ -112,7 +115,7 @@
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    font-family: 'Manrope', sans-serif;
+    font-family: 'Inter', sans-serif;
     font-size: var(--h3-size);
     font-weight: 600;
     background: var(--accent);
@@ -141,7 +144,7 @@
          class="reveal"
          style="position: absolute; top: clamp(1.5rem, 3vw, 3rem); left: clamp(1.5rem, 3vw, 3rem); width: clamp(280px, 32vw, 520px); height: auto; z-index: 3;">
     <div class="slide-content" style="align-items: center; text-align: center; justify-content: center;">
-      <h1 class="reveal" style="font-family: 'Manrope', sans-serif; font-weight: 700; font-size: clamp(2.8rem, 7.2vw, 7rem); color: var(--ink); margin: 0; letter-spacing: -0.025em; white-space: nowrap;">
+      <h1 class="reveal" style="font-family: 'Inter', sans-serif; font-weight: 700; font-size: clamp(2.2rem, 5.4vw, 5.4rem); color: var(--ink); margin: 0; letter-spacing: -0.025em; text-align: center; line-height: 1.1;">
         An Introduction to Ordinary Kriging
       </h1>
       <div class="reveal" style="margin-top: clamp(2.5rem, 5vw, 4.5rem); font-size: clamp(1.5rem, 2.6vw, 2.5rem); color: var(--accent); font-weight: 600;">
@@ -177,17 +180,17 @@
       <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; margin-top: 1.5rem;">
         <div class="reveal" style="text-align: center;">
           <img src="assets/img/slide03_what.svg" alt="What" style="width: 80%; max-width: 260px; height: auto;">
-          <h3 style="font-family: 'Fraunces', serif; font-size: var(--h3-size); margin-top: 1rem;">What Ordinary Kriging is</h3>
+          <h3 style="font-family: 'Inter', sans-serif; font-size: var(--h3-size); margin-top: 1rem;">What Ordinary Kriging is</h3>
           <p style="font-size: var(--body-size); color: var(--ink-soft); margin-top: 0.5rem;">Understand the core concept of geostatistical interpolation</p>
         </div>
         <div class="reveal" style="text-align: center;">
           <img src="assets/img/slide03_why.svg" alt="Why" style="width: 80%; max-width: 260px; height: auto;">
-          <h3 style="font-family: 'Fraunces', serif; font-size: var(--h3-size); margin-top: 1rem;">Why we use it</h3>
+          <h3 style="font-family: 'Inter', sans-serif; font-size: var(--h3-size); margin-top: 1rem;">Why we use it</h3>
           <p style="font-size: var(--body-size); color: var(--ink-soft); margin-top: 0.5rem;">See how spatial dependence improves prediction accuracy</p>
         </div>
         <div class="reveal" style="text-align: center;">
           <img src="assets/img/slide03_how.svg" alt="How" style="width: 80%; max-width: 260px; height: auto;">
-          <h3 style="font-family: 'Fraunces', serif; font-size: var(--h3-size); margin-top: 1rem;">How to apply it</h3>
+          <h3 style="font-family: 'Inter', sans-serif; font-size: var(--h3-size); margin-top: 1rem;">How to apply it</h3>
           <p style="font-size: var(--body-size); color: var(--ink-soft); margin-top: 0.5rem;">Learn the workflow from variogram to prediction map</p>
         </div>
       </div>
@@ -212,7 +215,7 @@
           based on nearby observations, relying on distance or smoothness assumptions.
         </p>
         <div class="reveal" style="margin-top: 1.2rem;">
-          <div style="font-family: 'Manrope', sans-serif; font-size: var(--small-size); letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-mute);">Common methods</div>
+          <div style="font-family: 'Inter', sans-serif; font-size: var(--small-size); letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-mute);">Common methods</div>
           <ul style="font-size: var(--body-size); color: var(--ink); margin-top: 0.4rem;">
             <li>Nearest Neighbor</li>
             <li>Bilinear</li>
@@ -272,20 +275,20 @@
       </p>
       <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-top: 2rem;">
         <div class="reveal" style="padding: 1.5rem; background: var(--paper-soft); border-left: 3px solid var(--accent);">
-          <div style="font-family: 'Fraunces', serif; font-size: var(--h2-size); color: var(--accent); font-weight: 500;">Best</div>
+          <div style="font-family: 'Inter', sans-serif; font-size: var(--h2-size); color: var(--accent); font-weight: 500;">Best</div>
           <p style="font-size: var(--body-size); color: var(--ink-soft); margin-top: 0.5rem;">
             Minimizes prediction error variance.
           </p>
         </div>
         <div class="reveal" style="padding: 1.5rem; background: var(--paper-soft); border-left: 3px solid var(--accent);">
-          <div style="font-family: 'Fraunces', serif; font-size: var(--h2-size); color: var(--accent); font-weight: 500;">Linear</div>
+          <div style="font-family: 'Inter', sans-serif; font-size: var(--h2-size); color: var(--accent); font-weight: 500;">Linear</div>
           <p style="font-size: var(--body-size); color: var(--ink-soft); margin-top: 0.5rem;">
             Prediction is a weighted sum of observed values, so Kriging remains
             mathematically interpretable.
           </p>
         </div>
         <div class="reveal" style="padding: 1.5rem; background: var(--paper-soft); border-left: 3px solid var(--accent);">
-          <div style="font-family: 'Fraunces', serif; font-size: var(--h2-size); color: var(--accent); font-weight: 500;">Unbiased</div>
+          <div style="font-family: 'Inter', sans-serif; font-size: var(--h2-size); color: var(--accent); font-weight: 500;">Unbiased</div>
           <p style="font-size: var(--body-size); color: var(--ink-soft); margin-top: 0.5rem;">
             Expected prediction error is zero — Kriging is statistically fair on average.
           </p>
@@ -332,26 +335,26 @@
       <h2 class="slide-heading reveal">When Ordinary Kriging is appropriate</h2>
       <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; margin-top: 1.5rem;">
         <div class="reveal" style="padding: 1.2rem; background: var(--paper-soft); border-left: 3px solid var(--accent);">
-          <div style="font-family: 'Fraunces', serif; font-size: var(--h3-size); color: var(--accent); font-weight: 500;">A. Spatial autocorrelation exists</div>
+          <div style="font-family: 'Inter', sans-serif; font-size: var(--h3-size); color: var(--accent); font-weight: 500;">A. Spatial autocorrelation exists</div>
           <p style="font-size: var(--body-size); color: var(--ink-soft); margin-top: 0.5rem;">
             Nearby points should be more similar than distant points.
           </p>
         </div>
         <div class="reveal" style="padding: 1.2rem; background: var(--paper-soft); border-left: 3px solid var(--accent);">
-          <div style="font-family: 'Fraunces', serif; font-size: var(--h3-size); color: var(--accent); font-weight: 500;">B. No strong large-scale trend</div>
+          <div style="font-family: 'Inter', sans-serif; font-size: var(--h3-size); color: var(--accent); font-weight: 500;">B. No strong large-scale trend</div>
           <p style="font-size: var(--body-size); color: var(--ink-soft); margin-top: 0.5rem;">
             A major directional trend (e.g., temperature decreasing steadily with altitude)
             will make Ordinary Kriging underperform.
           </p>
         </div>
         <div class="reveal" style="padding: 1.2rem; background: var(--paper-soft); border-left: 3px solid var(--accent);">
-          <div style="font-family: 'Fraunces', serif; font-size: var(--h3-size); color: var(--accent); font-weight: 500;">C. Sufficient sample density</div>
+          <div style="font-family: 'Inter', sans-serif; font-size: var(--h3-size); color: var(--accent); font-weight: 500;">C. Sufficient sample density</div>
           <p style="font-size: var(--body-size); color: var(--ink-soft); margin-top: 0.5rem;">
             A meaningful variogram requires enough data to estimate spatial dependence reliably.
           </p>
         </div>
         <div class="reveal" style="padding: 1.2rem; background: var(--paper-soft); border-left: 3px solid var(--accent);">
-          <div style="font-family: 'Fraunces', serif; font-size: var(--h3-size); color: var(--accent); font-weight: 500;">D. Continuous variables</div>
+          <div style="font-family: 'Inter', sans-serif; font-size: var(--h3-size); color: var(--accent); font-weight: 500;">D. Continuous variables</div>
           <p style="font-size: var(--body-size); color: var(--ink-soft); margin-top: 0.5rem;">
             Designed for continuous numeric variables (rainfall, temperature, soil moisture).
           </p>
@@ -453,7 +456,7 @@
           </tbody>
         </table>
         <div class="reveal" style="padding: 1.2rem; background: var(--paper-soft); border-radius: 6px;">
-          <div style="font-family: 'Manrope', sans-serif; font-size: var(--small-size); letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-mute);">Typical tools</div>
+          <div style="font-family: 'Inter', sans-serif; font-size: var(--small-size); letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-mute);">Typical tools</div>
           <ul style="font-size: var(--body-size); color: var(--ink); margin-top: 0.6rem; padding-left: 1.2rem;">
             <li>Histogram</li>
             <li>Summary statistics</li>
@@ -492,19 +495,19 @@
         </div>
         <div style="display: flex; flex-direction: column; gap: 0.8rem;">
           <div class="reveal" style="padding: 1rem; background: var(--paper-soft); border-left: 3px solid var(--accent);">
-            <div style="font-family: 'Fraunces', serif; font-size: var(--h3-size); color: var(--accent); font-weight: 500;">Nugget</div>
+            <div style="font-family: 'Inter', sans-serif; font-size: var(--h3-size); color: var(--accent); font-weight: 500;">Nugget</div>
             <p style="font-size: var(--body-size); color: var(--ink-soft); margin-top: 0.3rem;">
               Value at or near origin (h=0). Represents measurement error or microscale variation.
             </p>
           </div>
           <div class="reveal" style="padding: 1rem; background: var(--paper-soft); border-left: 3px solid var(--accent);">
-            <div style="font-family: 'Fraunces', serif; font-size: var(--h3-size); color: var(--accent); font-weight: 500;">Range</div>
+            <div style="font-family: 'Inter', sans-serif; font-size: var(--h3-size); color: var(--accent); font-weight: 500;">Range</div>
             <p style="font-size: var(--body-size); color: var(--ink-soft); margin-top: 0.3rem;">
               Distance where the curve levels off. Beyond this distance, points are effectively uncorrelated.
             </p>
           </div>
           <div class="reveal" style="padding: 1rem; background: var(--paper-soft); border-left: 3px solid var(--accent);">
-            <div style="font-family: 'Fraunces', serif; font-size: var(--h3-size); color: var(--accent); font-weight: 500;">Sill</div>
+            <div style="font-family: 'Inter', sans-serif; font-size: var(--h3-size); color: var(--accent); font-weight: 500;">Sill</div>
             <p style="font-size: var(--body-size); color: var(--ink-soft); margin-top: 0.3rem;">
               Plateau value. Approximate total variance of the data.
             </p>
@@ -577,7 +580,7 @@
         <!-- Spherical -->
         <div class="reveal" style="padding: 1rem; background: var(--paper-soft); border-radius: 6px;">
           <div style="display: flex; justify-content: space-between; align-items: center;">
-            <div style="font-family: 'Fraunces', serif; font-size: var(--h3-size); color: var(--accent); font-weight: 500;">Spherical</div>
+            <div style="font-family: 'Inter', sans-serif; font-size: var(--h3-size); color: var(--accent); font-weight: 500;">Spherical</div>
             <svg viewBox="0 0 80 40" width="80" height="40" aria-hidden="true">
               <!-- Spherical: rises then caps -->
               <path d="M 4 36 Q 16 12 38 8 L 76 8" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round"/>
@@ -592,7 +595,7 @@
         <!-- Exponential -->
         <div class="reveal" style="padding: 1rem; background: var(--paper-soft); border-radius: 6px;">
           <div style="display: flex; justify-content: space-between; align-items: center;">
-            <div style="font-family: 'Fraunces', serif; font-size: var(--h3-size); color: var(--accent); font-weight: 500;">Exponential</div>
+            <div style="font-family: 'Inter', sans-serif; font-size: var(--h3-size); color: var(--accent); font-weight: 500;">Exponential</div>
             <svg viewBox="0 0 80 40" width="80" height="40" aria-hidden="true">
               <!-- Exponential: asymptotic approach -->
               <path d="M 4 36 C 12 36 24 10 76 8" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round"/>
@@ -608,7 +611,7 @@
         <!-- Gaussian -->
         <div class="reveal" style="padding: 1rem; background: var(--paper-soft); border-radius: 6px;">
           <div style="display: flex; justify-content: space-between; align-items: center;">
-            <div style="font-family: 'Fraunces', serif; font-size: var(--h3-size); color: var(--accent); font-weight: 500;">Gaussian</div>
+            <div style="font-family: 'Inter', sans-serif; font-size: var(--h3-size); color: var(--accent); font-weight: 500;">Gaussian</div>
             <svg viewBox="0 0 80 40" width="80" height="40" aria-hidden="true">
               <!-- Gaussian: flat origin, S-curve -->
               <path d="M 4 36 C 4 36 20 36 36 18 C 52 4 60 8 76 8" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round"/>
@@ -640,23 +643,23 @@
       </div>
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; margin-top: 1.2rem;">
         <div class="reveal" style="padding: 1.2rem; background: var(--paper-soft); border-left: 3px solid var(--accent);">
-          <div style="font-family: 'Fraunces', serif; font-size: var(--h3-size); color: var(--accent); font-weight: 500;">A. Calculate semivariance / covariance</div>
+          <div style="font-family: 'Inter', sans-serif; font-size: var(--h3-size); color: var(--accent); font-weight: 500;">A. Calculate semivariance / covariance</div>
           <ul style="font-size: var(--body-size); color: var(--ink-soft); margin-top: 0.4rem; padding-left: 1.1rem;">
             <li>Between all sample points</li>
             <li>Between sample points and the target point</li>
           </ul>
         </div>
         <div class="reveal" style="padding: 1.2rem; background: var(--paper-soft); border-left: 3px solid var(--accent);">
-          <div style="font-family: 'Fraunces', serif; font-size: var(--h3-size); color: var(--accent); font-weight: 500;">B. Build the kriging system</div>
+          <div style="font-family: 'Inter', sans-serif; font-size: var(--h3-size); color: var(--accent); font-weight: 500;">B. Build the kriging system</div>
           <p style="font-size: var(--body-size); color: var(--ink-soft); margin-top: 0.4rem;">
             Spatial-relationship matrix plus an unbiasedness constraint row and column.
           </p>
         </div>
         <div class="reveal" style="padding: 1.2rem; background: var(--paper-soft); border-left: 3px solid var(--accent);">
-          <div style="font-family: 'Fraunces', serif; font-size: var(--h3-size); color: var(--accent); font-weight: 500;">C. Apply unbiasedness constraint</div>
+          <div style="font-family: 'Inter', sans-serif; font-size: var(--h3-size); color: var(--accent); font-weight: 500;">C. Apply unbiasedness constraint</div>
         </div>
         <div class="reveal" style="padding: 1.2rem; background: var(--paper-soft); border-left: 3px solid var(--accent);">
-          <div style="font-family: 'Fraunces', serif; font-size: var(--h3-size); color: var(--accent); font-weight: 500;">D. Solve for weights</div>
+          <div style="font-family: 'Inter', sans-serif; font-size: var(--h3-size); color: var(--accent); font-weight: 500;">D. Solve for weights</div>
         </div>
       </div>
     </div>
@@ -692,7 +695,7 @@
       </p>
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 1rem;">
         <div class="reveal">
-          <div style="font-family: 'Manrope', sans-serif; font-size: var(--small-size); letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-mute);">Steps</div>
+          <div style="font-family: 'Inter', sans-serif; font-size: var(--small-size); letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-mute);">Steps</div>
           <ol style="font-size: var(--body-size); color: var(--ink); margin-top: 0.5rem; padding-left: 1.3rem; line-height: 1.7;">
             <li>Remove one observed point</li>
             <li>Predict its value using the remaining points</li>
