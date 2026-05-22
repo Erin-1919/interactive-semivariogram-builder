@@ -1767,8 +1767,6 @@ const TenByTenMode = React.forwardRef((props, ref) => {
   const [revealedCount, setRevealedCount] = React.useState(0);
   const [hoveredCell, setHoveredCell] = React.useState(null);
   const [modelName, setModelName] = React.useState('none');
-  const [predictOn, setPredictOn] = React.useState(false);
-  const [predictTarget, setPredictTarget] = React.useState(null);
   const [revealedStep, setRevealedStep] = React.useState(1);
   const [activeTab, setActiveTab] = React.useState('calc');
   const [tabPinned, setTabPinned] = React.useState(false);
@@ -1795,7 +1793,6 @@ const TenByTenMode = React.forwardRef((props, ref) => {
 
   React.useImperativeHandle(ref, () => ({
     next: () => {
-      if (predictOn) return;
       if (revealedStep === 2 && revealedCount < lags.length) {
         setRevealedCount(rc => Math.min(lags.length, rc + 1));
         setSelectedIdx(i => Math.min(lags.length - 1, i + 1));
@@ -1812,7 +1809,6 @@ const TenByTenMode = React.forwardRef((props, ref) => {
       }
     },
     prev: () => {
-      if (predictOn) return;
       if (revealedStep === 2 && revealedCount > 1) {
         setRevealedCount(rc => rc - 1);
         setSelectedIdx(i => Math.max(0, i - 1));
@@ -1832,10 +1828,8 @@ const TenByTenMode = React.forwardRef((props, ref) => {
       setActiveTab('calc');
       setTabPinned(false);
       setModelName('none');
-      setPredictOn(false);
-      setPredictTarget(null);
     }
-  }), [revealedCount, lags.length, revealedStep, predictOn]);
+  }), [revealedCount, lags.length, revealedStep]);
 
   React.useEffect(() => {
     setRevealedCount(0);
@@ -1845,18 +1839,7 @@ const TenByTenMode = React.forwardRef((props, ref) => {
 
   React.useEffect(() => {
     setEditedGrid(null);
-    setPredictTarget(null);
   }, [presetKey]);
-
-  React.useEffect(() => {
-    if (!predictOn) { setPredictTarget(null); return; }
-    if (predictTarget) return;
-    for (let r = 0; r < grid.length; r++) {
-      for (let c = 0; c < grid[r].length; c++) {
-        if (grid[r][c] === null) { setPredictTarget({ r, c }); return; }
-      }
-    }
-  }, [predictOn, grid, predictTarget]);
 
   React.useEffect(() => {
     if (tabPinned) return;
@@ -1864,38 +1847,8 @@ const TenByTenMode = React.forwardRef((props, ref) => {
     setActiveTab(step.tab);
   }, [revealedStep, tabPinned]);
 
-  React.useEffect(() => {
-    if (predictOn) {
-      setTabPinned(false);
-      setActiveTab('predict');
-    } else {
-      // Snapshot the step's tab at toggle-off time. revealedStep is intentionally
-      // not in the deps array — we don't want this effect to re-run on every step
-      // change (that fight would re-pin the tab in a loop).
-      const stepDef = TEN_STEPS[Math.max(0, revealedStep - 1)];
-      setActiveTab(stepDef.tab);
-      setTabPinned(false);
-    }
-  }, [predictOn]);
-
   const selectedLag = revealedCount > 0 ? lags[selectedIdx] : null;
   const highlightedPairs = selectedLag ? selectedLag.pairs : null;
-
-  const knownCells = React.useMemo(() => {
-    const out = [];
-    for (let r = 0; r < grid.length; r++) {
-      for (let c = 0; c < grid[r].length; c++) {
-        const v = grid[r][c];
-        if (v !== null && v !== undefined) out.push({ r, c, v });
-      }
-    }
-    return out;
-  }, [grid]);
-
-  const prediction = React.useMemo(() => {
-    if (!predictOn || !predictTarget) return null;
-    return predictionWeights(predictTarget, knownCells, 6);
-  }, [predictOn, predictTarget, knownCells]);
 
   const onCellEdit = React.useCallback((r, c, value) => {
     setEditedGrid(prev => {
@@ -1904,12 +1857,7 @@ const TenByTenMode = React.forwardRef((props, ref) => {
       next[r][c] = value;
       return next;
     });
-    // If the edited cell was the prediction target and is no longer null,
-    // release the target so the ring doesn't sit on a known cell.
-    if (value !== null && predictTarget && predictTarget.r === r && predictTarget.c === c) {
-      setPredictTarget(null);
-    }
-  }, [preset.grid, predictTarget]);
+  }, [preset.grid]);
 
   const onResetValues = React.useCallback(() => {
     setEditedGrid(null);
@@ -1919,8 +1867,6 @@ const TenByTenMode = React.forwardRef((props, ref) => {
     setActiveTab('calc');
     setTabPinned(false);
     setModelName('none');
-    setPredictOn(false);
-    setPredictTarget(null);
     setHoveredCell(null);
   }, []);
 
@@ -1941,16 +1887,10 @@ const TenByTenMode = React.forwardRef((props, ref) => {
     setTabPinned(true);
   }, []);
 
-  const tabs = predictOn
-    ? [
-        { key: 'calc',    label: 'Calculation' },
-        { key: 'plot',    label: 'Semivariogram plot' },
-        { key: 'predict', label: 'Prediction' }
-      ]
-    : [
-        { key: 'calc',    label: 'Calculation' },
-        { key: 'plot',    label: 'Semivariogram plot' }
-      ];
+  const tabs = [
+    { key: 'calc', label: 'Calculation' },
+    { key: 'plot', label: 'Plot' }
+  ];
 
   const stepHighlight = TEN_STEPS[Math.max(0, revealedStep - 1)].highlight;
 
@@ -1971,24 +1911,16 @@ const TenByTenMode = React.forwardRef((props, ref) => {
             <button className={`toggle-btn ${allDirections ? 'active' : ''}`}
               onClick={() => setAllDirections(true)}>All directions</button>
           </div>
-          <label className="model-toggle-label" style={{ marginLeft: 8 }}>
-            <input type="checkbox" className="model-toggle"
-              checked={predictOn}
-              onChange={e => setPredictOn(e.target.checked)} />
-            Predict at an unknown cell
-          </label>
         </div>
       </div>
 
-      {!predictOn && (
-        <div style={{ padding: '0 40px' }}>
-          <StepBar
-            steps={TEN_STEPS.map(s => s.label)}
-            activeStep={revealedStep}
-            onStep={onStep}
-          />
-        </div>
-      )}
+      <div style={{ padding: '0 40px' }}>
+        <StepBar
+          steps={TEN_STEPS.map(s => s.label)}
+          activeStep={revealedStep}
+          onStep={onStep}
+        />
+      </div>
 
       <div className="formula-band">
         <FormulaPanel highlight={stepHighlight} />
@@ -2004,9 +1936,6 @@ const TenByTenMode = React.forwardRef((props, ref) => {
               size={520}
               onEdit={onCellEdit}
               editedKeys={editedKeys}
-              predictTarget={predictOn ? predictTarget : null}
-              predictNeighbors={prediction ? prediction.neighbors : null}
-              onTargetClick={predictOn ? setPredictTarget : null}
             />
           </div>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
@@ -2049,17 +1978,16 @@ const TenByTenMode = React.forwardRef((props, ref) => {
         <div className="right-pane">
           <TabbedPanel tabs={tabs} activeTab={activeTab} onTab={onTab} orientation="vertical">
             {{
-              calc:    <CalculationTable lag={selectedLag} />,
-              plot:    <div className="plot-frame">
-                         <SemivariogramPlot
-                           lags={lags}
-                           selectedIdx={selectedIdx}
-                           revealedCount={revealedCount}
-                           modelName={modelName}
-                           showPoints={showPoints}
-                         />
-                       </div>,
-              predict: <PredictionPanel prediction={prediction} />
+              calc: <CalculationTable lag={selectedLag} />,
+              plot: <div className="plot-frame">
+                      <SemivariogramPlot
+                        lags={lags}
+                        selectedIdx={selectedIdx}
+                        revealedCount={revealedCount}
+                        modelName={modelName}
+                        showPoints={showPoints}
+                      />
+                    </div>
             }}
           </TabbedPanel>
         </div>
