@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Why distance is not enough — Explorer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="lib/theme.css">
+<style>
+  .app { max-width: 1200px; margin: 0 auto; padding: 32px; }
+  h1.title {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 40px;
+    margin: 0 0 8px 0;
+    letter-spacing: -0.02em;
+  }
+  h1.title em { font-style: italic; color: var(--accent); }
+  .subtitle { color: var(--ink-soft); font-size: 18px; margin: 0 0 24px 0; }
+
+  /* Scenario tabs */
+  .tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+  .tab-btn {
+    font-family: 'Inter', sans-serif;
+    font-size: 17px;
+    font-weight: 500;
+    background: var(--paper);
+    color: var(--ink-soft);
+    border: 1px solid var(--rule);
+    padding: 10px 18px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+  }
+  .tab-btn:hover { border-color: var(--accent); }
+  .tab-btn.active {
+    background: var(--accent);
+    color: var(--paper);
+    border-color: var(--accent);
+  }
+
+  /* Two-column layout: field on the left, readout on the right */
+  .work-area {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 320px;
+    gap: 32px;
+    align-items: start;
+  }
+
+  .field-frame {
+    background: var(--paper-soft);
+    border: 1px solid var(--rule);
+    padding: 12px;
+    display: inline-block;
+    border-radius: 4px;
+  }
+  .field-svg { display: block; touch-action: none; }
+  .cell-rect { stroke: var(--rule-soft); stroke-width: 0.5; }
+  .ruler-line {
+    stroke: var(--ink);
+    stroke-width: 3;
+    pointer-events: none;
+  }
+  .handle {
+    fill: var(--paper);
+    stroke: var(--ink);
+    stroke-width: 2;
+    cursor: grab;
+  }
+  .handle.midpoint { fill: var(--accent); stroke: var(--accent-deep); cursor: move; }
+  .handle:active { cursor: grabbing; }
+
+  /* Readout */
+  .readout {
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    padding: 18px 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 16px;
+  }
+  .readout-row { display: flex; justify-content: space-between; padding: 6px 0; }
+  .readout-row.emphasis {
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    margin: 6px 0;
+    font-weight: 600;
+    color: var(--accent-deep);
+    font-size: 18px;
+  }
+  .readout-row.muted { color: var(--ink-mute); }
+  .readout-label { color: var(--ink-soft); }
+
+  /* Explanation */
+  .explain {
+    margin-top: 18px;
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    padding: 16px 20px;
+  }
+  .explain-toggle {
+    background: none;
+    border: none;
+    color: var(--accent);
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+  }
+  .explain-text {
+    margin-top: 10px;
+    font-family: 'Inter', sans-serif;
+    color: var(--ink-soft);
+    line-height: 1.55;
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script type="text/babel" data-presets="env,react">
+const { useState, useMemo, useCallback, useRef } = React;
+
+// ----- SCENARIOS placeholder (filled in Task 2) -----
+const SCENARIOS = {};
+
+// ----- Ruler geometry placeholder (filled in Task 3) -----
+
+// ----- self-tests placeholder (filled in Task 3) -----
+
+function WhyDistanceApp() {
+  return (
+    <div className="app">
+      <h1 className="title">Why distance is <em>not</em> enough</h1>
+      <p className="subtitle">Drag the ruler. Same length — different difference.</p>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<WhyDistanceApp />);
+</script>
+</body>
+</html>
