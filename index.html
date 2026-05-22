@@ -179,7 +179,15 @@
         UbiSensing &amp; AI Lab, University of Calgary<br>
         mingke.li@ucalgary.ca
       </div>
+      <div class="reveal" style="margin-top: clamp(1.5rem, 3vw, 2.5rem); font-size: clamp(1.1rem, 1.6vw, 1.55rem);">
+        <a href="https://erin-1919.github.io/interactive-semivariogram-builder/" target="_blank" rel="noopener" style="color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--accent);">
+          https://erin-1919.github.io/interactive-semivariogram-builder/
+        </a>
+      </div>
     </div>
+    <img src="assets/img/site_qr.jpg" alt="QR code to interactive semivariogram builder"
+         class="reveal"
+         style="position: absolute; top: clamp(1.5rem, 3vw, 3rem); right: clamp(1.5rem, 3vw, 3rem); width: clamp(110px, 11vw, 170px); height: auto; z-index: 3; border: 1px solid var(--rule); border-radius: 4px; background: #fff; padding: 4px;">
     <div class="reveal" style="position: absolute; bottom: clamp(1rem, 2.5vw, 2rem); left: 0; right: 0; text-align: center; font-size: clamp(0.95rem, 1.3vw, 1.2rem); color: var(--ink-soft); opacity: 0.75;">
       Tip: <kbd>&larr;</kbd> <kbd>&rarr;</kbd> or <kbd>Space</kbd> to navigate &nbsp;&middot;&nbsp; <kbd>Home</kbd> / <kbd>End</kbd> jump &nbsp;&middot;&nbsp; <kbd>F</kbd> toggles full-screen
     </div>
@@ -251,10 +259,26 @@
   </section>
 
   <!-- Slide 5: Why Distance Alone Is Not Enough -->
-  <section class="slide" id="slide-5" style="padding: 1.5rem;">
-    <div class="slide-content" style="flex-direction: column; align-items: center; justify-content: flex-start; gap: 0.8rem; max-height: 100%;">
-      <h2 class="slide-heading reveal" style="text-align: center; width: 100%; flex: 0 0 auto;">Why distance alone is not enough</h2>
-      <img class="reveal" src="assets/img/slide05_why_not.png" alt="Distance vs. similarity counter-example" style="flex: 1 1 auto; min-height: 0; width: auto; max-width: 100%; height: 100%; object-fit: contain; border-radius: 8px;">
+  <section class="slide" id="slide-5">
+    <div class="slide-content" style="flex-direction: row; gap: 3rem; align-items: center;">
+      <div class="reveal" style="flex: 1.2; display: flex; justify-content: center;">
+        <img src="assets/img/slide05_why_not.png" alt="Distance vs. similarity counter-example"
+             style="width: 100%; max-height: 80vh; object-fit: contain; border-radius: 8px;">
+      </div>
+      <div style="flex: 1;">
+        <h2 class="slide-heading reveal">Why distance alone is not enough</h2>
+        <p class="reveal" style="font-size: var(--body-size); color: var(--ink-soft); margin-top: 1.2rem;">
+          Four scenarios, one lesson: two points the <strong style="color: var(--accent);">same distance apart</strong> can have wildly different values once you account for what is between them.
+        </p>
+        <p class="reveal" style="font-size: var(--body-size); color: var(--ink-soft); margin-top: 0.8rem;">
+          Try moving and rotating a fixed-length ruler over each scenario and watch the value difference change.
+        </p>
+        <div class="reveal" style="margin-top: 1.8rem;">
+          <a href="why_distance.html" target="_blank" rel="noopener" class="launch-button">
+            Launch why-distance explorer →
+          </a>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -592,10 +616,28 @@
   <section class="slide" id="slide-14">
     <div class="slide-content">
       <h2 class="workflow-title reveal">Step-by-Step Ordinary Kriging Workflow</h2>
-      <h3 class="reveal step-sub">Steps 3 - 6. Overview</h3>
-      <div style="display: grid; grid-template-columns: 2.2fr 1fr; gap: 2rem; margin-top: 0.8rem; align-items: center;">
-        <div style="display: flex; flex-direction: column; gap: 0.6rem;">
-          <div class="reveal" style="padding: 0.7rem 1.1rem; background: var(--paper-soft); border-left: 4px solid var(--accent); border-radius: 4px;">
+      <h3 class="reveal step-sub">Steps 1 - 6. Overview</h3>
+      <div style="display: grid; grid-template-columns: 2.2fr 1fr; gap: 2rem; margin-top: 0.6rem; align-items: center;">
+        <div style="display: flex; flex-direction: column; gap: 0.45rem;">
+          <div class="reveal" style="padding: 0.55rem 1.1rem; background: var(--paper-soft); border-left: 4px solid var(--accent); border-radius: 4px;">
+            <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 1rem;">
+              <div style="font-family: 'Inter', sans-serif; font-size: var(--h3-size); color: var(--accent); font-weight: 700;">Step 1. Exploratory Data Analysis</div>
+              <span style="font-size: var(--small-size); color: var(--accent); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap;">Today</span>
+            </div>
+            <p style="font-size: var(--body-size); color: var(--ink-soft); margin: 0.3rem 0 0 0;">
+              Inspect the sample data for trends, outliers, and stationarity before any modeling.
+            </p>
+          </div>
+          <div class="reveal" style="padding: 0.55rem 1.1rem; background: var(--paper-soft); border-left: 4px solid var(--accent); border-radius: 4px;">
+            <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 1rem;">
+              <div style="font-family: 'Inter', sans-serif; font-size: var(--h3-size); color: var(--accent); font-weight: 700;">Step 2. Compute the Empirical Semivariogram</div>
+              <span style="font-size: var(--small-size); color: var(--accent); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap;">Today</span>
+            </div>
+            <p style="font-size: var(--body-size); color: var(--ink-soft); margin: 0.3rem 0 0 0;">
+              Bin sample pairs by separation distance and compute γ(h) to summarize spatial autocorrelation.
+            </p>
+          </div>
+          <div class="reveal" style="padding: 0.55rem 1.1rem; background: var(--paper-soft); border-left: 4px solid var(--accent); border-radius: 4px;">
             <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 1rem;">
               <div style="font-family: 'Inter', sans-serif; font-size: var(--h3-size); color: var(--accent); font-weight: 700;">Step 3. Fit a Theoretical Semivariogram Model</div>
               <span style="font-size: var(--small-size); color: var(--accent); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap;">Today</span>
@@ -604,7 +646,7 @@
               Fit a smooth, mathematically defined curve (Spherical / Exponential / Gaussian) through the empirical points.
             </p>
           </div>
-          <div class="reveal" style="padding: 0.7rem 1.1rem; background: var(--paper-soft); border-left: 4px solid var(--rule); border-radius: 4px; opacity: 0.85;">
+          <div class="reveal" style="padding: 0.55rem 1.1rem; background: var(--paper-soft); border-left: 4px solid var(--rule); border-radius: 4px; opacity: 0.85;">
             <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 1rem;">
               <div style="font-family: 'Inter', sans-serif; font-size: var(--h3-size); color: var(--ink-soft); font-weight: 600;">Step 4. Build the Kriging Matrix and Solve Weights</div>
               <span style="font-size: var(--small-size); color: var(--ink-mute); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap;">Next lecture</span>
@@ -613,7 +655,7 @@
               Plug the fitted model into a linear system and solve for the optimal weights at each prediction location.
             </p>
           </div>
-          <div class="reveal" style="padding: 0.7rem 1.1rem; background: var(--paper-soft); border-left: 4px solid var(--rule); border-radius: 4px; opacity: 0.85;">
+          <div class="reveal" style="padding: 0.55rem 1.1rem; background: var(--paper-soft); border-left: 4px solid var(--rule); border-radius: 4px; opacity: 0.85;">
             <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 1rem;">
               <div style="font-family: 'Inter', sans-serif; font-size: var(--h3-size); color: var(--ink-soft); font-weight: 600;">Step 5. Prediction Surface Generation</div>
               <span style="font-size: var(--small-size); color: var(--ink-mute); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap;">Next lecture</span>
@@ -622,7 +664,7 @@
               Apply the weights across the study area to produce a predicted-value map and an uncertainty map.
             </p>
           </div>
-          <div class="reveal" style="padding: 0.7rem 1.1rem; background: var(--paper-soft); border-left: 4px solid var(--rule); border-radius: 4px; opacity: 0.85;">
+          <div class="reveal" style="padding: 0.55rem 1.1rem; background: var(--paper-soft); border-left: 4px solid var(--rule); border-radius: 4px; opacity: 0.85;">
             <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 1rem;">
               <div style="font-family: 'Inter', sans-serif; font-size: var(--h3-size); color: var(--ink-soft); font-weight: 600;">Step 6. Validation</div>
               <span style="font-size: var(--small-size); color: var(--ink-mute); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap;">Next lecture</span>
@@ -640,26 +682,8 @@
     </div>
   </section>
 
-  <!-- Slide 15: Lab Assignment 6 + PDF button -->
+  <!-- Slide 15: Resources -->
   <section class="slide" id="slide-15">
-    <div class="slide-content" style="align-items: center; text-align: center; justify-content: center;">
-      <h2 class="reveal" style="font-family: 'Inter', sans-serif; font-weight: 700; font-size: clamp(3rem, 6vw, 5.5rem); color: var(--accent); margin: 0; letter-spacing: -0.025em;">
-        Lab Assignment 6
-      </h2>
-      <p class="reveal" style="font-size: clamp(1.5rem, 2.4vw, 2.3rem); color: var(--ink-soft); margin-top: 2.5rem; max-width: 30ch; line-height: 1.5;">
-        Move from theory into practice: hands-on Ordinary Kriging in ArcGIS Pro to
-        reinforce today's lecture.
-      </p>
-      <div class="reveal" style="margin-top: 3.5rem;">
-        <a href="assets/lab/Ordinary-Kriging-Laurier-Lab-EL_2026_05_26.pdf" target="_blank" rel="noopener" class="launch-button" style="font-size: clamp(1.4rem, 2.2vw, 2rem); padding: 1.2rem 2.4rem;">
-          Open Lab Assignment 6 (PDF) →
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <!-- Slide 16: Resources -->
-  <section class="slide" id="slide-16">
     <div class="slide-content">
       <h2 class="slide-heading reveal" style="margin-bottom: 1rem;">Resources</h2>
       <ul class="reveal" style="font-size: clamp(1.25rem, 1.65vw, 1.7rem); color: var(--ink); line-height: 1.55; margin: 0; padding-left: 2.2rem; list-style-position: outside;">
@@ -676,6 +700,24 @@
         <li style="margin-bottom: 0.55rem;">Lu, G. Y., &amp; Wong, D. W. (2008). An adaptive inverse-distance weighting spatial interpolation technique. <em>Computers &amp; Geosciences, 34</em>(9), 1044–1055.</li>
         <li>Zimmerman, D., Pavlik, C., Ruggles, A., &amp; Armstrong, M. P. (1999). Comparison of seven geostatistically based and inverse distance weighted interpolation methods for mapping soil properties. <em>Environmental Monitoring and Assessment, 53</em>(3), 337–348.</li>
       </ul>
+    </div>
+  </section>
+
+  <!-- Slide 16: Lab Assignment 6 + PDF button -->
+  <section class="slide" id="slide-16">
+    <div class="slide-content" style="align-items: center; text-align: center; justify-content: center;">
+      <h2 class="reveal" style="font-family: 'Inter', sans-serif; font-weight: 700; font-size: clamp(3rem, 6vw, 5.5rem); color: var(--accent); margin: 0; letter-spacing: -0.025em;">
+        Lab Assignment 6
+      </h2>
+      <p class="reveal" style="font-size: clamp(1.5rem, 2.4vw, 2.3rem); color: var(--ink-soft); margin-top: 2.5rem; max-width: 30ch; line-height: 1.5;">
+        Move from theory into practice: hands-on Ordinary Kriging in ArcGIS Pro to
+        reinforce today's lecture.
+      </p>
+      <div class="reveal" style="margin-top: 3.5rem;">
+        <a href="assets/lab/Ordinary-Kriging-Laurier-Lab-EL_2026_05_26.pdf" target="_blank" rel="noopener" class="launch-button" style="font-size: clamp(1.4rem, 2.2vw, 2rem); padding: 1.2rem 2.4rem;">
+          Open Lab Assignment 6 (PDF) →
+        </a>
+      </div>
     </div>
   </section>
 </div>
