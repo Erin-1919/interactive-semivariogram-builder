@@ -306,7 +306,10 @@ function diffAt(scenario, ruler) {
 const FIELD_PX = 520;       // pixel size of the field SVG (width and height)
 const GRID_N = 20;          // cells per side
 
-function FieldCanvas({ scenario, ruler }) {
+function FieldCanvas({ scenario, ruler, onRulerChange }) {
+  const svgRef = useRef(null);
+  const dragRef = useRef(null);  // 'a' | 'b' | 'mid' | null
+
   const cells = useMemo(() => {
     const out = [];
     const cell = FIELD_PX / GRID_N;
@@ -326,6 +329,42 @@ function FieldCanvas({ scenario, ruler }) {
     return out;
   }, [scenario]);
 
+  const ptFromEvent = (e) => {
+    const svg = svgRef.current;
+    if (!svg) return null;
+    const rect = svg.getBoundingClientRect();
+    return {
+      x: (e.clientX - rect.left) / rect.width,
+      y: (e.clientY - rect.top) / rect.height,
+    };
+  };
+
+  const onPointerDown = (handle) => (e) => {
+    e.preventDefault();
+    e.target.setPointerCapture(e.pointerId);
+    dragRef.current = handle;
+  };
+  const onPointerMove = (e) => {
+    if (!dragRef.current) return;
+    const p = ptFromEvent(e);
+    if (!p) return;
+    if (dragRef.current === 'mid') {
+      onRulerChange(clampRuler({ ...ruler, cx: p.x, cy: p.y }));
+    } else if (dragRef.current === 'a') {
+      // dragging endpoint A → rotate so A points toward p (i.e. angle from mid to p, +π)
+      const angle = Math.atan2(ruler.cy - p.y, ruler.cx - p.x);
+      onRulerChange(clampRuler({ ...ruler, angle }));
+    } else if (dragRef.current === 'b') {
+      onRulerChange(rotateTowards(ruler, p));
+    }
+  };
+  const onPointerUp = (e) => {
+    if (dragRef.current) {
+      try { e.target.releasePointerCapture(e.pointerId); } catch (_) {}
+    }
+    dragRef.current = null;
+  };
+
   const { a, b } = endpoints(ruler);
   const ax = a.x * FIELD_PX, ay = a.y * FIELD_PX;
   const bx = b.x * FIELD_PX, by = b.y * FIELD_PX;
@@ -333,8 +372,12 @@ function FieldCanvas({ scenario, ruler }) {
 
   return (
     <div className="field-frame">
-      <svg className="field-svg" width={FIELD_PX} height={FIELD_PX}
-           viewBox={`0 0 ${FIELD_PX} ${FIELD_PX}`}>
+      <svg className="field-svg" ref={svgRef}
+           width={FIELD_PX} height={FIELD_PX}
+           viewBox={`0 0 ${FIELD_PX} ${FIELD_PX}`}
+           onPointerMove={onPointerMove}
+           onPointerUp={onPointerUp}
+           onPointerCancel={onPointerUp}>
         <g>
           {cells.map(c => (
             <rect className="cell-rect"
@@ -342,9 +385,15 @@ function FieldCanvas({ scenario, ruler }) {
           ))}
         </g>
         <line className="ruler-line" x1={ax} y1={ay} x2={bx} y2={by} />
-        <circle className="handle" data-handle="a" cx={ax} cy={ay} r={9} />
-        <circle className="handle" data-handle="b" cx={bx} cy={by} r={9} />
-        <circle className="handle midpoint" data-handle="mid" cx={mx} cy={my} r={11} />
+        <circle className="handle" data-handle="a"
+                cx={ax} cy={ay} r={9}
+                onPointerDown={onPointerDown('a')} />
+        <circle className="handle" data-handle="b"
+                cx={bx} cy={by} r={9}
+                onPointerDown={onPointerDown('b')} />
+        <circle className="handle midpoint" data-handle="mid"
+                cx={mx} cy={my} r={11}
+                onPointerDown={onPointerDown('mid')} />
       </svg>
     </div>
   );
@@ -358,7 +407,7 @@ function WhyDistanceApp() {
       <h1 className="title">Why distance is <em>not</em> enough</h1>
       <p className="subtitle">Drag the ruler. Same length — different difference.</p>
       <div className="work-area">
-        <FieldCanvas scenario={scenario} ruler={ruler} />
+        <FieldCanvas scenario={scenario} ruler={ruler} onRulerChange={setRuler} />
         <div /> {/* readout placeholder, Task 7 */}
       </div>
     </div>
