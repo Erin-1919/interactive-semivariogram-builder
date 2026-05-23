@@ -20,7 +20,7 @@ The deck launches two interactive companion apps in new tabs:
 ## Hosting
 
 Served via GitHub Pages from the repo root. The deck is the homepage:
-`https://erin-1919.github.io/interactive-semivariogram-builder/`
+[https://erin-1919.github.io/interactive-semivariogram-builder/](https://erin-1919.github.io/interactive-semivariogram-builder/)
 
 ## Local development
 
